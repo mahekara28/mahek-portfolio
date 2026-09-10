@@ -82,13 +82,13 @@ export default function Projects() {
             Selected work
           </div>
 
-          <h1 className="mt-8 max-w-5xl text-[clamp(4rem,9vw,9rem)] font-semibold leading-[0.82] tracking-[-0.07em]">
+          <h1 className="mt-5 max-w-5xl text-[clamp(4rem,9vw,9rem)] font-semibold leading-[0.82] tracking-[-0.07em]">
             Things I&apos;ve
             <br />
             <span className="text-white/35">built.</span>
           </h1>
 
-          <div className="mt-10 flex max-w-xl items-center gap-4">
+          <div className="mt-6 flex max-w-xl items-center gap-4">
             <div className="h-px w-12 bg-emerald-400/50" />
 
             <p className="text-sm leading-6 text-white/40">
@@ -100,7 +100,7 @@ export default function Projects() {
       </section>
 
       {/* PROJECTS */}
-      <section className="relative z-10 mx-auto max-w-[1450px] px-6 pb-28 md:px-10">
+      <section className="relative z-10 mx-auto max-w-[1450px] px-6 pb-12 md:px-10">
 
         <div className="border-t border-white/10">
 
@@ -119,7 +119,7 @@ export default function Projects() {
               {/* Hover glow */}
               <div className="pointer-events-none absolute inset-0 -z-10 bg-emerald-400/[0.025] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-              <div className="grid gap-8 py-10 md:grid-cols-[80px_1fr_1fr_180px] md:items-center md:py-14">
+              <div className="grid gap-6 py-7 md:grid-cols-[80px_1fr_1fr_180px] md:items-center md:py-9">
 
                 {/* NUMBER */}
                 <div className="font-mono text-xs text-white/25">
@@ -203,7 +203,7 @@ export default function Projects() {
 
       {/* FOOTER */}
       <footer className="relative z-10 border-t border-white/10">
-        <div className="mx-auto flex max-w-[1450px] items-center justify-between px-6 py-6 text-[10px] uppercase tracking-[0.2em] text-white/25 md:px-10">
+        <div className="mx-auto flex max-w-[1450px] items-center justify-between px-6 py-4 text-[10px] uppercase tracking-[0.2em] text-white/25 md:px-10">
           <span>© 2026 Mahek Ara</span>
           <span>AI / LLM / BUILD</span>
         </div>
