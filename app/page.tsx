@@ -16,8 +16,8 @@ export default function Home() {
 
   return (
     <main
-      className={`relative min-h-screen overflow-hidden transition-colors duration-500 ${
-        dark
+      className={`relative h-screen overflow-hidden transition-colors duration-500 ${
+    dark
           ? "bg-[#060806] text-white"
           : "bg-[#f5f7f4] text-[#101310]"
       }`}
@@ -126,7 +126,7 @@ export default function Home() {
       </header>
 
       {/* HERO */}
-      <section className="relative z-10 mx-auto flex min-h-[calc(100vh-76px)] w-full max-w-[1450px] items-center px-6 py-8 md:px-10">
+        <section className="relative z-10 mx-auto flex h-[calc(100vh-126px)] w-full max-w-[1450px] items-center px-6 py-2 md:px-10">
         <div className="grid w-full items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8">
 
           {/* LEFT */}
@@ -137,8 +137,8 @@ export default function Home() {
             className="relative z-20"
           >
             {/* Status */}
-            <div className="mb-7 flex items-center gap-2 text-xs uppercase tracking-[0.22em] opacity-50">
-              <span className="relative flex h-2 w-2">
+            <div className="mb-5 flex items-center gap-2 text-xs uppercase tracking-[0.22em] opacity-50">
+                <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
               </span>
@@ -158,7 +158,7 @@ export default function Home() {
             </h1>
 
             {/* Role */}
-            <div className="mt-9 flex items-center gap-3">
+            <div className="mt-6 flex items-center gap-3">
               <span
                 className={`h-px w-10 ${
                   dark ? "bg-white/30" : "bg-black/20"
@@ -172,7 +172,7 @@ export default function Home() {
 
             {/* Tiny intro */}
             <p
-              className={`mt-5 max-w-md text-sm leading-6 md:text-base ${
+              className={`mt-4 max-w-md text-sm leading-6 md:text-base ${
                 dark ? "text-white/50" : "text-black/55"
               }`}
             >
@@ -181,7 +181,7 @@ export default function Home() {
             </p>
 
             {/* Actions */}
-            <div className="mt-8 flex items-center gap-3">
+            <div className="mt-6 flex items-center gap-3">
               <Link
                 href="/projects"
                 className="group flex items-center gap-2 rounded-full bg-emerald-400 px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-300"
