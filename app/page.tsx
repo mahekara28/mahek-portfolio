@@ -68,7 +68,7 @@ export default function Home() {
         </Link>
 
         {/* Navigation */}
-        <nav className="flex items-center gap-3 text-xs sm:gap-5 sm:text-sm md:gap-7">
+        <nav className="flex items-center gap-3 text-xs sm:gap-5 sm:text-sm md:gap-7 md:text-sm">
           <Link
             href="/projects"
             className="opacity-60 transition hover:text-emerald-400 hover:opacity-100"
@@ -87,7 +87,7 @@ export default function Home() {
             href="https://github.com/mahekara28"
             target="_blank"
             rel="noreferrer"
-            className="hidden opacity-60 transition hover:text-emerald-400 hover:opacity-100 sm:block"
+            className="opacity-60 transition hover:text-emerald-400 hover:opacity-100"
           >
             GitHub
           </a>
@@ -96,7 +96,7 @@ export default function Home() {
             href="https://www.linkedin.com/in/mahek-ara/"
             target="_blank"
             rel="noreferrer"
-            className="hidden opacity-60 transition hover:text-emerald-400 hover:opacity-100 sm:block"
+            className="opacity-60 transition hover:text-emerald-400 hover:opacity-100"
           >
             LinkedIn
           </a>
