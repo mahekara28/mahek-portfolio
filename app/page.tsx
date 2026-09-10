@@ -102,7 +102,7 @@ export default function Home() {
           </a>
 
           <a
-            href="/resume.pdf"
+            href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
             target="_blank"
             className="hidden items-center gap-1 opacity-60 transition hover:text-emerald-400 hover:opacity-100 md:flex"
           >
@@ -195,7 +195,7 @@ export default function Home() {
               </Link>
 
               <a
-                href="/resume.pdf"
+                href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
                 target="_blank"
                 className={`flex items-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition ${
                   dark
