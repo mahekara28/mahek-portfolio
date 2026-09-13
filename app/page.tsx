@@ -4,190 +4,537 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import {
   ArrowUpRight,
+  BookOpen,
+  Briefcase,
   FileText,
-  GitBranch,
   Moon,
   Sun,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { useTheme } from "./theme-provider";
+
+const statusPhrases = [
+  "loading context",
+  "mapping systems",
+  "designing intelligence",
+  "building in public",
+];
+
+function useTypedLoop(phrases: string[], typingSpeed = 70, pause = 1400) {
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [text, setText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = phrases[phraseIndex];
+    const finishedTyping = !isDeleting && text === current;
+    const finishedDeleting = isDeleting && text === "";
+
+    const timeout = window.setTimeout(
+      () => {
+        if (finishedTyping) {
+          setIsDeleting(true);
+          return;
+        }
+
+        if (finishedDeleting) {
+          setIsDeleting(false);
+          setPhraseIndex((prev) => (prev + 1) % phrases.length);
+          return;
+        }
+
+        setText(
+          isDeleting
+            ? current.slice(0, text.length - 1)
+            : current.slice(0, text.length + 1),
+        );
+      },
+      finishedTyping ? pause : isDeleting ? typingSpeed / 1.8 : typingSpeed,
+    );
+
+    return () => window.clearTimeout(timeout);
+  }, [isDeleting, pause, phraseIndex, phrases, text, typingSpeed]);
+
+  return text;
+}
+
+function useTypeOnce(value: string, speed = 45, delay = 0) {
+  const [text, setText] = useState("");
+
+  useEffect(() => {
+    const startTimeout = window.setTimeout(() => {
+      let index = 0;
+
+      const interval = window.setInterval(() => {
+        index += 1;
+        setText(value.slice(0, index));
+
+        if (index >= value.length) {
+          window.clearInterval(interval);
+        }
+      }, speed);
+
+      return () => window.clearInterval(interval);
+    }, delay);
+
+    return () => window.clearTimeout(startTimeout);
+  }, [delay, speed, value]);
+
+  return text;
+}
+
+function GitHubIcon({ className = "h-[17px] w-[17px]" }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12 .5a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.02c-3.34.73-4.04-1.42-4.04-1.42-.55-1.38-1.33-1.75-1.33-1.75-1.09-.75.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.83 2.8 1.3 3.49.99.11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.92 0-1.31.47-2.38 1.24-3.22-.12-.3-.54-1.52.12-3.17 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.65.24 2.87.12 3.17.77.84 1.24 1.91 1.24 3.22 0 4.6-2.8 5.61-5.48 5.91.43.38.81 1.12.81 2.26v3.35c0 .32.22.69.83.58A12 12 0 0 0 12 .5Z" />
+    </svg>
+  );
+}
+
+function LinkedInIcon({
+  className = "h-[17px] w-[17px]",
+}: {
+  className?: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M4.98 3.5C4.98 4.88 3.87 6 2.49 6S0 4.88 0 3.5 1.11 1 2.49 1s2.49 1.12 2.49 2.5ZM.5 8h4V24h-4V8Zm6.5 0h3.83v2.19h.05c.53-1.01 1.84-2.19 3.79-2.19C18.73 8 20 10.03 20 13.26V24h-4v-9.53c0-2.27-.04-5.19-3.16-5.19-3.16 0-3.64 2.47-3.64 5.02V24h-4V8Z" />
+    </svg>
+  );
+}
+
+function NavIconLink({
+  href,
+  label,
+  children,
+  external = false,
+  isDark,
+}: {
+  href: string;
+  label: string;
+  children: ReactNode;
+  external?: boolean;
+  isDark: boolean;
+}) {
+  const classes = `group inline-flex h-10 items-center rounded-full border px-3 transition ${
+    isDark
+      ? "border-white/10 text-white/55 hover:border-emerald-400/35 hover:bg-emerald-400/10 hover:text-emerald-300"
+      : "border-black/10 text-black/55 hover:border-emerald-600/25 hover:bg-emerald-500/8 hover:text-emerald-700"
+  }`;
+
+  const content = (
+    <>
+      <span className="flex h-4 w-4 items-center justify-center transition duration-300 group-hover:-rotate-12 group-hover:scale-95">
+        {children}
+      </span>
+      <span className="ml-0 max-w-0 overflow-hidden whitespace-nowrap text-[11px] uppercase tracking-[0.16em] opacity-0 transition-all duration-300 group-hover:ml-2 group-hover:max-w-[90px] group-hover:opacity-100">
+        {label}
+      </span>
+    </>
+  );
+
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noreferrer" aria-label={label} className={classes}>
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} aria-label={label} className={classes}>
+      {content}
+    </Link>
+  );
+}
+
+function McpFlowVisual({ isDark }: { isDark: boolean }) {
+  const lineColor = isDark ? "rgba(52,211,153,0.24)" : "rgba(16,185,129,0.22)";
+  const softLineColor = isDark ? "rgba(255,255,255,0.10)" : "rgba(15,20,17,0.10)";
+  const chipBase = isDark
+    ? "border-white/10 bg-[#08110b]/70 text-white/64"
+    : "border-black/10 bg-white/70 text-black/58";
+  const chipAccent = isDark
+    ? "border-emerald-400/18 bg-emerald-400/[0.08] text-emerald-300/82"
+    : "border-emerald-600/20 bg-emerald-500/[0.08] text-emerald-700/85";
+  const ringOuter = isDark ? "border-white/8" : "border-black/10";
+  const ringInner = isDark ? "border-emerald-400/16" : "border-emerald-700/16";
+  const coreBorder = isDark ? "border-emerald-400/24" : "border-emerald-700/20";
+  const coreBg = isDark ? "bg-emerald-400/8" : "bg-emerald-500/[0.06]";
+  const nodeFill = isDark ? "rgba(52,211,153,0.9)" : "rgba(16,185,129,0.72)";
+  const nodeGlow = isDark
+    ? "0 0 20px rgba(52,211,153,0.24)"
+    : "0 0 14px rgba(16,185,129,0.12)";
+
+  const labels = [
+    { text: "PROMPT", left: "8%", top: "22%", accent: false, delay: 0.1 },
+    { text: "MCP TOOLS", left: "70%", top: "18%", accent: true, delay: 0.45 },
+    { text: "MEMORY", left: "74%", top: "70%", accent: false, delay: 0.8 },
+    { text: "RETRIEVAL", left: "10%", top: "74%", accent: false, delay: 1.1 },
+    { text: "RESPONSE", left: "38%", top: "5%", accent: true, delay: 1.4 },
+  ];
+
+  const particles = [
+    { left: "18%", top: "22%", delay: 0.1 },
+    { left: "33%", top: "16%", delay: 0.5 },
+    { left: "70%", top: "19%", delay: 0.9 },
+    { left: "81%", top: "42%", delay: 0.2 },
+    { left: "72%", top: "74%", delay: 1.2 },
+    { left: "48%", top: "84%", delay: 0.7 },
+    { left: "20%", top: "72%", delay: 1.4 },
+    { left: "13%", top: "48%", delay: 1.0 },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 24 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.9, delay: 0.12 }}
+      className="relative flex h-[360px] w-full items-center justify-center sm:h-[430px] md:h-[500px] lg:h-[560px]"
+    >
+      <motion.div
+        animate={{ scale: [0.96, 1.05, 0.96], opacity: [0.1, 0.22, 0.1] }}
+        transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
+        className={`pointer-events-none absolute h-[240px] w-[240px] rounded-full blur-[90px] sm:h-[320px] sm:w-[320px] md:h-[400px] md:w-[400px] ${
+          isDark ? "bg-emerald-400/20" : "bg-emerald-500/10"
+        }`}
+      />
+
+      <div className="relative h-[92%] w-full max-w-[580px]">
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
+          className={`absolute left-1/2 top-1/2 h-[72%] w-[72%] -translate-x-1/2 -translate-y-1/2 rounded-full border ${ringOuter}`}
+        />
+        <motion.div
+          animate={{ rotate: -360 }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className={`absolute left-1/2 top-1/2 h-[48%] w-[48%] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed ${ringInner}`}
+        />
+
+        <svg
+          className="absolute inset-0 h-full w-full"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <motion.path
+            d="M18 22 C32 22, 42 30, 50 50"
+            stroke={lineColor}
+            strokeWidth="0.36"
+            fill="none"
+            strokeDasharray="1.8 1.8"
+            animate={{ pathLength: [0.14, 1, 0.14], opacity: [0.22, 0.84, 0.22] }}
+            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.path
+            d="M70 18 C62 28, 56 36, 50 50"
+            stroke={lineColor}
+            strokeWidth="0.36"
+            fill="none"
+            strokeDasharray="1.8 1.8"
+            animate={{ pathLength: [0.16, 1, 0.16], opacity: [0.22, 0.82, 0.22] }}
+            transition={{ duration: 4.8, delay: 0.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.path
+            d="M74 70 C66 64, 58 58, 50 50"
+            stroke={lineColor}
+            strokeWidth="0.34"
+            fill="none"
+            strokeDasharray="1.8 1.8"
+            animate={{ pathLength: [0.16, 1, 0.16], opacity: [0.18, 0.8, 0.18] }}
+            transition={{ duration: 5, delay: 0.5, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.path
+            d="M20 72 C28 64, 38 58, 50 50"
+            stroke={lineColor}
+            strokeWidth="0.34"
+            fill="none"
+            strokeDasharray="1.8 1.8"
+            animate={{ pathLength: [0.18, 1, 0.18], opacity: [0.18, 0.78, 0.18] }}
+            transition={{ duration: 4.6, delay: 0.8, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.path
+            d="M50 50 C50 38, 46 22, 40 8"
+            stroke={lineColor}
+            strokeWidth="0.38"
+            fill="none"
+            strokeDasharray="2 2"
+            animate={{ pathLength: [0.14, 1, 0.14], opacity: [0.24, 0.95, 0.24] }}
+            transition={{ duration: 3.8, delay: 0.45, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.path
+            d="M18 22 C46 20, 62 18, 70 18"
+            stroke={softLineColor}
+            strokeWidth="0.22"
+            fill="none"
+            strokeDasharray="1 2"
+            animate={{ opacity: [0.08, 0.2, 0.08] }}
+            transition={{ duration: 5.6, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.path
+            d="M20 72 C48 84, 66 82, 74 70"
+            stroke={softLineColor}
+            strokeWidth="0.22"
+            fill="none"
+            strokeDasharray="1 2"
+            animate={{ opacity: [0.08, 0.18, 0.08] }}
+            transition={{ duration: 6.2, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </svg>
+
+        <motion.div
+          animate={{ scale: [0.97, 1.05, 0.97], opacity: [0.78, 1, 0.78] }}
+          transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
+          className={`absolute left-1/2 top-1/2 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border sm:h-28 sm:w-28 md:h-32 md:w-32 ${coreBorder} ${coreBg}`}
+        >
+          <div className={`absolute inset-3 rounded-full border ${isDark ? "border-emerald-400/16" : "border-emerald-700/14"}`} />
+          <div className={`absolute inset-6 rounded-full border ${isDark ? "border-emerald-400/10" : "border-emerald-700/10"}`} />
+          <div className="text-center">
+            <div className={isDark ? "text-[8px] uppercase tracking-[0.26em] text-white/34" : "text-[8px] uppercase tracking-[0.26em] text-black/36"}>
+              agent
+            </div>
+            <div className={isDark ? "mt-2 text-[10px] uppercase tracking-[0.28em] text-emerald-300/78" : "mt-2 text-[10px] uppercase tracking-[0.28em] text-emerald-700/82"}>
+              router
+            </div>
+          </div>
+        </motion.div>
+
+        {labels.map((label) => (
+          <motion.div
+            key={label.text}
+            animate={{
+              y: [0, -6, 0],
+              opacity: [0.5, 1, 0.5],
+              scale: [0.98, 1.02, 0.98],
+            }}
+            transition={{
+              duration: 3.6,
+              delay: label.delay,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className={`absolute rounded-full border px-3 py-2 text-[10px] uppercase tracking-[0.16em] ${
+              label.accent ? chipAccent : chipBase
+            }`}
+            style={{ left: label.left, top: label.top }}
+          >
+            {label.text}
+          </motion.div>
+        ))}
+
+        {particles.map((particle) => (
+          <motion.span
+            key={`${particle.left}-${particle.top}`}
+            animate={{
+              y: [0, -10, 0],
+              opacity: [0.2, 0.92, 0.2],
+              scale: [0.9, 1.18, 0.9],
+            }}
+            transition={{
+              duration: 3.4,
+              delay: particle.delay,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+            className="absolute h-2 w-2 rounded-full"
+            style={{
+              left: particle.left,
+              top: particle.top,
+              backgroundColor: nodeFill,
+              boxShadow: nodeGlow,
+            }}
+          />
+        ))}
+
+        <div
+          className={`absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[8px] uppercase tracking-[0.28em] ${
+            isDark ? "text-white/26" : "text-black/32"
+          }`}
+        >
+          prompt • tools • memory • response
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
 export default function Home() {
-  const [dark, setDark] = useState(true);
+  const { isDark, toggleTheme } = useTheme();
+  const typedStatus = useTypedLoop(statusPhrases, 58, 1100);
+  const typedFirstName = useTypeOnce("MAHEK", 70, 120);
+  const typedLastName = useTypeOnce("ARA", 70, 520);
+  const typedIntro = useTypeOnce(
+    "Building practical AI systems with LLMs, agents, automation and AI security.",
+    18,
+    760,
+  );
 
   return (
     <main
       className={`relative min-h-screen overflow-x-hidden transition-colors duration-500 ${
-        dark
-          ? "bg-[#060806] text-white"
-          : "bg-[#f5f7f4] text-[#101310]"
+        isDark ? "bg-[#060806] text-white" : "bg-[#f4f7f2] text-[#0f1411]"
       }`}
     >
-      {/* Background atmosphere */}
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <motion.div
-          animate={{
-            x: [0, 40, 0],
-            y: [0, -30, 0],
-            opacity: [0.18, 0.28, 0.18],
-          }}
-          transition={{
-            duration: 10,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute -right-40 top-20 h-[500px] w-[500px] rounded-full bg-emerald-500/20 blur-[140px]"
+          animate={{ x: [0, 40, 0], y: [0, -30, 0], opacity: [0.18, 0.28, 0.18] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          className={`absolute -right-40 top-20 h-[500px] w-[500px] rounded-full blur-[140px] ${
+            isDark ? "bg-emerald-500/20" : "bg-emerald-500/10"
+          }`}
         />
-
         <motion.div
-          animate={{
-            x: [0, -30, 0],
-            y: [0, 30, 0],
-            opacity: [0.1, 0.2, 0.1],
-          }}
-          transition={{
-            duration: 12,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-          className="absolute -left-40 bottom-0 h-[400px] w-[400px] rounded-full bg-emerald-400/10 blur-[130px]"
+          animate={{ x: [0, -30, 0], y: [0, 30, 0], opacity: [0.1, 0.2, 0.1] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className={`absolute -left-40 bottom-0 h-[400px] w-[400px] rounded-full blur-[130px] ${
+            isDark ? "bg-emerald-400/10" : "bg-emerald-400/8"
+          }`}
         />
       </div>
 
-      {/* NAVBAR */}
-      <header className="relative z-50 mx-auto flex min-h-[68px] w-full max-w-[1450px] items-center justify-between border-b border-white/10 px-4 sm:px-6 md:h-[76px] md:px-10">
-        {/* Logo */}
-        <Link
-          href="/"
-          className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-xs font-bold tracking-tight transition ${
-            dark
-              ? "border-white/20 text-white hover:border-emerald-400"
-              : "border-black/15 text-black hover:border-emerald-500"
-          }`}
-        >
-          MA
-        </Link>
-
-        {/* Navigation */}
-        <nav className="flex items-center gap-3 text-xs sm:gap-5 sm:text-sm md:gap-7 md:text-sm">
-          <Link
-            href="/projects"
-            className="opacity-60 transition hover:text-emerald-400 hover:opacity-100"
-          >
-            Work
-          </Link>
-
-          <Link
-            href="/blog"
-            className="opacity-60 transition hover:text-emerald-400 hover:opacity-100"
-          >
-            Blog
-          </Link>
-
-          <a
-            href="https://github.com/mahekara28"
-            target="_blank"
-            rel="noreferrer"
-            className="opacity-60 transition hover:text-emerald-400 hover:opacity-100"
-          >
-            GitHub
-          </a>
-
-          <a
-            href="https://www.linkedin.com/in/mahek-ara/"
-            target="_blank"
-            rel="noreferrer"
-            className="opacity-60 transition hover:text-emerald-400 hover:opacity-100"
-          >
-            LinkedIn
-          </a>
-
-          <a
-            href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
-            target="_blank"
-            className="hidden items-center gap-1 opacity-60 transition hover:text-emerald-400 hover:opacity-100 md:flex"
-          >
-            Resume
-            <ArrowUpRight size={13} />
-          </a>
-
-          {/* Theme */}
-          <button
-            onClick={() => setDark(!dark)}
-            aria-label="Toggle theme"
-            className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border transition ${
-              dark
-                ? "border-white/15 hover:border-emerald-400"
-                : "border-black/15 hover:border-emerald-500"
+      <header
+        className={`relative z-50 mx-auto flex min-h-[72px] w-full max-w-[1450px] items-center justify-between border-b px-4 sm:min-h-[78px] sm:px-6 md:min-h-[84px] md:px-10 ${
+          isDark ? "border-white/10" : "border-black/10"
+        }`}
+      >
+        <Link href="/" className={isDark ? "text-white" : "text-black"}>
+          <span
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold tracking-[0.12em] transition sm:h-11 sm:w-11 sm:text-xs ${
+              isDark
+                ? "border-white/20 hover:border-emerald-400"
+                : "border-black/15 hover:border-emerald-600"
             }`}
           >
-            {dark ? <Sun size={15} /> : <Moon size={15} />}
+            MA
+          </span>
+        </Link>
+
+        <nav className="flex items-center gap-2 sm:gap-3">
+          <NavIconLink href="/projects" label="Work" isDark={isDark}>
+            <Briefcase className="h-[17px] w-[17px]" />
+          </NavIconLink>
+
+          <NavIconLink href="/blog" label="Blog" isDark={isDark}>
+            <BookOpen className="h-[17px] w-[17px]" />
+          </NavIconLink>
+
+          <NavIconLink href="https://github.com/mahekara28" label="GitHub" external isDark={isDark}>
+            <GitHubIcon />
+          </NavIconLink>
+
+          <NavIconLink href="https://www.linkedin.com/in/mahek-ara/" label="LinkedIn" external isDark={isDark}>
+            <LinkedInIcon />
+          </NavIconLink>
+
+          <NavIconLink
+            href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
+            label="Resume"
+            external
+            isDark={isDark}
+          >
+            <FileText className="h-[17px] w-[17px]" />
+          </NavIconLink>
+
+          <button
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition ${
+              isDark
+                ? "border-white/15 text-white/55 hover:border-emerald-400 hover:text-emerald-300"
+                : "border-black/15 text-black/55 hover:border-emerald-600 hover:text-emerald-700"
+            }`}
+          >
+            {isDark ? <Sun size={15} /> : <Moon size={15} />}
           </button>
         </nav>
       </header>
 
-      {/* HERO */}
-      <section className="relative z-10 mx-auto flex w-full max-w-[1450px] px-4 py-8 sm:px-6 md:min-h-[calc(100vh-126px)] md:items-center md:px-10 md:py-2">
-        <div className="grid w-full items-center gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8">
-
-          {/* LEFT */}
+      <section className="relative z-10 mx-auto flex w-full max-w-[1450px] px-4 py-10 sm:px-6 sm:py-12 md:min-h-[calc(100vh-140px)] md:items-center md:px-10 md:py-6">
+        <div className="grid w-full items-center gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative z-20"
+            className="relative z-20 max-w-[720px]"
           >
-            {/* Status */}
-            <div className="mb-5 flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] opacity-50 sm:text-xs sm:tracking-[0.22em]">
+            <div
+              className={`mb-6 flex min-h-[20px] items-center gap-2 text-[10px] uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.22em] ${
+                isDark ? "text-white/55" : "text-black/55"
+              }`}
+            >
               <span className="relative flex h-2 w-2 shrink-0">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
 
-              AI Engineer · Building in public
+              <span>AI Engineer</span>
+              <span className={isDark ? "opacity-40" : "opacity-30"}>·</span>
+              <span className={isDark ? "text-emerald-400/90" : "text-emerald-700/90"}>
+                {typedStatus}
+                <motion.span
+                  animate={{ opacity: [0, 1, 0] }}
+                  transition={{ duration: 0.85, repeat: Infinity }}
+                  className="ml-1 inline-block"
+                >
+                  |
+                </motion.span>
+              </span>
             </div>
 
-            {/* Name */}
-            <h1 className="font-black tracking-[-0.075em] leading-[0.78]">
-              <span className="block text-[clamp(4rem,18vw,10.5rem)]">
-                MAHEK
-              </span>
-
-              <span className="mt-3 block text-[clamp(4rem,18vw,10.5rem)] text-emerald-400">
-                ARA
+            <h1
+              className={`font-black leading-[0.86] tracking-[-0.08em] ${
+                isDark ? "text-white" : "text-[#0f1411]"
+              }`}
+            >
+              <span className="block text-[clamp(4.2rem,18vw,11rem)]">{typedFirstName}</span>
+              <span className={isDark ? "block text-[clamp(4.2rem,18vw,11rem)] text-emerald-400" : "block text-[clamp(4.2rem,18vw,11rem)] text-emerald-700"}>
+                {typedLastName}
               </span>
             </h1>
 
-            {/* Role */}
             <div className="mt-6 flex items-center gap-3">
               <span
-                className={`h-px w-8 shrink-0 sm:w-10 ${
-                  dark ? "bg-white/30" : "bg-black/20"
+                className={`h-px w-10 shrink-0 sm:w-14 ${
+                  isDark ? "bg-white/30" : "bg-black/20"
                 }`}
               />
-
-              <p className="text-sm font-medium tracking-wide sm:text-base md:text-lg">
+              <p className={isDark ? "text-sm font-medium tracking-wide text-white sm:text-base md:text-lg" : "text-sm font-medium tracking-wide text-[#0f1411] sm:text-base md:text-lg"}>
                 AI Engineer
               </p>
             </div>
 
-            {/* Tiny intro */}
             <p
-              className={`mt-4 max-w-md text-sm leading-6 sm:text-base ${
-                dark ? "text-white/50" : "text-black/55"
+              className={`mt-5 max-w-[560px] text-sm leading-7 sm:text-base sm:leading-8 ${
+                isDark ? "text-white/52" : "text-black/62"
               }`}
             >
-              Building practical AI systems with LLMs, agents,
-              automation and AI security.
+              {typedIntro}
+              <motion.span
+                animate={{ opacity: [0, 1, 0] }}
+                transition={{ duration: 0.85, repeat: Infinity }}
+                className="ml-1 inline-block"
+              >
+                |
+              </motion.span>
             </p>
 
-            {/* Actions */}
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-7 flex flex-wrap items-center gap-3">
               <Link
                 href="/projects"
-                className="group flex items-center gap-2 rounded-full bg-emerald-400 px-4 py-3 text-sm font-semibold text-black transition hover:bg-emerald-300 sm:px-5"
+                className="group flex h-12 items-center gap-2 rounded-full bg-emerald-400 px-5 text-sm font-semibold text-black transition hover:bg-emerald-300 sm:h-14 sm:px-6"
               >
                 Explore work
-
                 <ArrowUpRight
                   size={15}
                   className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -197,411 +544,48 @@ export default function Home() {
               <a
                 href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
                 target="_blank"
-                className={`flex items-center gap-2 rounded-full border px-4 py-3 text-sm font-medium transition sm:px-5 ${
-                  dark
-                    ? "border-white/15 hover:border-white/40"
-                    : "border-black/15 hover:border-black/30"
+                rel="noreferrer"
+                className={`flex h-12 items-center gap-2 rounded-full border px-5 text-sm font-medium transition sm:h-14 sm:px-6 ${
+                  isDark
+                    ? "border-white/15 text-white/80 hover:border-white/40"
+                    : "border-black/15 text-black/75 hover:border-black/30"
                 }`}
               >
                 <FileText size={15} />
                 Resume
               </a>
             </div>
-          </motion.div>
 
-          {/* RIGHT — LLM ATTENTION VISUALIZATION */}
-          <motion.div
-            initial={{ opacity: 0, x: 25 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 1, delay: 0.15 }}
-            className="relative flex h-[380px] w-full items-center justify-center sm:h-[430px] md:h-[460px] lg:h-[520px] lg:-ml-4"
-          >
-            {/* Ambient glow */}
-            <motion.div
-              animate={{
-                scale: [0.9, 1.08, 0.9],
-                opacity: [0.12, 0.22, 0.12],
-              }}
-              transition={{
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-              className="pointer-events-none absolute h-[220px] w-[220px] rounded-full bg-emerald-400/20 blur-[80px] sm:h-[280px] sm:w-[280px] sm:blur-[100px] md:h-[340px] md:w-[340px] md:blur-[110px]"
-            />
-
-            {/* Neural field */}
-            <div className="relative h-[330px] w-full max-w-[560px] sm:h-[380px] md:h-[400px] lg:h-[430px]">
-
-              {/* Connecting lines */}
-              <svg
-                className="pointer-events-none absolute inset-0 h-full w-full overflow-visible"
-                viewBox="0 0 560 430"
-                preserveAspectRatio="xMidYMid meet"
-                fill="none"
-              >
-                {/* Input → Attention */}
-                <motion.path
-                  d="M70 120 C180 80 190 160 280 210"
-                  stroke="rgba(52,211,153,0.22)"
-                  strokeWidth="1"
-                  strokeDasharray="5 8"
-                  animate={{
-                    strokeDashoffset: [0, -80],
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-
-                <motion.path
-                  d="M70 215 C170 190 210 210 280 215"
-                  stroke="rgba(52,211,153,0.35)"
-                  strokeWidth="1"
-                  strokeDasharray="5 8"
-                  animate={{
-                    strokeDashoffset: [0, -80],
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-
-                <motion.path
-                  d="M70 310 C180 350 210 270 280 220"
-                  stroke="rgba(52,211,153,0.2)"
-                  strokeWidth="1"
-                  strokeDasharray="5 8"
-                  animate={{
-                    strokeDashoffset: [0, -80],
-                  }}
-                  transition={{
-                    duration: 6,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-
-                {/* Attention → Representation */}
-                <motion.path
-                  d="M280 215 C355 170 385 145 455 135"
-                  stroke="rgba(52,211,153,0.4)"
-                  strokeWidth="1"
-                  strokeDasharray="4 7"
-                  animate={{
-                    strokeDashoffset: [0, -70],
-                  }}
-                  transition={{
-                    duration: 4,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-
-                <motion.path
-                  d="M280 215 C360 215 390 215 470 215"
-                  stroke="rgba(52,211,153,0.55)"
-                  strokeWidth="1"
-                  strokeDasharray="4 7"
-                  animate={{
-                    strokeDashoffset: [0, -70],
-                  }}
-                  transition={{
-                    duration: 3.5,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-
-                <motion.path
-                  d="M280 215 C355 260 385 290 455 300"
-                  stroke="rgba(52,211,153,0.3)"
-                  strokeWidth="1"
-                  strokeDasharray="4 7"
-                  animate={{
-                    strokeDashoffset: [0, -70],
-                  }}
-                  transition={{
-                    duration: 5,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-
-                {/* Output flow */}
-                <motion.path
-                  d="M455 135 C500 155 505 190 500 215"
-                  stroke="rgba(52,211,153,0.25)"
-                  strokeWidth="1"
-                  strokeDasharray="3 6"
-                  animate={{
-                    strokeDashoffset: [0, -50],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-
-                <motion.path
-                  d="M470 215 C505 225 505 260 455 300"
-                  stroke="rgba(52,211,153,0.25)"
-                  strokeWidth="1"
-                  strokeDasharray="3 6"
-                  animate={{
-                    strokeDashoffset: [0, -50],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                />
-              </svg>
-
-              {/* INPUT TOKENS */}
-              <div className="absolute left-0 top-[50px] space-y-5 sm:top-[60px] sm:space-y-6 md:top-[70px] md:space-y-7">
-                {["The", "model", "predicts"].map((token, i) => (
-                  <motion.div
-                    key={token}
-                    animate={{
-                      x: [0, 7, 0],
-                      opacity: [0.45, 0.8, 0.45],
-                    }}
-                    transition={{
-                      duration: 3 + i,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: i * 0.4,
-                    }}
-                    className="font-mono text-[10px] tracking-wider text-white/45 sm:text-xs"
-                  >
-                    <span className="mr-1.5 text-emerald-400/70 sm:mr-2">
-                      0{i + 1}
-                    </span>
-
-                    {token}
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* CENTRAL ATTENTION CORE */}
-              <motion.div
-                animate={{
-                  scale: [1, 1.04, 1],
-                  opacity: [0.8, 1, 0.8],
-                }}
-                transition={{
-                  duration: 3,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="absolute left-1/2 top-1/2 flex h-[90px] w-[90px] -translate-x-1/2 -translate-y-1/2 items-center justify-center sm:h-[105px] sm:w-[105px] md:h-[120px] md:w-[120px]"
-              >
-                {/* Outer ring */}
+            <div className="mt-9 grid max-w-[560px] grid-cols-1 gap-3 sm:grid-cols-3">
+              {["LLM systems", "Agent workflows", "AI security"].map((item, index) => (
                 <motion.div
-                  animate={{
-                    rotate: 360,
-                  }}
-                  transition={{
-                    duration: 12,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  className="absolute inset-0 rounded-full border border-emerald-400/20"
-                />
-
-                {/* Second ring */}
-                <motion.div
-                  animate={{
-                    rotate: -360,
-                  }}
-                  transition={{
-                    duration: 18,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  className="absolute -inset-3 rounded-full border border-emerald-400/10 sm:-inset-4"
-                />
-
-                {/* Core glow */}
-                <div className="absolute h-16 w-16 rounded-full bg-emerald-400/10 blur-xl sm:h-20 sm:w-20 sm:blur-2xl" />
-
-                {/* Core */}
-                <div className="relative flex h-12 w-12 items-center justify-center rounded-full border border-emerald-400/40 bg-[#060806]/80 shadow-[0_0_50px_rgba(52,211,153,0.18)] backdrop-blur-sm sm:h-14 sm:w-14 md:h-16 md:w-16">
-                  <motion.div
-                    animate={{
-                      scale: [0.8, 1.15, 0.8],
-                      opacity: [0.4, 0.9, 0.4],
-                    }}
-                    transition={{
-                      duration: 2.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_20px_8px_rgba(52,211,153,0.4)] sm:h-3 sm:w-3"
-                  />
-                </div>
-              </motion.div>
-
-              {/* ATTENTION LABEL */}
-              <div className="absolute left-1/2 top-[calc(50%+65px)] -translate-x-1/2 text-center sm:top-[calc(50%+72px)] md:top-[calc(50%+82px)]">
-                <div className="whitespace-nowrap font-mono text-[8px] uppercase tracking-[0.2em] text-emerald-400/70 sm:text-[9px] md:text-[10px] md:tracking-[0.28em]">
-                  Self-Attention
-                </div>
-
-                <div className="mt-1 font-mono text-[8px] tracking-wider text-white/25 sm:text-[9px]">
-                  Q · K · V
-                </div>
-              </div>
-
-              {/* LATENT NODES */}
-              <div className="absolute right-0 top-[50px] space-y-5 sm:top-[60px] sm:space-y-6 md:top-[70px] md:space-y-7">
-                {[
-                  {
-                    label: "context",
-                    value: "0.82",
-                  },
-                  {
-                    label: "semantic",
-                    value: "0.94",
-                  },
-                  {
-                    label: "next token",
-                    value: "0.71",
-                  },
-                ].map((node, i) => (
-                  <motion.div
-                    key={node.label}
-                    animate={{
-                      y: [0, -4, 0],
-                      opacity: [0.45, 0.85, 0.45],
-                    }}
-                    transition={{
-                      duration: 3.5 + i,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: i * 0.5,
-                    }}
-                    className="flex items-center gap-2 sm:gap-3"
-                  >
-                    <div className="text-right">
-                      <div className="font-mono text-[8px] uppercase tracking-wider text-white/45 sm:text-[9px] md:text-[10px]">
-                        {node.label}
-                      </div>
-
-                      <div className="mt-1 whitespace-nowrap font-mono text-[7px] text-emerald-400/50 sm:text-[8px] md:text-[9px]">
-                        attention {node.value}
-                      </div>
-                    </div>
-
-                    <motion.span
-                      animate={{
-                        scale: [1, 1.5, 1],
-                        opacity: [0.5, 1, 0.5],
-                      }}
-                      transition={{
-                        duration: 2,
-                        repeat: Infinity,
-                        delay: i * 0.4,
-                      }}
-                      className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-400 shadow-[0_0_14px_4px_rgba(52,211,153,0.25)] sm:h-2 sm:w-2"
-                    />
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* Technical annotation */}
-              <div className="absolute left-[18%] top-0 font-mono text-[7px] uppercase tracking-[0.18em] text-white/20 sm:text-[8px] sm:tracking-[0.22em] md:text-[9px] md:tracking-[0.25em]">
-                Transformer layer 08
-              </div>
-
-              {/* Bottom annotation */}
-              <motion.div
-                animate={{
-                  opacity: [0.25, 0.55, 0.25],
-                }}
-                transition={{
-                  duration: 4,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-                className="absolute bottom-0 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[7px] uppercase tracking-[0.18em] text-emerald-400/40 sm:text-[8px] sm:tracking-[0.24em] md:text-[9px] md:tracking-[0.3em]"
-              >
-                latent representation → generation
-              </motion.div>
-
-              {/* Floating particles */}
-              {[
-                {
-                  left: "30%",
-                  top: "15%",
-                  delay: 0,
-                },
-                {
-                  left: "42%",
-                  top: "78%",
-                  delay: 1,
-                },
-                {
-                  left: "67%",
-                  top: "8%",
-                  delay: 1.8,
-                },
-                {
-                  left: "78%",
-                  top: "70%",
-                  delay: 0.7,
-                },
-                {
-                  left: "17%",
-                  top: "78%",
-                  delay: 2,
-                },
-              ].map((particle, i) => (
-                <motion.span
-                  key={i}
-                  animate={{
-                    y: [0, -12, 0],
-                    opacity: [0.15, 0.5, 0.15],
-                  }}
-                  transition={{
-                    duration: 4 + i,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                    delay: particle.delay,
-                  }}
-                  className="absolute h-1 w-1 rounded-full bg-emerald-300"
-                  style={{
-                    left: particle.left,
-                    top: particle.top,
-                  }}
-                />
+                  key={item}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.45, delay: 0.55 + index * 0.08 }}
+                  className={`rounded-full border px-4 py-3 text-center text-[11px] uppercase tracking-[0.18em] ${
+                    isDark
+                      ? "border-white/8 bg-white/[0.02] text-white/34"
+                      : "border-black/8 bg-black/[0.02] text-black/45"
+                  }`}
+                >
+                  {item}
+                </motion.div>
               ))}
             </div>
           </motion.div>
+
+          <McpFlowVisual isDark={isDark} />
         </div>
       </section>
 
-      {/* FOOTER */}
       <footer
         className={`relative z-20 mx-auto flex w-full max-w-[1450px] items-center justify-between border-t px-4 py-4 text-[9px] uppercase tracking-[0.14em] sm:px-6 sm:text-[10px] sm:tracking-[0.18em] md:px-10 md:py-5 md:text-[11px] ${
-          dark
-            ? "border-white/10 text-white/30"
-            : "border-black/10 text-black/30"
+          isDark ? "border-white/10 text-white/30" : "border-black/10 text-black/35"
         }`}
       >
         <span>© 2026 Mahek Ara</span>
-
-        <div className="flex items-center gap-2 sm:gap-4">
-          <span>AI / LLM / BUILD</span>
-          <GitBranch size={13} />
-        </div>
+        <span>AI / LLM / BUILD</span>
       </footer>
     </main>
   );

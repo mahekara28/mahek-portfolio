@@ -1,96 +1,185 @@
+"use client";
+
 import Link from "next/link";
+import { useTheme } from "../../theme-provider";
 
 export default function LLMRoutingPage() {
+  const { isDark } = useTheme();
+
   return (
-    <main className="min-h-screen bg-[#080808] text-white">
-      {/* Header */}
-      <nav className="border-b border-white/10 px-6 py-5">
-        <div className="mx-auto flex max-w-5xl items-center justify-between">
+    <main
+      className={`min-h-screen transition-colors duration-500 ${
+        isDark ? "bg-[#060806] text-white" : "bg-[#f4f7f2] text-[#0f1411]"
+      }`}
+    >
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div
+          className={`absolute -right-40 top-20 h-[500px] w-[500px] rounded-full blur-[140px] ${
+            isDark ? "bg-emerald-500/[0.05]" : "bg-emerald-500/[0.10]"
+          }`}
+        />
+        <div
+          className={`absolute -left-40 bottom-0 h-[400px] w-[400px] rounded-full blur-[130px] ${
+            isDark ? "bg-emerald-400/[0.04]" : "bg-emerald-400/[0.08]"
+          }`}
+        />
+      </div>
+
+      <nav
+        className={`relative z-20 border-b px-4 py-5 sm:px-6 md:px-10 ${
+          isDark ? "border-white/10" : "border-black/10"
+        }`}
+      >
+        <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Link
             href="/"
-            className="text-sm font-medium tracking-tight text-white"
+            className={`flex h-10 w-10 items-center justify-center rounded-full border text-[11px] font-semibold tracking-[0.12em] transition ${
+              isDark
+                ? "border-white/15 text-white hover:border-emerald-400 hover:text-emerald-300"
+                : "border-black/15 text-[#0f1411] hover:border-emerald-600 hover:text-emerald-700"
+            }`}
           >
-            Mahek Ara
+            MA
           </Link>
 
           <Link
             href="/blog"
-            className="font-mono text-xs text-white/35 transition hover:text-emerald-300"
+            className={`rounded-full border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition ${
+              isDark
+                ? "border-white/10 text-white/40 hover:border-emerald-400/35 hover:bg-emerald-400/10 hover:text-emerald-300"
+                : "border-black/10 text-black/45 hover:border-emerald-600/25 hover:bg-emerald-500/8 hover:text-emerald-700"
+            }`}
           >
-            ← Blog
+            Back to blog
           </Link>
         </div>
       </nav>
 
-      {/* Article */}
-      <article className="px-6">
-        <div className="mx-auto max-w-3xl">
-          {/* Intro */}
-          <header className="pb-16 pt-20 sm:pt-28">
-            <div className="mb-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.16em] text-white/30">
-              <span className="text-emerald-300/70">AI Engineering</span>
-              <span>·</span>
-              <span>September 2026</span>
+      <article className="relative z-10 px-4 sm:px-6 md:px-10">
+        <div className="mx-auto max-w-6xl">
+          <header
+            className={`grid gap-12 border-b pb-12 pt-14 md:grid-cols-[180px_minmax(0,1fr)] md:pb-16 md:pt-20 ${
+              isDark ? "border-white/10" : "border-black/10"
+            }`}
+          >
+            <div className="space-y-6">
+              <div>
+                <div
+                  className={`text-[10px] uppercase tracking-[0.18em] ${
+                    isDark ? "text-white/28" : "text-black/36"
+                  }`}
+                >
+                  Category
+                </div>
+                <div className={isDark ? "mt-2 text-sm text-emerald-300/80" : "mt-2 text-sm text-emerald-700/85"}>
+                  AI Engineering
+                </div>
+              </div>
+
+              <div>
+                <div
+                  className={`text-[10px] uppercase tracking-[0.18em] ${
+                    isDark ? "text-white/28" : "text-black/36"
+                  }`}
+                >
+                  Published
+                </div>
+                <div className={isDark ? "mt-2 text-sm text-white/58" : "mt-2 text-sm text-black/60"}>
+                  September 2026
+                </div>
+              </div>
+
+              <div>
+                <div
+                  className={`text-[10px] uppercase tracking-[0.18em] ${
+                    isDark ? "text-white/28" : "text-black/36"
+                  }`}
+                >
+                  Read time
+                </div>
+                <div className={isDark ? "mt-2 text-sm text-white/58" : "mt-2 text-sm text-black/60"}>
+                  6 min read
+                </div>
+              </div>
             </div>
 
-            <h1 className="max-w-3xl text-4xl font-medium leading-[1.08] tracking-[-0.04em] sm:text-5xl md:text-6xl">
-              Your LLM Doesn&apos;t Need More Intelligence.
-              <span className="block text-white/40">
-                It Needs Better Routing.
-              </span>
-            </h1>
+            <div>
+              <div className={isDark ? "text-[10px] uppercase tracking-[0.22em] text-emerald-400/80" : "text-[10px] uppercase tracking-[0.22em] text-emerald-700/85"}>
+                Essay 01
+              </div>
 
-            <p className="mt-7 max-w-2xl text-base leading-7 text-white/50 sm:text-lg">
-              I started thinking about this while building LLM-based systems:
-              why should every request go to the biggest model available?
-            </p>
+              <h1 className="mt-6 max-w-4xl text-4xl font-medium leading-[1.02] tracking-[-0.05em] sm:text-5xl md:text-6xl">
+                Your LLM doesn&apos;t need more intelligence.
+                <span className={isDark ? "block text-white/38" : "block text-black/38"}>
+                  It needs better routing.
+                </span>
+              </h1>
 
-            <div className="mt-8 flex items-center gap-3 font-mono text-xs text-white/25">
-              <span className="text-emerald-300/60">~</span>
-              <span>6 min read</span>
+              <p className={isDark ? "mt-7 max-w-2xl text-base leading-8 text-white/50 sm:text-lg" : "mt-7 max-w-2xl text-base leading-8 text-black/62 sm:text-lg"}>
+                I kept coming back to one annoying question while building LLM
+                systems: why do we keep sending every request to the biggest
+                model we have, even when the task clearly doesn&apos;t need it?
+              </p>
             </div>
           </header>
 
-          {/* Article body */}
-          <div className="border-t border-white/10 pb-24 pt-14">
-            <Section>
-              <p>
-                A simple question can be answered by a small model. A
-                complicated coding problem probably shouldn&apos;t be.
-              </p>
+          <div className="grid gap-14 py-12 md:grid-cols-[180px_minmax(0,1fr)] md:py-16">
+            <aside className="hidden md:block">
+              <div className="sticky top-24">
+                <div
+                  className={`text-[10px] uppercase tracking-[0.18em] ${
+                    isDark ? "text-white/28" : "text-black/36"
+                  }`}
+                >
+                  In this note
+                </div>
 
-              <p>
-                But if your application sends both requests to the same model,
-                you&apos;re essentially treating every user request as equally
-                difficult.
-              </p>
+                <div className={isDark ? "mt-5 space-y-3 text-sm text-white/46" : "mt-5 space-y-3 text-sm text-black/56"}>
+                  <div>The real problem</div>
+                  <div>What a router should do</div>
+                  <div>Why cheap isn&apos;t the goal</div>
+                  <div>Where it gets interesting</div>
+                  <div>What I&apos;d measure</div>
+                </div>
+              </div>
+            </aside>
 
-              <p>
-                That works for a prototype. It gets expensive once the
-                application grows.
-              </p>
-            </Section>
+            <div className="max-w-3xl">
+              <Section isDark={isDark}>
+                <p>
+                  A simple question can be answered by a small model. A messy
+                  reasoning task probably can&apos;t.
+                </p>
 
-            {/* Architecture */}
-            <Diagram />
+                <p>
+                  But a lot of LLM products still behave as if every prompt is
+                  equally difficult. Everything goes to the same expensive
+                  model, every time.
+                </p>
 
-            <Section>
-              <p>
-                The idea is pretty simple: put a small routing layer before the
-                actual models.
-              </p>
+                <p>
+                  That is fine in a demo. It starts to feel wasteful the moment
+                  the product gets real users, real traffic, and real latency
+                  complaints.
+                </p>
+              </Section>
 
-              <p>
-                It looks at the request and decides{" "}
-                <span className="text-emerald-300/80">
-                  where it should go.
-                </span>
-              </p>
+              <Diagram isDark={isDark} />
 
-              <p>Something like:</p>
+              <Section title="The basic idea" isDark={isDark}>
+                <p>
+                  Put a routing layer in front of the models. Let that layer
+                  decide where a request should go before inference starts.
+                </p>
 
-              <CodeBlock
-                code={`if complexity == "low":
+                <p>
+                  The logic itself is not the exciting part. It can be as simple
+                  as:
+                </p>
+
+                <CodeBlock
+                  isDark={isDark}
+                  code={`if complexity == "low":
     model = small_model
 
 elif complexity == "medium":
@@ -98,202 +187,179 @@ elif complexity == "medium":
 
 else:
     model = reasoning_model`}
-              />
+                />
 
-              <p>
-                Nothing revolutionary here. The interesting part is what this
-                changes at the{" "}
-                <span className="text-emerald-300/80">system level.</span>
-              </p>
-            </Section>
+                <p>
+                  On paper, this looks obvious. What makes it useful is not the
+                  code. It&apos;s the change in mindset.
+                </p>
+              </Section>
 
-            <Section title="A router doesn't need to solve the problem">
-              <p>This was the part I found most interesting.</p>
+              <Section title="The shift that matters" isDark={isDark}>
+                <p>
+                  A router does not need to solve the user&apos;s problem. It only
+                  needs to make one decision well:
+                </p>
 
-              <p>
-                The router isn&apos;t responsible for generating the final
-                answer. It only needs to make one decision well:
-              </p>
+                <Quote isDark={isDark}>
+                  Which model is worth using for this request?
+                </Quote>
 
-              <p className="border-l border-emerald-400/40 pl-5 text-white/75">
-                which model should handle this?
-              </p>
+                <p>
+                  That one shift changes the economics of the whole system. The
+                  routing layer can be small, fast, and cheap, because it is not
+                  responsible for the final answer.
+                </p>
 
-              <p>
-                That means the routing model can be much smaller and cheaper
-                than the models doing the actual work.
-              </p>
+                <p>
+                  Once I started looking at it this way, the router stopped
+                  feeling like a classifier and started feeling like control
+                  logic.
+                </p>
+              </Section>
 
-              <CodeBlock
-                language="python"
-                code={`def route(prompt):
-    task = classify(prompt)
+              <Section title="Routing is not free" isDark={isDark}>
+                <p>
+                  There is still a cost to doing this. You are inserting another
+                  step before the answer, which means extra latency and another
+                  chance to make a bad call.
+                </p>
 
-    routes = {
-        "simple": "small-model",
-        "general": "mid-model",
-        "complex": "large-model",
-    }
+                <p>
+                  So I would not optimize for &quot;always use the cheapest
+                  model.&quot; That goal sounds smart and usually produces a brittle
+                  system.
+                </p>
 
-    return routes[task]`}
-              />
-            </Section>
+                <p>I&apos;d rather optimize for a rough balance:</p>
 
-            <Section title="But routing isn't free">
-              <p>There&apos;s a catch.</p>
-
-              <p>
-                You&apos;ve added another step before the answer. That means
-                extra latency, and the router can get the decision wrong.
-              </p>
-
-              <p>
-                So I wouldn&apos;t optimise for{" "}
-                <span className="text-emerald-300">
-                  &quot;always use the cheapest model.&quot;
-                </span>
-              </p>
-
-              <p>I&apos;d optimise for something closer to:</p>
-
-              <CodeBlock
-                language="objective"
-                code={`lowest cost
+                <CodeBlock
+                  isDark={isDark}
+                  language="objective"
+                  code={`lowest reasonable cost
 +
-lowest latency
++lowest acceptable latency
 +
-acceptable answer quality`}
-              />
++answer quality that still holds up`}
+                />
 
-              <p>
-                If a request genuinely needs a stronger model, send it there.
-                The point is not to avoid expensive models. It&apos;s to stop
-                using them when they aren&apos;t necessary.
-              </p>
-            </Section>
+                <p>
+                  If a request genuinely needs a stronger model, send it there
+                  without hesitation. The point is not to avoid powerful models.
+                  The point is to stop treating them like the default answer to
+                  everything.
+                </p>
+              </Section>
 
-            <Section title="Where this gets interesting">
-              <p>
-                The basic router is easy. The harder question is what happens
-                after the model responds.
-              </p>
+              <Section title="Where it gets more interesting" isDark={isDark}>
+                <p>
+                  The first version of routing is straightforward. The more
+                  interesting question is what happens after the model answers.
+                </p>
 
-              <p>
-                You could evaluate the answer and escalate when it
-                isn&apos;t good enough.
-              </p>
+                <p>
+                  If the response looks weak, incomplete, or uncertain, the
+                  system could escalate. At that point you are not just routing
+                  requests. You are managing inference as a pipeline.
+                </p>
 
-              <Diagram
-                secondary
-                code={`             user
-               │
-               ▼
+                <Diagram
+                  isDark={isDark}
+                  secondary
+                  code={`             user
+               |
+               v
              router
-          ┌────┼────┐
-          ▼    ▼    ▼
-        small mid  large
-          │    │    │
-          └────┼────┘
-               ▼
+          /    |    \\
+         v     v     v
+      small   mid   large
+         \\     |     /
+          \\    |    /
+               v
             evaluate
-               │
-          ┌────┴────┐
-          │         │
-         good      retry
-          │         │
-          ▼         ▼
-        answer   stronger model`}
-              />
+               |
+         good  |  retry
+           \\   |   /
+            \\  |  /
+         stronger model`}
+                />
 
-              <p>
-                At that point, it stops feeling like a model selector and
-                starts looking more like an{" "}
-                <span className="text-emerald-300/80">
-                  inference control layer.
-                </span>
-              </p>
-            </Section>
+                <p>
+                  That is the version I find more compelling. Not just model
+                  selection, but a system that knows how to spend intelligence
+                  carefully.
+                </p>
+              </Section>
 
-            <Section title="What I'd measure">
-              <p>
-                If I actually put this into production, I&apos;d watch a few
-                things closely:
-              </p>
+              <Section title="What I&apos;d watch in production" isDark={isDark}>
+                <p>
+                  If I shipped this for real, I&apos;d care less about how clever
+                  the router looked and more about whether the numbers stayed
+                  honest.
+                </p>
 
-              <ul className="my-8 space-y-3 font-mono text-sm text-white/50">
-                <li>
-                  <span className="mr-3 text-emerald-400">01</span>
-                  routing accuracy
-                </li>
-                <li>
-                  <span className="mr-3 text-emerald-400">02</span>
-                  average latency
-                </li>
-                <li>
-                  <span className="mr-3 text-emerald-400">03</span>
-                  cost per request
-                </li>
-                <li>
-                  <span className="mr-3 text-emerald-400">04</span>
-                  answer quality
-                </li>
-                <li>
-                  <span className="mr-3 text-emerald-400">05</span>
-                  escalation rate
-                </li>
-              </ul>
+                <List
+                  isDark={isDark}
+                  items={[
+                    "routing accuracy",
+                    "average latency",
+                    "cost per request",
+                    "answer quality",
+                    "escalation rate",
+                  ]}
+                />
 
-              <p>
-                Saving tokens doesn&apos;t mean much if answer quality drops.
-                And a cheaper model isn&apos;t really cheaper if you end up
-                retrying the request three times.
-              </p>
-            </Section>
+                <p>
+                  Saving tokens is not useful if answer quality drops. A cheaper
+                  path is not actually cheaper if the system keeps retrying and
+                  climbing to a bigger model anyway.
+                </p>
+              </Section>
 
-            <Section>
-              <p>
-                I think this is one of those ideas that becomes more useful as
-                LLM applications become less of a single-model wrapper and
-                more of an actual system.
-              </p>
+              <Section isDark={isDark}>
+                <p>
+                  I think this becomes more relevant as LLM products mature.
+                  Once you stop treating them like single-model wrappers, you
+                  start asking better systems questions.
+                </p>
 
-              <p>We keep asking how to make models smarter.</p>
+                <p>Not &quot;how do I make the model smarter?&quot;</p>
 
-              <p className="text-xl leading-8 text-emerald-300 sm:text-2xl">
-                I&apos;m more interested in what happens when the system gets
-                better at deciding{" "}
-                <em className="text-emerald-200">
-                  when intelligence is actually needed.
-                </em>
-              </p>
-            </Section>
+                <p className={isDark ? "text-xl leading-8 text-emerald-300 sm:text-2xl" : "text-xl leading-8 text-emerald-700 sm:text-2xl"}>
+                  More like: how do I make the system better at deciding when
+                  intelligence is actually needed?
+                </p>
+              </Section>
 
-            {/* Footer */}
-            <div className="mt-16 border-t border-white/10 pt-10">
-              <div className="mb-5 font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/40">
-                More from me
-              </div>
-
-              <p className="text-sm leading-6 text-white/35">
-                I&apos;m building and writing about AI systems, agents and
-                developer tooling.
-              </p>
-
-              <div className="mt-5 flex gap-5 text-sm">
-                <Link
-                  href="/#work"
-                  className="text-emerald-300 underline decoration-emerald-300/30 underline-offset-4 transition hover:text-emerald-200"
-                >
-                  View my work
-                </Link>
-
-                <Link
-                  href="/blog"
-                  className="text-white/35 transition hover:text-white"
+              <footer
+                className={`mt-16 border-t pt-10 ${
+                  isDark ? "border-white/10" : "border-black/10"
+                }`}
+              >
+                <div
+                  className={`text-[10px] uppercase tracking-[0.18em] ${
+                    isDark ? "text-white/28" : "text-black/36"
+                  }`}
                 >
                   More writing
-                </Link>
-              </div>
+                </div>
+
+                <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
+                  <Link
+                    href="/blog"
+                    className={isDark ? "text-white/45 transition hover:text-white" : "text-black/55 transition hover:text-black"}
+                  >
+                    Back to archive
+                  </Link>
+
+                  <Link
+                    href="/projects"
+                    className={isDark ? "text-emerald-300 transition hover:text-emerald-200" : "text-emerald-700 transition hover:text-emerald-800"}
+                  >
+                    View projects
+                  </Link>
+                </div>
+              </footer>
             </div>
           </div>
         </div>
@@ -302,246 +368,179 @@ acceptable answer quality`}
   );
 }
 
-/* -------------------------------- */
-/* Article Section                  */
-/* -------------------------------- */
-
 function Section({
   title,
   children,
+  isDark,
 }: {
   title?: string;
   children: React.ReactNode;
+  isDark: boolean;
 }) {
   return (
     <section className="mb-14">
-      {title && (
-        <h2 className="mb-5 text-xl font-medium tracking-tight text-white">
-          <span className="mr-2 text-emerald-400/60">/</span>
-          {title}
-        </h2>
-      )}
-
-      <div className="space-y-5 text-[16px] leading-8 text-white/55">
+      {title && <h2 className="mb-5 text-xl font-medium tracking-tight sm:text-2xl">{title}</h2>}
+      <div
+        className={`space-y-5 text-[16px] leading-8 ${
+          isDark ? "text-white/56" : "text-black/66"
+        }`}
+      >
         {children}
       </div>
     </section>
   );
 }
 
-/* -------------------------------- */
-/* Architecture Diagram             */
-/* -------------------------------- */
+function Quote({
+  children,
+  isDark,
+}: {
+  children: React.ReactNode;
+  isDark: boolean;
+}) {
+  return (
+    <div
+      className={`my-8 border-l pl-5 text-lg leading-8 ${
+        isDark
+          ? "border-emerald-400/40 text-white/78"
+          : "border-emerald-600/35 text-black/82"
+      }`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function List({
+  items,
+  isDark,
+}: {
+  items: string[];
+  isDark: boolean;
+}) {
+  return (
+    <ul className={`my-8 space-y-3 text-[15px] ${isDark ? "text-white/56" : "text-black/66"}`}>
+      {items.map((item, index) => (
+        <li key={item} className="flex items-center gap-3">
+          <span className={isDark ? "font-mono text-xs text-emerald-400/70" : "font-mono text-xs text-emerald-700/70"}>
+            0{index + 1}
+          </span>
+          <span>{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function Diagram({
   secondary = false,
   code,
+  isDark,
 }: {
   secondary?: boolean;
   code?: string;
+  isDark: boolean;
 }) {
   const diagramCode =
     code ||
-    `                    USER REQUEST
-                         │
-                         ▼
-                  ┌────────────┐
-                  │   ROUTER   │
-                  └──────┬─────┘
-                         │
-             ┌───────────┼───────────┐
-             ▼           ▼           ▼
-        ┌─────────┐ ┌─────────┐ ┌─────────┐
-        │  SMALL  │ │ GENERAL │ │  LARGE  │
-        │  MODEL  │ │  MODEL  │ │  MODEL  │
-        └─────────┘ └─────────┘ └─────────┘`;
+    `             user request
+                  |
+                  v
+               router
+           /      |      \\
+          v       v       v
+       small   general   large
+       model    model    model`;
 
   return (
     <div
-      className={`my-14 overflow-hidden rounded-lg border ${
+      className={`my-14 overflow-hidden rounded-[24px] border ${
         secondary
-          ? "border-emerald-400/10 bg-[#050b07]"
-          : "border-emerald-400/15 bg-[#061009]"
+          ? isDark
+            ? "border-white/10 bg-white/[0.02]"
+            : "border-black/10 bg-white/55"
+          : isDark
+            ? "border-emerald-400/12 bg-[#071009]"
+            : "border-emerald-600/14 bg-emerald-50/70"
       }`}
     >
-      {/* Diagram header */}
-      <div className="flex items-center justify-between border-b border-emerald-400/10 px-5 py-3">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/50">
-          {secondary ? "evaluation flow" : "architecture"}
+      <div
+        className={`flex items-center justify-between border-b px-5 py-3 ${
+          isDark ? "border-white/8" : "border-black/8"
+        }`}
+      >
+        <span
+          className={`font-mono text-[10px] uppercase tracking-[0.18em] ${
+            isDark ? "text-white/34" : "text-black/40"
+          }`}
+        >
+          {secondary ? "escalation flow" : "routing sketch"}
         </span>
-
-        <span className="font-mono text-[10px] text-white/20">
-          {secondary ? "escalation" : "llm-routing"}
+        <span
+          className={`font-mono text-[10px] ${
+            isDark ? "text-white/20" : "text-black/28"
+          }`}
+        >
+          {secondary ? "system view" : "architecture"}
         </span>
       </div>
 
-      {/* Diagram */}
-      <div className="overflow-x-auto p-6 sm:p-10">
-        <pre className="min-w-[620px] font-mono text-xs leading-7 sm:text-sm">
-          {diagramCode.split("\n").map((line, index) => (
-            <div key={index}>
-              {highlightDiagramLine(line)}
-            </div>
-          ))}
+      <div className="overflow-x-auto p-6 sm:p-8">
+        <pre
+          className={`min-w-[420px] font-mono text-xs leading-7 sm:text-sm ${
+            isDark ? "text-white/48" : "text-black/62"
+          }`}
+        >
+          {diagramCode}
         </pre>
       </div>
     </div>
   );
 }
 
-/* -------------------------------- */
-/* Diagram Highlighting             */
-/* -------------------------------- */
-
-function highlightDiagramLine(line: string) {
-  const isArrow =
-    line.includes("▼") ||
-    line.includes("│") ||
-    line.includes("┼") ||
-    line.includes("┴") ||
-    line.includes("┌") ||
-    line.includes("└");
-
-  const isImportant =
-    line.includes("ROUTER") ||
-    line.includes("SMALL") ||
-    line.includes("GENERAL") ||
-    line.includes("LARGE") ||
-    line.includes("evaluate") ||
-    line.includes("stronger model");
-
-  if (isImportant) {
-    const parts = line.split(
-      /(ROUTER|SMALL|GENERAL|LARGE|evaluate|stronger model)/
-    );
-
-    return parts.map((part, index) => {
-      if (
-        [
-          "ROUTER",
-          "SMALL",
-          "GENERAL",
-          "LARGE",
-          "evaluate",
-          "stronger model",
-        ].includes(part)
-      ) {
-        return (
-          <span key={index} className="text-emerald-300">
-            {part}
-          </span>
-        );
-      }
-
-      return (
-        <span key={index} className="text-white/35">
-          {part}
-        </span>
-      );
-    });
-  }
-
-  return (
-    <span className={isArrow ? "text-emerald-400/60" : "text-white/30"}>
-      {line}
-    </span>
-  );
-}
-
-/* -------------------------------- */
-/* Code Block                       */
-/* -------------------------------- */
-
 function CodeBlock({
   code,
   language = "python",
+  isDark,
 }: {
   code: string;
   language?: string;
+  isDark: boolean;
 }) {
   return (
-    <div className="my-8 overflow-hidden rounded-lg border border-emerald-400/15 bg-[#061009]">
-      {/* Code header */}
-      <div className="flex items-center justify-between border-b border-emerald-400/10 px-4 py-2.5">
-        <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-emerald-300/50">
+    <div
+      className={`my-8 overflow-hidden rounded-[24px] border ${
+        isDark ? "border-white/10 bg-white/[0.02]" : "border-black/10 bg-white/60"
+      }`}
+    >
+      <div
+        className={`flex items-center justify-between border-b px-4 py-3 ${
+          isDark ? "border-white/8" : "border-black/8"
+        }`}
+      >
+        <span
+          className={`font-mono text-[10px] uppercase tracking-[0.18em] ${
+            isDark ? "text-white/34" : "text-black/40"
+          }`}
+        >
           {language}
         </span>
-
-        <span className="font-mono text-[10px] text-white/20">
-          code
+        <span
+          className={`font-mono text-[10px] ${
+            isDark ? "text-white/20" : "text-black/28"
+          }`}
+        >
+          snippet
         </span>
       </div>
 
-      {/* Code */}
-      <pre className="overflow-x-auto p-5 font-mono text-[13px] leading-7">
-        <code>
-          {code.split("\n").map((line, index) => (
-            <div key={index} className="flex">
-              <span className="mr-6 w-5 shrink-0 select-none text-right text-white/15">
-                {index + 1}
-              </span>
-
-              <span className="text-white/60">
-                {highlightCode(line)}
-              </span>
-            </div>
-          ))}
-        </code>
+      <pre
+        className={`overflow-x-auto p-5 font-mono text-[13px] leading-7 ${
+          isDark ? "text-white/62" : "text-black/72"
+        }`}
+      >
+        <code>{code}</code>
       </pre>
     </div>
   );
-}
-
-/* -------------------------------- */
-/* Lightweight Syntax Highlighting  */
-/* -------------------------------- */
-
-function highlightCode(line: string) {
-  const parts = line.split(
-    /(\bdef\b|\bif\b|\belif\b|\belse\b|\breturn\b|\bclass\b|\bfor\b|\bin\b|\bimport\b|\bfrom\b|".*?"|'.*?')/
-  );
-
-  return parts.map((part, index) => {
-    if (
-      [
-        "def",
-        "if",
-        "elif",
-        "else",
-        "return",
-        "class",
-        "for",
-        "in",
-        "import",
-        "from",
-      ].includes(part)
-    ) {
-      return (
-        <span key={index} className="text-emerald-300">
-          {part}
-        </span>
-      );
-    }
-
-    if (
-      (part.startsWith('"') && part.endsWith('"')) ||
-      (part.startsWith("'") && part.endsWith("'"))
-    ) {
-      return (
-        <span key={index} className="text-lime-300/80">
-          {part}
-        </span>
-      );
-    }
-
-    if (part.startsWith("#")) {
-      return (
-        <span key={index} className="text-emerald-300/30">
-          {part}
-        </span>
-      );
-    }
-
-    return <span key={index}>{part}</span>;
-  });
 }
