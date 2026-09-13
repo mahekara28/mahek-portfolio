@@ -342,12 +342,6 @@ export default function Home() {
     760,
   );
 
-  const mobileSkills = [
-    { label: "LLM Systems", span: "col-span-2" },
-    { label: "Agent Workflows", span: "col-span-1" },
-    { label: "AI Security", span: "col-span-1" },
-  ];
-
   return (
     <main
       className={`relative min-h-screen overflow-x-hidden transition-colors duration-500 ${
@@ -528,50 +522,6 @@ export default function Home() {
                 <FileText size={15} />
                 Resume
               </a>
-            </div>
-
-            <div className="mt-9 sm:hidden">
-              <div className="grid grid-cols-2 gap-3">
-                {mobileSkills.map((item, index) => (
-                  <motion.div
-                    key={item.label}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.45, delay: 0.55 + index * 0.08 }}
-                    className={`${item.span} rounded-[22px] border px-4 py-4 text-center ${
-                      isDark
-                        ? "border-white/8 bg-white/[0.03]"
-                        : "border-black/8 bg-black/[0.02]"
-                    }`}
-                  >
-                    <div
-                      className={`text-[10px] uppercase tracking-[0.18em] ${
-                        isDark ? "text-white/34" : "text-black/46"
-                      }`}
-                    >
-                      {item.label}
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-9 hidden max-w-[560px] sm:grid sm:grid-cols-3 sm:gap-3">
-              {["LLM systems", "Agent workflows", "AI security"].map((item, index) => (
-                <motion.div
-                  key={item}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, delay: 0.55 + index * 0.08 }}
-                  className={`rounded-full border px-4 py-3 text-center text-[11px] uppercase tracking-[0.18em] ${
-                    isDark
-                      ? "border-white/8 bg-white/[0.02] text-white/34"
-                      : "border-black/8 bg-black/[0.02] text-black/45"
-                  }`}
-                >
-                  {item}
-                </motion.div>
-              ))}
             </div>
           </motion.div>
 
