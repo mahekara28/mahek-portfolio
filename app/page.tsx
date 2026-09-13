@@ -158,7 +158,13 @@ function NavIconLink({
   );
 }
 
-function McpFlowVisual({ isDark }: { isDark: boolean }) {
+function McpFlowVisual({
+  isDark,
+  compact = false,
+}: {
+  isDark: boolean;
+  compact?: boolean;
+}) {
   const lineColor = isDark ? "rgba(52,211,153,0.24)" : "rgba(16,185,129,0.22)";
   const softLineColor = isDark ? "rgba(255,255,255,0.10)" : "rgba(15,20,17,0.10)";
   const chipBase = isDark
@@ -197,20 +203,26 @@ function McpFlowVisual({ isDark }: { isDark: boolean }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 24 }}
+      initial={{ opacity: 0, x: compact ? 0 : 24 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.9, delay: 0.12 }}
-      className="relative flex h-[360px] w-full items-center justify-center sm:h-[430px] md:h-[500px] lg:h-[560px]"
+      className={`relative flex items-center justify-center ${
+        compact
+          ? "h-[320px] w-[320px]"
+          : "h-[360px] w-full sm:h-[430px] md:h-[500px] lg:h-[560px]"
+      }`}
     >
       <motion.div
         animate={{ scale: [0.96, 1.05, 0.96], opacity: [0.1, 0.22, 0.1] }}
         transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
-        className={`pointer-events-none absolute h-[240px] w-[240px] rounded-full blur-[90px] sm:h-[320px] sm:w-[320px] md:h-[400px] md:w-[400px] ${
-          isDark ? "bg-emerald-400/20" : "bg-emerald-500/10"
-        }`}
+        className={`pointer-events-none absolute rounded-full blur-[90px] ${
+          compact
+            ? "h-[220px] w-[220px]"
+            : "h-[240px] w-[240px] sm:h-[320px] sm:w-[320px] md:h-[400px] md:w-[400px]"
+        } ${isDark ? "bg-emerald-400/20" : "bg-emerald-500/10"}`}
       />
 
-      <div className="relative h-[92%] w-full max-w-[580px]">
+      <div className={`relative ${compact ? "h-full w-full" : "h-[92%] w-full max-w-[580px]"}`}>
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 28, repeat: Infinity, ease: "linear" }}
@@ -228,110 +240,58 @@ function McpFlowVisual({ isDark }: { isDark: boolean }) {
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <motion.path
-            d="M18 22 C32 22, 42 30, 50 50"
-            stroke={lineColor}
-            strokeWidth="0.36"
-            fill="none"
-            strokeDasharray="1.8 1.8"
-            animate={{ pathLength: [0.14, 1, 0.14], opacity: [0.22, 0.84, 0.22] }}
-            transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M70 18 C62 28, 56 36, 50 50"
-            stroke={lineColor}
-            strokeWidth="0.36"
-            fill="none"
-            strokeDasharray="1.8 1.8"
-            animate={{ pathLength: [0.16, 1, 0.16], opacity: [0.22, 0.82, 0.22] }}
-            transition={{ duration: 4.8, delay: 0.2, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M74 70 C66 64, 58 58, 50 50"
-            stroke={lineColor}
-            strokeWidth="0.34"
-            fill="none"
-            strokeDasharray="1.8 1.8"
-            animate={{ pathLength: [0.16, 1, 0.16], opacity: [0.18, 0.8, 0.18] }}
-            transition={{ duration: 5, delay: 0.5, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M20 72 C28 64, 38 58, 50 50"
-            stroke={lineColor}
-            strokeWidth="0.34"
-            fill="none"
-            strokeDasharray="1.8 1.8"
-            animate={{ pathLength: [0.18, 1, 0.18], opacity: [0.18, 0.78, 0.18] }}
-            transition={{ duration: 4.6, delay: 0.8, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M50 50 C50 38, 46 22, 40 8"
-            stroke={lineColor}
-            strokeWidth="0.38"
-            fill="none"
-            strokeDasharray="2 2"
-            animate={{ pathLength: [0.14, 1, 0.14], opacity: [0.24, 0.95, 0.24] }}
-            transition={{ duration: 3.8, delay: 0.45, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M18 22 C46 20, 62 18, 70 18"
-            stroke={softLineColor}
-            strokeWidth="0.22"
-            fill="none"
-            strokeDasharray="1 2"
-            animate={{ opacity: [0.08, 0.2, 0.08] }}
-            transition={{ duration: 5.6, repeat: Infinity, ease: "easeInOut" }}
-          />
-          <motion.path
-            d="M20 72 C48 84, 66 82, 74 70"
-            stroke={softLineColor}
-            strokeWidth="0.22"
-            fill="none"
-            strokeDasharray="1 2"
-            animate={{ opacity: [0.08, 0.18, 0.08] }}
-            transition={{ duration: 6.2, repeat: Infinity, ease: "easeInOut" }}
-          />
+          <motion.path d="M18 22 C32 22, 42 30, 50 50" stroke={lineColor} strokeWidth="0.36" fill="none" strokeDasharray="1.8 1.8" animate={{ pathLength: [0.14, 1, 0.14], opacity: [0.22, 0.84, 0.22] }} transition={{ duration: 4.2, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.path d="M70 18 C62 28, 56 36, 50 50" stroke={lineColor} strokeWidth="0.36" fill="none" strokeDasharray="1.8 1.8" animate={{ pathLength: [0.16, 1, 0.16], opacity: [0.22, 0.82, 0.22] }} transition={{ duration: 4.8, delay: 0.2, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.path d="M74 70 C66 64, 58 58, 50 50" stroke={lineColor} strokeWidth="0.34" fill="none" strokeDasharray="1.8 1.8" animate={{ pathLength: [0.16, 1, 0.16], opacity: [0.18, 0.8, 0.18] }} transition={{ duration: 5, delay: 0.5, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.path d="M20 72 C28 64, 38 58, 50 50" stroke={lineColor} strokeWidth="0.34" fill="none" strokeDasharray="1.8 1.8" animate={{ pathLength: [0.18, 1, 0.18], opacity: [0.18, 0.78, 0.18] }} transition={{ duration: 4.6, delay: 0.8, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.path d="M50 50 C50 38, 46 22, 40 8" stroke={lineColor} strokeWidth="0.38" fill="none" strokeDasharray="2 2" animate={{ pathLength: [0.14, 1, 0.14], opacity: [0.24, 0.95, 0.24] }} transition={{ duration: 3.8, delay: 0.45, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.path d="M18 22 C46 20, 62 18, 70 18" stroke={softLineColor} strokeWidth="0.22" fill="none" strokeDasharray="1 2" animate={{ opacity: [0.08, 0.2, 0.08] }} transition={{ duration: 5.6, repeat: Infinity, ease: "easeInOut" }} />
+          <motion.path d="M20 72 C48 84, 66 82, 74 70" stroke={softLineColor} strokeWidth="0.22" fill="none" strokeDasharray="1 2" animate={{ opacity: [0.08, 0.18, 0.08] }} transition={{ duration: 6.2, repeat: Infinity, ease: "easeInOut" }} />
         </svg>
 
         <motion.div
           animate={{ scale: [0.97, 1.05, 0.97], opacity: [0.78, 1, 0.78] }}
           transition={{ duration: 3.8, repeat: Infinity, ease: "easeInOut" }}
-          className={`absolute left-1/2 top-1/2 flex h-24 w-24 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border sm:h-28 sm:w-28 md:h-32 md:w-32 ${coreBorder} ${coreBg}`}
+          className={`absolute left-1/2 top-1/2 flex h-20 w-20 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border sm:h-28 sm:w-28 md:h-32 md:w-32 ${coreBorder} ${coreBg} ${compact ? "sm:h-20 sm:w-20 md:h-20 md:w-20" : ""}`}
         >
           <div className={`absolute inset-3 rounded-full border ${isDark ? "border-emerald-400/16" : "border-emerald-700/14"}`} />
           <div className={`absolute inset-6 rounded-full border ${isDark ? "border-emerald-400/10" : "border-emerald-700/10"}`} />
           <div className="text-center">
-            <div className={isDark ? "text-[8px] uppercase tracking-[0.26em] text-white/34" : "text-[8px] uppercase tracking-[0.26em] text-black/36"}>
+            <div className={`uppercase tracking-[0.26em] ${isDark ? "text-white/34" : "text-black/36"} ${compact ? "text-[7px]" : "text-[8px]"}`}>
               agent
             </div>
-            <div className={isDark ? "mt-2 text-[10px] uppercase tracking-[0.28em] text-emerald-300/78" : "mt-2 text-[10px] uppercase tracking-[0.28em] text-emerald-700/82"}>
+            <div className={`mt-2 uppercase tracking-[0.28em] ${isDark ? "text-emerald-300/78" : "text-emerald-700/82"} ${compact ? "text-[9px]" : "text-[10px]"}`}>
               router
             </div>
           </div>
         </motion.div>
 
-        {labels.map((label) => (
-          <motion.div
-            key={label.text}
-            animate={{
-              y: [0, -6, 0],
-              opacity: [0.5, 1, 0.5],
-              scale: [0.98, 1.02, 0.98],
-            }}
-            transition={{
-              duration: 3.6,
-              delay: label.delay,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-            className={`absolute rounded-full border px-3 py-2 text-[10px] uppercase tracking-[0.16em] ${
-              label.accent ? chipAccent : chipBase
-            }`}
-            style={{ left: label.left, top: label.top }}
-          >
-            {label.text}
-          </motion.div>
-        ))}
+        {labels.map((label, index) => {
+          if (compact && index > 2) return null;
+
+          return (
+            <motion.div
+              key={label.text}
+              animate={{
+                y: [0, -6, 0],
+                opacity: [0.5, 1, 0.5],
+                scale: [0.98, 1.02, 0.98],
+              }}
+              transition={{
+                duration: 3.6,
+                delay: label.delay,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className={`absolute rounded-full border px-3 py-2 uppercase tracking-[0.16em] ${
+                label.accent ? chipAccent : chipBase
+              } ${compact ? "text-[9px]" : "text-[10px]"}`}
+              style={{ left: label.left, top: label.top }}
+            >
+              {label.text}
+            </motion.div>
+          );
+        })}
 
         {particles.map((particle) => (
           <motion.span
@@ -347,7 +307,7 @@ function McpFlowVisual({ isDark }: { isDark: boolean }) {
               repeat: Infinity,
               ease: "easeInOut",
             }}
-            className="absolute h-2 w-2 rounded-full"
+            className={`${compact ? "h-1.5 w-1.5" : "h-2 w-2"} absolute rounded-full`}
             style={{
               left: particle.left,
               top: particle.top,
@@ -357,13 +317,15 @@ function McpFlowVisual({ isDark }: { isDark: boolean }) {
           />
         ))}
 
-        <div
-          className={`absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[8px] uppercase tracking-[0.28em] ${
-            isDark ? "text-white/26" : "text-black/32"
-          }`}
-        >
-          prompt • tools • memory • response
-        </div>
+        {!compact && (
+          <div
+            className={`absolute bottom-2 left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[8px] uppercase tracking-[0.28em] ${
+              isDark ? "text-white/26" : "text-black/32"
+            }`}
+          >
+            prompt • tools • memory • response
+          </div>
+        )}
       </div>
     </motion.div>
   );
@@ -460,13 +422,19 @@ export default function Home() {
         </nav>
       </header>
 
-      <section className="relative z-10 mx-auto flex w-full max-w-[1450px] px-4 py-10 sm:px-6 sm:py-12 md:min-h-[calc(100vh-140px)] md:items-center md:px-10 md:py-6">
+      <section className="relative z-10 mx-auto flex w-full max-w-[1450px] overflow-hidden px-4 py-10 sm:px-6 sm:py-12 md:min-h-[calc(100vh-140px)] md:px-10 md:py-6 lg:items-center">
+        <div className="pointer-events-none absolute right-[-90px] top-[110px] z-0 opacity-80 lg:hidden">
+          <div className="scale-[0.78] sm:scale-[0.88]">
+            <McpFlowVisual isDark={isDark} compact />
+          </div>
+        </div>
+
         <div className="grid w-full items-center gap-10 lg:grid-cols-[0.92fr_1.08fr] lg:gap-10">
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8 }}
-            className="relative z-20 max-w-[720px]"
+            className="relative z-20 max-w-[720px] pr-20 sm:pr-28 lg:pr-0"
           >
             <div
               className={`mb-6 flex min-h-[20px] items-center gap-2 text-[10px] uppercase tracking-[0.16em] sm:text-xs sm:tracking-[0.22em] ${
@@ -497,8 +465,8 @@ export default function Home() {
                 isDark ? "text-white" : "text-[#0f1411]"
               }`}
             >
-              <span className="block text-[clamp(4.2rem,18vw,11rem)]">{typedFirstName}</span>
-              <span className={isDark ? "block text-[clamp(4.2rem,18vw,11rem)] text-emerald-400" : "block text-[clamp(4.2rem,18vw,11rem)] text-emerald-700"}>
+              <span className="block text-[clamp(4.1rem,18vw,11rem)]">{typedFirstName}</span>
+              <span className={isDark ? "block text-[clamp(4.1rem,18vw,11rem)] text-emerald-400" : "block text-[clamp(4.1rem,18vw,11rem)] text-emerald-700"}>
                 {typedLastName}
               </span>
             </h1>
@@ -575,7 +543,9 @@ export default function Home() {
             </div>
           </motion.div>
 
-          <McpFlowVisual isDark={isDark} />
+          <div className="hidden lg:block">
+            <McpFlowVisual isDark={isDark} />
+          </div>
         </div>
       </section>
 
