@@ -191,7 +191,7 @@ function McpFlowVisual({
       initial={{ opacity: 0, x: compact ? 0 : 24, y: compact ? 8 : 0 }}
       animate={{ opacity: 1, x: 0, y: 0 }}
       transition={{ duration: 0.85, delay: 0.18 }}
-      className={`relative ${compact ? "h-[260px] w-[260px]" : "h-[520px] w-full max-w-[560px]"}`}
+      className={`relative ${compact ? "h-[230px] w-[230px]" : "h-[520px] w-full max-w-[560px]"}`}
     >
       <motion.div
         animate={{
@@ -200,7 +200,7 @@ function McpFlowVisual({
         }}
         transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-400/20 blur-[70px] ${
-          compact ? "h-[160px] w-[160px]" : "h-[290px] w-[290px]"
+          compact ? "h-[138px] w-[138px]" : "h-[290px] w-[290px]"
         }`}
       />
 
@@ -208,7 +208,7 @@ function McpFlowVisual({
         animate={{ rotate: 360 }}
         transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border ${ring} ${
-          compact ? "h-[210px] w-[210px]" : "h-[390px] w-[390px]"
+          compact ? "h-[186px] w-[186px]" : "h-[390px] w-[390px]"
         }`}
       />
 
@@ -216,7 +216,7 @@ function McpFlowVisual({
         animate={{ rotate: -360 }}
         transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed ${softRing} ${
-          compact ? "h-[136px] w-[136px]" : "h-[250px] w-[250px]"
+          compact ? "h-[118px] w-[118px]" : "h-[250px] w-[250px]"
         }`}
       />
 
@@ -280,7 +280,7 @@ function McpFlowVisual({
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className={`absolute rounded-full border border-white/10 px-3 py-2 backdrop-blur-md ${panel}`}
+          className={`absolute rounded-full border border-white/10 px-3 py-2 backdrop-blur-md ${panel} ${compact ? "opacity-80" : ""}`}
           style={{ left: node.left, top: node.top }}
         >
           <span
@@ -305,7 +305,7 @@ function McpFlowVisual({
           }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           className={`relative flex items-center justify-center rounded-full border border-emerald-400/24 bg-emerald-400/8 ${
-            compact ? "h-[88px] w-[88px]" : "h-[138px] w-[138px]"
+            compact ? "h-[78px] w-[78px]" : "h-[138px] w-[138px]"
           }`}
         >
           <div
@@ -325,7 +325,7 @@ function McpFlowVisual({
             <p
               className={`mt-2 font-semibold uppercase tracking-[0.22em] ${
                 dark ? "text-white" : "text-[#0e1711]"
-              } ${compact ? "text-[11px]" : "text-sm"}`}
+              } ${compact ? "text-[10px]" : "text-sm"}`}
             >
               Agent
               <br />
@@ -453,13 +453,13 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="relative z-10 mx-auto max-w-[1450px] px-4 pb-16 pt-8 sm:px-6 sm:pb-20 sm:pt-12 md:px-10 md:pt-16">
+      <section className="relative z-10 mx-auto max-w-[1450px] px-4 pb-10 pt-8 sm:px-6 sm:pb-20 sm:pt-12 md:px-10 md:pt-16">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(460px,0.96fr)]">
           <motion.div
             initial={{ opacity: 0, y: 26 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.78 }}
-            className="relative max-w-[760px] pb-[12.5rem] md:pb-0"
+            className="relative min-h-[calc(100svh-11.5rem)] max-w-[760px] pb-8 md:min-h-0 md:pb-0"
           >
             <div
               className={`flex min-h-[22px] items-center gap-3 text-[10px] uppercase tracking-[0.24em] sm:text-xs ${
@@ -542,8 +542,8 @@ export default function Home() {
               </a>
             </div>
 
-            <div className="pointer-events-none absolute right-[-0.8rem] top-[8.6rem] z-0 md:hidden">
-              <div className="scale-[0.86] sm:scale-[0.94]">
+            <div className="pointer-events-none absolute right-[-2.1rem] top-[4.7rem] z-0 opacity-90 md:hidden">
+              <div className="scale-[0.74] sm:scale-[0.82]">
                 <McpFlowVisual dark={isDark} compact />
               </div>
             </div>
