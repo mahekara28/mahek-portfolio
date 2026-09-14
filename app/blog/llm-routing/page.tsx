@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { useTheme } from "../../theme-provider";
 
 export default function LLMRoutingPage() {
@@ -9,25 +10,20 @@ export default function LLMRoutingPage() {
   return (
     <main
       className={`min-h-screen transition-colors duration-500 ${
-        isDark ? "bg-[#060806] text-white" : "bg-[#f4f7f2] text-[#0f1411]"
+        isDark ? "bg-[#140d10] text-[#efe1d6]" : "bg-[#f3e9df] text-[#24181a]"
       }`}
     >
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div
-          className={`absolute -right-40 top-20 h-[500px] w-[500px] rounded-full blur-[140px] ${
-            isDark ? "bg-emerald-500/[0.05]" : "bg-emerald-500/[0.10]"
-          }`}
-        />
-        <div
-          className={`absolute -left-40 bottom-0 h-[400px] w-[400px] rounded-full blur-[130px] ${
-            isDark ? "bg-emerald-400/[0.04]" : "bg-emerald-400/[0.08]"
-          }`}
-        />
+        <div className="absolute -left-24 top-0 h-[320px] w-[320px] rounded-full bg-[#5a4558]/18 blur-[130px]" />
+        <div className="absolute -right-44 top-16 h-[420px] w-[420px] rounded-full bg-[#6f2f3d]/22 blur-[130px]" />
+        <div className="absolute -left-36 bottom-0 h-[320px] w-[320px] rounded-full bg-[#4f3946]/18 blur-[120px]" />
       </div>
+
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(126,63,76,0.13),transparent_34%),radial-gradient(circle_at_top_right,rgba(212,178,159,0.04),transparent_28%)]" />
 
       <nav
         className={`relative z-20 border-b px-4 py-5 sm:px-6 md:px-10 ${
-          isDark ? "border-white/10" : "border-black/10"
+          isDark ? "border-[#d4b29f]/10" : "border-black/10"
         }`}
       >
         <div className="mx-auto flex max-w-6xl items-center justify-between">
@@ -35,8 +31,8 @@ export default function LLMRoutingPage() {
             href="/"
             className={`flex h-10 w-10 items-center justify-center rounded-full border text-[11px] font-semibold tracking-[0.12em] transition ${
               isDark
-                ? "border-white/15 text-white hover:border-emerald-400 hover:text-emerald-300"
-                : "border-black/15 text-[#0f1411] hover:border-emerald-600 hover:text-emerald-700"
+                ? "border-[#d4b29f]/18 text-[#efe1d6] hover:border-[#d4b29f]/34 hover:text-[#f5e7db]"
+                : "border-[#7e3f4c]/16 text-[#24181a] hover:border-[#7e3f4c]/32 hover:text-[#7e3f4c]"
             }`}
           >
             MA
@@ -46,8 +42,8 @@ export default function LLMRoutingPage() {
             href="/blog"
             className={`rounded-full border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition ${
               isDark
-                ? "border-white/10 text-white/40 hover:border-emerald-400/35 hover:bg-emerald-400/10 hover:text-emerald-300"
-                : "border-black/10 text-black/45 hover:border-emerald-600/25 hover:bg-emerald-500/8 hover:text-emerald-700"
+                ? "border-[#d4b29f]/12 text-[#efe1d6]/44 hover:border-[#d4b29f]/30 hover:bg-[#d4b29f]/[0.04] hover:text-[#f5e7db]"
+                : "border-[#7e3f4c]/12 text-black/45 hover:border-[#7e3f4c]/28 hover:bg-[#7e3f4c]/[0.04] hover:text-[#7e3f4c]"
             }`}
           >
             Back to blog
@@ -58,64 +54,54 @@ export default function LLMRoutingPage() {
       <article className="relative z-10 px-4 sm:px-6 md:px-10">
         <div className="mx-auto max-w-6xl">
           <header
-            className={`grid gap-12 border-b pb-12 pt-14 md:grid-cols-[180px_minmax(0,1fr)] md:pb-16 md:pt-20 ${
-              isDark ? "border-white/10" : "border-black/10"
+            className={`grid gap-12 border-b pb-12 pt-14 md:grid-cols-[190px_minmax(0,1fr)] md:pb-16 md:pt-20 ${
+              isDark ? "border-[#d4b29f]/10" : "border-black/10"
             }`}
           >
             <div className="space-y-6">
-              <div>
-                <div
-                  className={`text-[10px] uppercase tracking-[0.18em] ${
-                    isDark ? "text-white/28" : "text-black/36"
-                  }`}
-                >
-                  Category
-                </div>
-                <div className={isDark ? "mt-2 text-sm text-emerald-300/80" : "mt-2 text-sm text-emerald-700/85"}>
-                  AI Engineering
-                </div>
-              </div>
-
-              <div>
-                <div
-                  className={`text-[10px] uppercase tracking-[0.18em] ${
-                    isDark ? "text-white/28" : "text-black/36"
-                  }`}
-                >
-                  Published
-                </div>
-                <div className={isDark ? "mt-2 text-sm text-white/58" : "mt-2 text-sm text-black/60"}>
-                  September 2026
-                </div>
-              </div>
-
-              <div>
-                <div
-                  className={`text-[10px] uppercase tracking-[0.18em] ${
-                    isDark ? "text-white/28" : "text-black/36"
-                  }`}
-                >
-                  Read time
-                </div>
-                <div className={isDark ? "mt-2 text-sm text-white/58" : "mt-2 text-sm text-black/60"}>
-                  6 min read
-                </div>
-              </div>
+              <MetaBlock
+                label="Category"
+                value="AI Engineering"
+                highlight
+                isDark={isDark}
+              />
+              <MetaBlock
+                label="Published"
+                value="September 2026"
+                isDark={isDark}
+              />
+              <MetaBlock
+                label="Read time"
+                value="6 min read"
+                isDark={isDark}
+              />
             </div>
 
             <div>
-              <div className={isDark ? "text-[10px] uppercase tracking-[0.22em] text-emerald-400/80" : "text-[10px] uppercase tracking-[0.22em] text-emerald-700/85"}>
+              <div
+                className={`text-[10px] uppercase tracking-[0.22em] ${
+                  isDark ? "text-[#d4b29f]" : "text-[#8b4652]"
+                }`}
+              >
                 Essay 01
               </div>
 
               <h1 className="mt-6 max-w-4xl text-4xl font-medium leading-[1.02] tracking-[-0.05em] sm:text-5xl md:text-6xl">
                 Your LLM doesn&apos;t need more intelligence.
-                <span className={isDark ? "block text-white/38" : "block text-black/38"}>
+                <span
+                  className={`block ${
+                    isDark ? "text-[#b88388]" : "text-[#8b4652]"
+                  }`}
+                >
                   It needs better routing.
                 </span>
               </h1>
 
-              <p className={isDark ? "mt-7 max-w-2xl text-base leading-8 text-white/50 sm:text-lg" : "mt-7 max-w-2xl text-base leading-8 text-black/62 sm:text-lg"}>
+              <p
+                className={`mt-7 max-w-2xl text-base leading-8 sm:text-lg ${
+                  isDark ? "text-[#efe1d6]/60" : "text-black/62"
+                }`}
+              >
                 I kept coming back to one annoying question while building LLM
                 systems: why do we keep sending every request to the biggest
                 model we have, even when the task clearly doesn&apos;t need it?
@@ -123,18 +109,22 @@ export default function LLMRoutingPage() {
             </div>
           </header>
 
-          <div className="grid gap-14 py-12 md:grid-cols-[180px_minmax(0,1fr)] md:py-16">
+          <div className="grid gap-14 py-12 md:grid-cols-[190px_minmax(0,1fr)] md:py-16">
             <aside className="hidden md:block">
               <div className="sticky top-24">
                 <div
                   className={`text-[10px] uppercase tracking-[0.18em] ${
-                    isDark ? "text-white/28" : "text-black/36"
+                    isDark ? "text-[#efe1d6]/30" : "text-black/36"
                   }`}
                 >
                   In this note
                 </div>
 
-                <div className={isDark ? "mt-5 space-y-3 text-sm text-white/46" : "mt-5 space-y-3 text-sm text-black/56"}>
+                <div
+                  className={`mt-5 space-y-3 text-sm ${
+                    isDark ? "text-[#efe1d6]/48" : "text-black/56"
+                  }`}
+                >
                   <div>The real problem</div>
                   <div>What a router should do</div>
                   <div>Why cheap isn&apos;t the goal</div>
@@ -158,9 +148,9 @@ export default function LLMRoutingPage() {
                 </p>
 
                 <p>
-                  That is fine in a demo. It starts to feel wasteful the moment
-                  the product gets real users, real traffic, and real latency
-                  complaints.
+                  That feels fine in a demo. It starts to feel wasteful the
+                  moment the product gets real users, real traffic, and real
+                  latency complaints.
                 </p>
               </Section>
 
@@ -213,8 +203,8 @@ else:
 
                 <p>
                   Once I started looking at it this way, the router stopped
-                  feeling like a classifier and started feeling like control
-                  logic.
+                  feeling like a classifier and started feeling more like
+                  control logic.
                 </p>
               </Section>
 
@@ -325,7 +315,11 @@ else:
 
                 <p>Not &quot;how do I make the model smarter?&quot;</p>
 
-                <p className={isDark ? "text-xl leading-8 text-emerald-300 sm:text-2xl" : "text-xl leading-8 text-emerald-700 sm:text-2xl"}>
+                <p
+                  className={`text-xl leading-8 sm:text-2xl ${
+                    isDark ? "text-[#d4b29f]" : "text-[#8b4652]"
+                  }`}
+                >
                   More like: how do I make the system better at deciding when
                   intelligence is actually needed?
                 </p>
@@ -333,12 +327,12 @@ else:
 
               <footer
                 className={`mt-16 border-t pt-10 ${
-                  isDark ? "border-white/10" : "border-black/10"
+                  isDark ? "border-[#d4b29f]/10" : "border-black/10"
                 }`}
               >
                 <div
                   className={`text-[10px] uppercase tracking-[0.18em] ${
-                    isDark ? "text-white/28" : "text-black/36"
+                    isDark ? "text-[#efe1d6]/30" : "text-black/36"
                   }`}
                 >
                   More writing
@@ -347,14 +341,22 @@ else:
                 <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
                   <Link
                     href="/blog"
-                    className={isDark ? "text-white/45 transition hover:text-white" : "text-black/55 transition hover:text-black"}
+                    className={`transition ${
+                      isDark
+                        ? "text-[#efe1d6]/48 hover:text-[#f5e7db]"
+                        : "text-black/55 hover:text-black"
+                    }`}
                   >
                     Back to archive
                   </Link>
 
                   <Link
                     href="/projects"
-                    className={isDark ? "text-emerald-300 transition hover:text-emerald-200" : "text-emerald-700 transition hover:text-emerald-800"}
+                    className={`transition ${
+                      isDark
+                        ? "text-[#d4b29f] hover:text-[#f5e7db]"
+                        : "text-[#8b4652] hover:text-[#7e3f4c]"
+                    }`}
                   >
                     View projects
                   </Link>
@@ -368,21 +370,62 @@ else:
   );
 }
 
+function MetaBlock({
+  label,
+  value,
+  highlight = false,
+  isDark,
+}: {
+  label: string;
+  value: string;
+  highlight?: boolean;
+  isDark: boolean;
+}) {
+  return (
+    <div>
+      <div
+        className={`text-[10px] uppercase tracking-[0.18em] ${
+          isDark ? "text-[#efe1d6]/30" : "text-black/36"
+        }`}
+      >
+        {label}
+      </div>
+      <div
+        className={`mt-2 text-sm ${
+          highlight
+            ? isDark
+              ? "text-[#d4b29f]"
+              : "text-[#8b4652]"
+            : isDark
+              ? "text-[#efe1d6]/60"
+              : "text-black/60"
+        }`}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
 function Section({
   title,
   children,
   isDark,
 }: {
   title?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   isDark: boolean;
 }) {
   return (
     <section className="mb-14">
-      {title && <h2 className="mb-5 text-xl font-medium tracking-tight sm:text-2xl">{title}</h2>}
+      {title && (
+        <h2 className="mb-5 text-xl font-medium tracking-tight sm:text-2xl">
+          {title}
+        </h2>
+      )}
       <div
         className={`space-y-5 text-[16px] leading-8 ${
-          isDark ? "text-white/56" : "text-black/66"
+          isDark ? "text-[#efe1d6]/60" : "text-black/66"
         }`}
       >
         {children}
@@ -395,15 +438,15 @@ function Quote({
   children,
   isDark,
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   isDark: boolean;
 }) {
   return (
     <div
       className={`my-8 border-l pl-5 text-lg leading-8 ${
         isDark
-          ? "border-emerald-400/40 text-white/78"
-          : "border-emerald-600/35 text-black/82"
+          ? "border-[#8b4652]/50 text-[#efe1d6]/82"
+          : "border-[#8b4652]/40 text-black/82"
       }`}
     >
       {children}
@@ -419,10 +462,18 @@ function List({
   isDark: boolean;
 }) {
   return (
-    <ul className={`my-8 space-y-3 text-[15px] ${isDark ? "text-white/56" : "text-black/66"}`}>
+    <ul
+      className={`my-8 space-y-3 text-[15px] ${
+        isDark ? "text-[#efe1d6]/58" : "text-black/66"
+      }`}
+    >
       {items.map((item, index) => (
         <li key={item} className="flex items-center gap-3">
-          <span className={isDark ? "font-mono text-xs text-emerald-400/70" : "font-mono text-xs text-emerald-700/70"}>
+          <span
+            className={`font-mono text-xs ${
+              isDark ? "text-[#d4b29f]/76" : "text-[#8b4652]/76"
+            }`}
+          >
             0{index + 1}
           </span>
           <span>{item}</span>
@@ -457,28 +508,28 @@ function Diagram({
       className={`my-14 overflow-hidden rounded-[24px] border ${
         secondary
           ? isDark
-            ? "border-white/10 bg-white/[0.02]"
+            ? "border-[#d4b29f]/10 bg-white/[0.02]"
             : "border-black/10 bg-white/55"
           : isDark
-            ? "border-emerald-400/12 bg-[#071009]"
-            : "border-emerald-600/14 bg-emerald-50/70"
+            ? "border-[#8b4652]/18 bg-[#191115]"
+            : "border-[#8b4652]/14 bg-[#fbf4ef]"
       }`}
     >
       <div
         className={`flex items-center justify-between border-b px-5 py-3 ${
-          isDark ? "border-white/8" : "border-black/8"
+          isDark ? "border-[#d4b29f]/8" : "border-black/8"
         }`}
       >
         <span
           className={`font-mono text-[10px] uppercase tracking-[0.18em] ${
-            isDark ? "text-white/34" : "text-black/40"
+            isDark ? "text-[#efe1d6]/34" : "text-black/40"
           }`}
         >
           {secondary ? "escalation flow" : "routing sketch"}
         </span>
         <span
           className={`font-mono text-[10px] ${
-            isDark ? "text-white/20" : "text-black/28"
+            isDark ? "text-[#efe1d6]/22" : "text-black/28"
           }`}
         >
           {secondary ? "system view" : "architecture"}
@@ -488,7 +539,7 @@ function Diagram({
       <div className="overflow-x-auto p-6 sm:p-8">
         <pre
           className={`min-w-[420px] font-mono text-xs leading-7 sm:text-sm ${
-            isDark ? "text-white/48" : "text-black/62"
+            isDark ? "text-[#efe1d6]/54" : "text-black/62"
           }`}
         >
           {diagramCode}
@@ -510,24 +561,26 @@ function CodeBlock({
   return (
     <div
       className={`my-8 overflow-hidden rounded-[24px] border ${
-        isDark ? "border-white/10 bg-white/[0.02]" : "border-black/10 bg-white/60"
+        isDark
+          ? "border-[#d4b29f]/10 bg-white/[0.02]"
+          : "border-black/10 bg-white/60"
       }`}
     >
       <div
         className={`flex items-center justify-between border-b px-4 py-3 ${
-          isDark ? "border-white/8" : "border-black/8"
+          isDark ? "border-[#d4b29f]/8" : "border-black/8"
         }`}
       >
         <span
           className={`font-mono text-[10px] uppercase tracking-[0.18em] ${
-            isDark ? "text-white/34" : "text-black/40"
+            isDark ? "text-[#efe1d6]/34" : "text-black/40"
           }`}
         >
           {language}
         </span>
         <span
           className={`font-mono text-[10px] ${
-            isDark ? "text-white/20" : "text-black/28"
+            isDark ? "text-[#efe1d6]/22" : "text-black/28"
           }`}
         >
           snippet
@@ -536,7 +589,7 @@ function CodeBlock({
 
       <pre
         className={`overflow-x-auto p-5 font-mono text-[13px] leading-7 ${
-          isDark ? "text-white/62" : "text-black/72"
+          isDark ? "text-[#efe1d6]/68" : "text-black/72"
         }`}
       >
         <code>{code}</code>
