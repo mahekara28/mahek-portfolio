@@ -584,7 +584,7 @@ export default function Home() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: 320, opacity: 0.92 }}
               transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-              className={`fixed right-0 top-0 z-50 flex h-screen w-[84%] max-w-[320px] flex-col border-l px-5 pb-6 pt-5 shadow-[0_28px_80px_rgba(0,0,0,0.18)] md:hidden ${
+              className={`fixed right-0 top-0 z-50 flex h-[100dvh] max-h-[100dvh] w-[84%] max-w-[320px] flex-col overflow-y-auto overscroll-contain border-l px-5 pb-[calc(env(safe-area-inset-bottom)+1.5rem)] pt-5 shadow-[0_28px_80px_rgba(0,0,0,0.18)] md:hidden ${
                 isDark
                   ? "border-[#d4b29f]/12 bg-[#140d10]/96 text-[#efe1d6]"
                   : "border-[#7e3f4c]/10 bg-[#f6ede4]/97 text-[#24181a]"
@@ -669,7 +669,7 @@ export default function Home() {
                 </a>
 
                 <a
-                  href="https://x.com/mahekara28"
+                  href="https://x.com/"
                   target="_blank"
                   rel="noreferrer"
                   aria-label="X"
