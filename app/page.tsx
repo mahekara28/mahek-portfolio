@@ -9,7 +9,6 @@ import {
   FileText,
   Menu,
   Moon,
-  Sparkles,
   Sun,
   X,
 } from "lucide-react";
@@ -120,6 +119,23 @@ function LinkedInIcon({
   );
 }
 
+function XSocialIcon({
+  className = "h-[18px] w-[18px]",
+}: {
+  className?: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
+    >
+      <path d="M18.244 2H21.5l-7.111 8.129L22.75 22h-6.545l-5.126-6.704L5.214 22H1.956l7.607-8.695L1.55 2h6.711l4.634 6.117L18.244 2Zm-1.142 18h1.804L7.276 3.895H5.341L17.102 20Z" />
+    </svg>
+  );
+}
+
 function NavIconLink({
   href,
   label,
@@ -166,39 +182,32 @@ function NavIconLink({
 function MobilePanelLink({
   href,
   label,
-  icon,
   isDark,
   onClick,
   external = false,
+  active = false,
 }: {
   href: string;
   label: string;
-  icon: ReactNode;
   isDark: boolean;
   onClick: () => void;
   external?: boolean;
+  active?: boolean;
 }) {
-  const className = `flex h-14 items-center justify-between rounded-[20px] border px-4 transition ${
-    isDark
-      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/84 hover:border-[#d4b29f]/28 hover:bg-[#d4b29f]/[0.035]"
-      : "border-[#7e3f4c]/10 bg-white/60 text-black/78 hover:border-[#7e3f4c]/24 hover:bg-[#7e3f4c]/[0.04]"
+  const className = `flex h-14 items-center justify-between rounded-[18px] px-5 text-[1.05rem] transition ${
+    active
+      ? isDark
+        ? "bg-white/[0.04] text-[#f6eadf]"
+        : "bg-[#2a1f21] text-[#f7eee6]"
+      : isDark
+        ? "text-[#efe1d6]/82 hover:bg-white/[0.03] hover:text-[#f6eadf]"
+        : "text-black/80 hover:bg-black/[0.03] hover:text-black"
   }`;
 
   const content = (
     <>
-      <span className="flex items-center gap-3 text-sm">
-        <span
-          className={`flex h-9 w-9 items-center justify-center rounded-full border ${
-            isDark
-              ? "border-[#d4b29f]/10 bg-[#25181d]"
-              : "border-[#7e3f4c]/10 bg-[#f8f1ea]"
-          }`}
-        >
-          {icon}
-        </span>
-        {label}
-      </span>
-      <ArrowUpRight className="h-4 w-4 opacity-70" />
+      <span>{label}</span>
+      <ArrowUpRight className="h-4 w-4 opacity-55" />
     </>
   );
 
@@ -581,40 +590,7 @@ export default function Home() {
                   : "border-[#7e3f4c]/10 bg-[#f6ede4]/97 text-[#24181a]"
               }`}
             >
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <div
-                    className={`relative flex h-12 w-12 items-center justify-center rounded-[18px] border ${
-                      isDark
-                        ? "border-[#d4b29f]/16 bg-[#2a1a1f]"
-                        : "border-[#7e3f4c]/12 bg-white/70"
-                    }`}
-                  >
-                    <div
-                      className={`absolute inset-[7px] rounded-[14px] border ${
-                        isDark
-                          ? "border-[#d4b29f]/10"
-                          : "border-[#7e3f4c]/10"
-                      }`}
-                    />
-                    <span className="text-[13px] font-semibold tracking-[0.14em]">
-                      MA
-                    </span>
-                    <Sparkles className="absolute -right-1.5 -top-1.5 h-4 w-4 text-[#b88388]" />
-                  </div>
-
-                  <div>
-                    <p
-                      className={`text-[11px] uppercase tracking-[0.24em] ${
-                        isDark ? "text-[#efe1d6]/42" : "text-black/42"
-                      }`}
-                    >
-                      Signal panel
-                    </p>
-                    <p className="mt-1 text-sm">AI / LLM / DevRel</p>
-                  </div>
-                </div>
-
+              <div className="flex items-start justify-end">
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   aria-label="Close navigation menu"
@@ -628,73 +604,42 @@ export default function Home() {
                 </button>
               </div>
 
-              <div className="mt-8 space-y-3">
-                <MobilePanelLink
-                  href="/"
-                  label="Home"
-                  icon={<span className="text-sm font-semibold">MA</span>}
-                  isDark={isDark}
-                  onClick={() => setMobileMenuOpen(false)}
-                />
-                <MobilePanelLink
-                  href="/projects"
-                  label="Projects"
-                  icon={<BriefcaseBusiness className="h-[17px] w-[17px]" />}
-                  isDark={isDark}
-                  onClick={() => setMobileMenuOpen(false)}
-                />
-                <MobilePanelLink
-                  href="/blog"
-                  label="Blog"
-                  icon={<BookOpen className="h-[17px] w-[17px]" />}
-                  isDark={isDark}
-                  onClick={() => setMobileMenuOpen(false)}
-                />
-                <MobilePanelLink
-                  href="https://github.com/mahekara28"
-                  label="GitHub"
-                  icon={<GitHubIcon className="h-[17px] w-[17px]" />}
-                  isDark={isDark}
-                  external
-                  onClick={() => setMobileMenuOpen(false)}
-                />
-                <MobilePanelLink
-                  href="https://www.linkedin.com/in/mahek-ara/"
-                  label="LinkedIn"
-                  icon={<LinkedInIcon className="h-[17px] w-[17px]" />}
-                  isDark={isDark}
-                  external
-                  onClick={() => setMobileMenuOpen(false)}
-                />
-                <MobilePanelLink
-                  href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
-                  label="Resume"
-                  icon={<FileText className="h-[17px] w-[17px]" />}
-                  isDark={isDark}
-                  external
-                  onClick={() => setMobileMenuOpen(false)}
-                />
+              <div className="mt-10 px-1">
+                <div className="space-y-3">
+                  <MobilePanelLink
+                    href="/"
+                    label="Home"
+                    isDark={isDark}
+                    onClick={() => setMobileMenuOpen(false)}
+                    active
+                  />
+                  <MobilePanelLink
+                    href="/projects"
+                    label="Projects"
+                    isDark={isDark}
+                    onClick={() => setMobileMenuOpen(false)}
+                  />
+                  <MobilePanelLink
+                    href="/blog"
+                    label="Blogs"
+                    isDark={isDark}
+                    onClick={() => setMobileMenuOpen(false)}
+                  />
+                  <MobilePanelLink
+                    href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
+                    label="Resume"
+                    isDark={isDark}
+                    external
+                    onClick={() => setMobileMenuOpen(false)}
+                  />
+                </div>
               </div>
 
               <div
-                className={`mt-auto flex items-center justify-between border-t pt-5 ${
+                className={`mt-auto flex items-center justify-start gap-4 border-t px-1 pt-5 ${
                   isDark ? "border-[#d4b29f]/10" : "border-[#7e3f4c]/10"
                 }`}
               >
-                <a
-                  href="https://github.com/mahekara28"
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="GitHub"
-                  className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
-                    isDark
-                      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/76"
-                      : "border-[#7e3f4c]/12 bg-white/68 text-black/72"
-                  }`}
-                >
-                  <GitHubIcon className="h-[17px] w-[17px]" />
-                </a>
-
                 <a
                   href="https://www.linkedin.com/in/mahek-ara/"
                   target="_blank"
@@ -702,25 +647,39 @@ export default function Home() {
                   aria-label="LinkedIn"
                   className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
                     isDark
-                      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/76"
-                      : "border-[#7e3f4c]/12 bg-white/68 text-black/72"
+                      ? "border-[#d4b29f]/14 bg-white/[0.01] text-[#efe1d6]/76 hover:border-[#d4b29f]/28"
+                      : "border-[#7e3f4c]/12 bg-white/48 text-black/72 hover:border-[#7e3f4c]/24"
                   }`}
                 >
                   <LinkedInIcon className="h-[17px] w-[17px]" />
                 </a>
 
                 <a
-                  href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
+                  href="https://github.com/mahekara28"
                   target="_blank"
                   rel="noreferrer"
-                  aria-label="Resume"
+                  aria-label="GitHub"
                   className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
                     isDark
-                      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/76"
-                      : "border-[#7e3f4c]/12 bg-white/68 text-black/72"
+                      ? "border-[#d4b29f]/14 bg-white/[0.01] text-[#efe1d6]/76 hover:border-[#d4b29f]/28"
+                      : "border-[#7e3f4c]/12 bg-white/48 text-black/72 hover:border-[#7e3f4c]/24"
                   }`}
                 >
-                  <FileText className="h-[17px] w-[17px]" />
+                  <GitHubIcon className="h-[17px] w-[17px]" />
+                </a>
+
+                <a
+                  href="https://x.com/mahekara28"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="X"
+                  className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
+                    isDark
+                      ? "border-[#d4b29f]/14 bg-white/[0.01] text-[#efe1d6]/76 hover:border-[#d4b29f]/28"
+                      : "border-[#7e3f4c]/12 bg-white/48 text-black/72 hover:border-[#7e3f4c]/24"
+                  }`}
+                >
+                  <XSocialIcon className="h-[16px] w-[16px]" />
                 </a>
 
                 <button
@@ -728,8 +687,8 @@ export default function Home() {
                   aria-label="Toggle theme"
                   className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
                     isDark
-                      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/76"
-                      : "border-[#7e3f4c]/12 bg-white/68 text-black/72"
+                      ? "border-[#d4b29f]/14 bg-white/[0.01] text-[#efe1d6]/76 hover:border-[#d4b29f]/28"
+                      : "border-[#7e3f4c]/12 bg-white/48 text-black/72 hover:border-[#7e3f4c]/24"
                   }`}
                 >
                   {isDark ? (
