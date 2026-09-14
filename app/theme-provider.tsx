@@ -24,19 +24,8 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("theme") as Theme | null;
-
-    if (savedTheme === "dark" || savedTheme === "light") {
-      setThemeState(savedTheme);
-    } else {
-      setThemeState("light");
-      localStorage.setItem("theme", "light");
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("theme", theme);
     document.documentElement.dataset.theme = theme;
+    localStorage.setItem("theme", theme);
   }, [theme]);
 
   const setTheme = (nextTheme: Theme) => {
