@@ -1,14 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import {
   ArrowUpRight,
   BookOpen,
   BriefcaseBusiness,
   FileText,
+  Menu,
   Moon,
+  Sparkles,
   Sun,
+  X,
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
@@ -156,6 +159,66 @@ function NavIconLink({
     <Link href={href} aria-label={label} className={baseClass}>
       {icon}
       {labelNode}
+    </Link>
+  );
+}
+
+function MobilePanelLink({
+  href,
+  label,
+  icon,
+  isDark,
+  onClick,
+  external = false,
+}: {
+  href: string;
+  label: string;
+  icon: ReactNode;
+  isDark: boolean;
+  onClick: () => void;
+  external?: boolean;
+}) {
+  const className = `flex h-14 items-center justify-between rounded-[20px] border px-4 transition ${
+    isDark
+      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/84 hover:border-[#d4b29f]/28 hover:bg-[#d4b29f]/[0.035]"
+      : "border-[#7e3f4c]/10 bg-white/60 text-black/78 hover:border-[#7e3f4c]/24 hover:bg-[#7e3f4c]/[0.04]"
+  }`;
+
+  const content = (
+    <>
+      <span className="flex items-center gap-3 text-sm">
+        <span
+          className={`flex h-9 w-9 items-center justify-center rounded-full border ${
+            isDark
+              ? "border-[#d4b29f]/10 bg-[#25181d]"
+              : "border-[#7e3f4c]/10 bg-[#f8f1ea]"
+          }`}
+        >
+          {icon}
+        </span>
+        {label}
+      </span>
+      <ArrowUpRight className="h-4 w-4 opacity-70" />
+    </>
+  );
+
+  if (external) {
+    return (
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className={className}
+        onClick={onClick}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link href={href} className={className} onClick={onClick}>
+      {content}
     </Link>
   );
 }
@@ -367,6 +430,7 @@ function McpFlowVisual({
 
 export default function Home() {
   const { isDark, toggleTheme } = useTheme();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const typedStatus = useTypedLoop(statusPhrases, 58, 1200);
   const typedHeading = useTypeOnce("Hi, I'm Mahek Ara", 30, 70);
   const typedIntro = useTypeOnce(introLine, 16, 520);
@@ -427,8 +491,20 @@ export default function Home() {
             </span>
           </Link>
 
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open navigation menu"
+            className={`flex h-11 w-11 items-center justify-center rounded-full border transition duration-300 md:hidden ${
+              isDark
+                ? "border-[#d4b29f]/14 text-[#efe1d6]/76 hover:border-[#d4b29f]/34 hover:text-[#f5e7db]"
+                : "border-[#7e3f4c]/14 text-black/70 hover:border-[#7e3f4c]/32 hover:text-[#7e3f4c]"
+            }`}
+          >
+            <Menu className="h-[18px] w-[18px]" />
+          </button>
+
           <div
-            className={`flex flex-wrap items-center justify-end gap-2 sm:gap-3 ${
+            className={`hidden flex-wrap items-center justify-end gap-2 sm:gap-3 md:flex ${
               isDark ? "text-[#efe1d6]/74" : "text-black/66"
             }`}
           >
@@ -479,6 +555,171 @@ export default function Home() {
           </div>
         </div>
       </header>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <>
+            <motion.button
+              type="button"
+              aria-label="Close navigation menu"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className="fixed inset-0 z-40 bg-black/28 backdrop-blur-[2px] md:hidden"
+            />
+
+            <motion.aside
+              initial={{ x: -320, opacity: 0.92 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -320, opacity: 0.92 }}
+              transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
+              className={`fixed left-0 top-0 z-50 flex h-screen w-[84%] max-w-[320px] flex-col border-r px-5 pb-6 pt-5 shadow-[0_28px_80px_rgba(0,0,0,0.18)] md:hidden ${
+                isDark
+                  ? "border-[#d4b29f]/12 bg-[#140d10]/95 text-[#efe1d6]"
+                  : "border-[#7e3f4c]/10 bg-[#f6ede4]/96 text-[#24181a]"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`relative flex h-12 w-12 items-center justify-center rounded-[18px] border ${
+                      isDark
+                        ? "border-[#d4b29f]/16 bg-[#2a1a1f]"
+                        : "border-[#7e3f4c]/12 bg-white/70"
+                    }`}
+                  >
+                    <div
+                      className={`absolute inset-[7px] rounded-[14px] border ${
+                        isDark
+                          ? "border-[#d4b29f]/10"
+                          : "border-[#7e3f4c]/10"
+                      }`}
+                    />
+                    <span className="text-[13px] font-semibold tracking-[0.14em]">
+                      MA
+                    </span>
+                    <Sparkles className="absolute -right-1.5 -top-1.5 h-4 w-4 text-[#b88388]" />
+                  </div>
+
+                  <div>
+                    <p
+                      className={`text-[11px] uppercase tracking-[0.24em] ${
+                        isDark ? "text-[#efe1d6]/42" : "text-black/42"
+                      }`}
+                    >
+                      Signal panel
+                    </p>
+                    <p className="mt-1 text-sm">AI / LLM / DevRel</p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setMobileMenuOpen(false)}
+                  aria-label="Close navigation menu"
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border transition ${
+                    isDark
+                      ? "border-[#d4b29f]/14 text-[#efe1d6]/76 hover:border-[#d4b29f]/34"
+                      : "border-[#7e3f4c]/12 text-black/68 hover:border-[#7e3f4c]/26"
+                  }`}
+                >
+                  <X className="h-[17px] w-[17px]" />
+                </button>
+              </div>
+
+              <div
+                className={`mt-6 rounded-[24px] border px-4 py-4 ${
+                  isDark
+                    ? "border-[#d4b29f]/10 bg-white/[0.02]"
+                    : "border-[#7e3f4c]/10 bg-white/58"
+                }`}
+              >
+                <p
+                  className={`text-[10px] uppercase tracking-[0.22em] ${
+                    isDark ? "text-[#efe1d6]/42" : "text-black/42"
+                  }`}
+                >
+                  Navigation
+                </p>
+                <p
+                  className={`mt-2 text-sm leading-6 ${
+                    isDark ? "text-[#efe1d6]/70" : "text-black/62"
+                  }`}
+                >
+                  A cleaner mobile menu for your work, writing, links and theme.
+                </p>
+              </div>
+
+              <div className="mt-6 space-y-3">
+                <MobilePanelLink
+                  href="/projects"
+                  label="Projects"
+                  icon={<BriefcaseBusiness className="h-[17px] w-[17px]" />}
+                  isDark={isDark}
+                  onClick={() => setMobileMenuOpen(false)}
+                />
+                <MobilePanelLink
+                  href="/blog"
+                  label="Blog"
+                  icon={<BookOpen className="h-[17px] w-[17px]" />}
+                  isDark={isDark}
+                  onClick={() => setMobileMenuOpen(false)}
+                />
+                <MobilePanelLink
+                  href="https://github.com/mahekara28"
+                  label="GitHub"
+                  icon={<GitHubIcon className="h-[17px] w-[17px]" />}
+                  isDark={isDark}
+                  external
+                  onClick={() => setMobileMenuOpen(false)}
+                />
+                <MobilePanelLink
+                  href="https://www.linkedin.com/in/mahek-ara/"
+                  label="LinkedIn"
+                  icon={<LinkedInIcon className="h-[17px] w-[17px]" />}
+                  isDark={isDark}
+                  external
+                  onClick={() => setMobileMenuOpen(false)}
+                />
+                <MobilePanelLink
+                  href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
+                  label="Resume"
+                  icon={<FileText className="h-[17px] w-[17px]" />}
+                  isDark={isDark}
+                  external
+                  onClick={() => setMobileMenuOpen(false)}
+                />
+              </div>
+
+              <button
+                onClick={toggleTheme}
+                className={`mt-auto flex h-14 items-center justify-between rounded-full border px-5 transition ${
+                  isDark
+                    ? "border-[#d4b29f]/16 bg-white/[0.02] text-[#efe1d6]/82 hover:border-[#d4b29f]/34"
+                    : "border-[#7e3f4c]/12 bg-white/62 text-black/76 hover:border-[#7e3f4c]/28"
+                }`}
+              >
+                <span className="flex items-center gap-3 text-sm">
+                  {isDark ? (
+                    <Sun className="h-[17px] w-[17px]" />
+                  ) : (
+                    <Moon className="h-[17px] w-[17px]" />
+                  )}
+                  {isDark ? "Switch to day mode" : "Switch to dark mode"}
+                </span>
+                <span
+                  className={`text-[10px] uppercase tracking-[0.18em] ${
+                    isDark ? "text-[#efe1d6]/38" : "text-black/38"
+                  }`}
+                >
+                  Theme
+                </span>
+              </button>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
 
       <section className="relative z-10 flex-1 px-4 pt-3 sm:px-6 sm:py-8 md:px-10 md:py-16">
         <div className="mx-auto grid h-full max-w-[1450px] items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(460px,0.96fr)]">
