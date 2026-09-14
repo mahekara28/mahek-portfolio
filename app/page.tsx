@@ -177,9 +177,9 @@ function McpFlowVisual({
 
   const nodes = compact
     ? [
-        { label: "PROMPT", left: "10%", top: "32%" },
-        { label: "TOOLS", left: "74%", top: "18%" },
-        { label: "MEMORY", left: "76%", top: "66%" },
+        { label: "PROMPT", left: "12%", top: "34%" },
+        { label: "TOOLS", left: "73%", top: "18%" },
+        { label: "MEMORY", left: "74%", top: "67%" },
       ]
     : [
         { label: "PROMPT", left: "11%", top: "32%" },
@@ -193,7 +193,7 @@ function McpFlowVisual({
       initial={{ opacity: 0, x: compact ? 0 : 24, y: compact ? 8 : 0 }}
       animate={{ opacity: 1, x: 0, y: 0 }}
       transition={{ duration: 0.85, delay: 0.18 }}
-      className={`relative ${compact ? "h-[230px] w-[230px]" : "h-[520px] w-full max-w-[560px]"}`}
+      className={`relative ${compact ? "h-[210px] w-[210px]" : "h-[520px] w-full max-w-[560px]"}`}
     >
       <motion.div
         animate={{
@@ -202,7 +202,7 @@ function McpFlowVisual({
         }}
         transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut" }}
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#8a4252]/26 blur-[74px] ${
-          compact ? "h-[138px] w-[138px]" : "h-[290px] w-[290px]"
+          compact ? "h-[124px] w-[124px]" : "h-[290px] w-[290px]"
         }`}
       />
 
@@ -210,7 +210,7 @@ function McpFlowVisual({
         animate={{ rotate: 360 }}
         transition={{ duration: 26, repeat: Infinity, ease: "linear" }}
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border ${ring} ${
-          compact ? "h-[186px] w-[186px]" : "h-[390px] w-[390px]"
+          compact ? "h-[170px] w-[170px]" : "h-[390px] w-[390px]"
         }`}
       />
 
@@ -218,7 +218,7 @@ function McpFlowVisual({
         animate={{ rotate: -360 }}
         transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
         className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed ${softRing} ${
-          compact ? "h-[118px] w-[118px]" : "h-[250px] w-[250px]"
+          compact ? "h-[108px] w-[108px]" : "h-[250px] w-[250px]"
         }`}
       />
 
@@ -297,12 +297,12 @@ function McpFlowVisual({
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className={`absolute rounded-full border border-[#d4b29f]/10 px-3 py-2 backdrop-blur-md ${panel} ${compact ? "opacity-90" : ""}`}
+          className={`absolute rounded-full border border-[#d4b29f]/10 px-3 py-2 backdrop-blur-md ${panel} ${compact ? "opacity-85" : "opacity-90"}`}
           style={{ left: node.left, top: node.top }}
         >
           <span
-            className={`block whitespace-nowrap text-[9px] font-medium uppercase tracking-[0.22em] ${
-              dark ? "text-[#e4d2c7]/62" : "text-black/45"
+            className={`block whitespace-nowrap text-[8px] font-medium uppercase tracking-[0.2em] ${
+              dark ? "text-[#e4d2c7]/58" : "text-black/42"
             }`}
           >
             {node.label}
@@ -322,7 +322,7 @@ function McpFlowVisual({
           }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
           className={`relative flex items-center justify-center rounded-full border border-[#d4b29f]/24 bg-[#8f4e5d]/12 shadow-[0_0_36px_rgba(143,78,93,0.18)] ${
-            compact ? "h-[78px] w-[78px]" : "h-[138px] w-[138px]"
+            compact ? "h-[72px] w-[72px]" : "h-[138px] w-[138px]"
           }`}
         >
           <div
@@ -336,13 +336,13 @@ function McpFlowVisual({
             }`}
           />
           <div className="text-center">
-            <p className={`text-[9px] uppercase tracking-[0.28em] ${text}`}>
+            <p className={`text-[8px] uppercase tracking-[0.24em] ${text}`}>
               Live flow
             </p>
             <p
-              className={`mt-2 font-semibold uppercase tracking-[0.22em] ${
+              className={`mt-2 font-semibold uppercase tracking-[0.18em] ${
                 dark ? "text-[#efe1d6]" : "text-[#2a1b22]"
-              } ${compact ? "text-[10px]" : "text-sm"}`}
+              } ${compact ? "text-[9px]" : "text-sm"}`}
             >
               Agent
               <br />
@@ -373,7 +373,7 @@ export default function Home() {
 
   return (
     <main
-      className={`relative min-h-screen overflow-x-hidden transition-colors duration-500 ${
+      className={`relative flex min-h-screen flex-col overflow-hidden transition-colors duration-500 ${
         isDark ? "bg-[#140d10] text-[#efe1d6]" : "bg-[#f3e9df] text-[#24181a]"
       }`}
     >
@@ -414,10 +414,10 @@ export default function Home() {
           isDark ? "border-[#d4b29f]/10" : "border-black/10"
         }`}
       >
-        <div className="mx-auto flex max-w-[1450px] items-center justify-between px-4 py-5 sm:px-6 md:px-10">
+        <div className="mx-auto flex max-w-[1450px] items-center justify-between px-4 py-4 sm:px-6 md:px-10 md:py-5">
           <Link href="/" className="flex items-center">
             <span
-              className={`flex h-11 w-11 items-center justify-center rounded-full border text-[12px] font-semibold tracking-[0.12em] transition ${
+              className={`flex h-10 w-10 items-center justify-center rounded-full border text-[11px] font-semibold tracking-[0.12em] transition md:h-11 md:w-11 md:text-[12px] ${
                 isDark
                   ? "border-[#d4b29f]/18 text-[#efe1d6] hover:border-[#d4b29f]/34 hover:text-[#f5e7db]"
                   : "border-[#7e3f4c]/16 text-[#24181a] hover:border-[#7e3f4c]/32 hover:text-[#7e3f4c]"
@@ -428,37 +428,37 @@ export default function Home() {
           </Link>
 
           <div
-            className={`flex items-center gap-2.5 sm:gap-3 ${
+            className={`flex flex-wrap items-center justify-end gap-2 sm:gap-3 ${
               isDark ? "text-[#efe1d6]/74" : "text-black/66"
             }`}
           >
             <NavIconLink
               href="/projects"
               label="Work"
-              icon={<BriefcaseBusiness className="h-[18px] w-[18px]" />}
+              icon={<BriefcaseBusiness className="h-[17px] w-[17px]" />}
             />
             <NavIconLink
               href="/blog"
               label="Blog"
-              icon={<BookOpen className="h-[18px] w-[18px]" />}
+              icon={<BookOpen className="h-[17px] w-[17px]" />}
             />
             <NavIconLink
               href="https://github.com/mahekara28"
               label="GitHub"
               external
-              icon={<GitHubIcon />}
+              icon={<GitHubIcon className="h-[17px] w-[17px]" />}
             />
             <NavIconLink
               href="https://www.linkedin.com/in/mahek-ara/"
               label="LinkedIn"
               external
-              icon={<LinkedInIcon />}
+              icon={<LinkedInIcon className="h-[17px] w-[17px]" />}
             />
             <NavIconLink
               href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
               label="Resume"
               external
-              icon={<FileText className="h-[18px] w-[18px]" />}
+              icon={<FileText className="h-[17px] w-[17px]" />}
             />
 
             <button
@@ -471,73 +471,75 @@ export default function Home() {
               }`}
             >
               {isDark ? (
-                <Sun className="h-[18px] w-[18px]" />
+                <Sun className="h-[17px] w-[17px]" />
               ) : (
-                <Moon className="h-[18px] w-[18px]" />
+                <Moon className="h-[17px] w-[17px]" />
               )}
             </button>
           </div>
         </div>
       </header>
 
-      <section className="relative z-10 mx-auto max-w-[1450px] px-4 pb-10 pt-8 sm:px-6 sm:pb-20 sm:pt-12 md:px-10 md:pt-16">
-        <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(460px,0.96fr)]">
+      <section className="relative z-10 flex-1 px-4 py-5 sm:px-6 sm:py-8 md:px-10 md:py-16">
+        <div className="mx-auto grid h-full max-w-[1450px] items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(460px,0.96fr)]">
           <motion.div
             initial={{ opacity: 0, y: 26 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.78 }}
-            className="relative min-h-[calc(100svh-11.5rem)] max-w-[760px] pb-8 md:min-h-0 md:pb-0"
+            className="relative flex min-h-[calc(100svh-11rem)] max-w-[760px] flex-col justify-center md:min-h-0"
           >
             <div
-              className={`flex min-h-[22px] items-center gap-3 text-[10px] uppercase tracking-[0.24em] sm:text-xs ${
+              className={`max-w-[15.25rem] text-[10px] uppercase tracking-[0.22em] sm:max-w-none sm:text-xs sm:tracking-[0.24em] ${
                 isDark ? "text-[#efe1d6]/56" : "text-black/48"
               }`}
             >
-              <span className="relative flex h-2 w-2 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7e3f4c] opacity-70" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[#d4b29f]" />
-              </span>
-              <span>AI Engineer</span>
-              <span className={isDark ? "text-white/24" : "text-black/24"}>•</span>
-              <span className="text-[#d4b29f]">
-                {typedStatus}
-                <motion.span
-                  animate={{ opacity: [0, 1, 0] }}
-                  transition={{ duration: 0.85, repeat: Infinity }}
-                  className="ml-1 inline-block"
-                >
-                  |
-                </motion.span>
-              </span>
+              <div className="flex items-center gap-3 overflow-hidden">
+                <span className="relative flex h-2 w-2 shrink-0">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7e3f4c] opacity-70" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#d4b29f]" />
+                </span>
+                <span className="shrink-0">AI Engineer</span>
+                <span className={isDark ? "text-white/24" : "text-black/24"}>•</span>
+                <span className="min-w-0 truncate text-[#d4b29f]">
+                  {typedStatus}
+                  <motion.span
+                    animate={{ opacity: [0, 1, 0] }}
+                    transition={{ duration: 0.85, repeat: Infinity }}
+                    className="ml-1 inline-block"
+                  >
+                    |
+                  </motion.span>
+                </span>
+              </div>
             </div>
 
-            <div className="mt-6 max-w-[760px]">
-              <h1 className="text-[clamp(3.1rem,12vw,7.8rem)] font-semibold leading-[0.9] tracking-[-0.07em]">
+            <div className="mt-5 max-w-[19rem] pr-8 sm:mt-6 sm:max-w-[760px] sm:pr-0">
+              <h1 className="text-[clamp(3.05rem,12vw,7.8rem)] font-semibold leading-[0.92] tracking-[-0.07em]">
                 <span
                   className={`block ${
                     isDark ? "text-[#efe1d6]" : "text-[#261a1c]"
                   }`}
                 >
                   {typedHeading}
-                  <span className="ml-3 inline-block align-[10%] text-[0.34em] text-[#b88388]">
+                  <span className="ml-2 inline-block align-[8%] text-[0.28em] text-[#b88388] sm:ml-3 sm:text-[0.34em]">
                     👩‍💻
                   </span>
                 </span>
               </h1>
             </div>
 
-            <div className="mt-8 flex max-w-[640px] items-start gap-4 sm:gap-5">
-              <div className="mt-3 h-px w-10 shrink-0 bg-[#7e3f4c]/70 shadow-[0_0_20px_rgba(126,63,76,0.22)] sm:w-14" />
+            <div className="mt-6 flex max-w-[18.75rem] items-start gap-3 sm:mt-8 sm:max-w-[640px] sm:gap-5">
+              <div className="mt-3 h-px w-8 shrink-0 bg-[#7e3f4c]/70 shadow-[0_0_20px_rgba(126,63,76,0.22)] sm:w-14" />
               <div>
                 <p
-                  className={`text-[1.9rem] leading-none sm:text-[2.2rem] ${
+                  className={`text-[1.55rem] leading-none sm:text-[2.2rem] ${
                     isDark ? "text-[#efe1d6]" : "text-[#24181a]"
                   }`}
                 >
                   AI Engineer
                 </p>
                 <p
-                  className={`mt-5 max-w-[540px] text-base leading-8 sm:text-lg ${
+                  className={`mt-4 max-w-[17rem] text-[0.98rem] leading-7 sm:mt-5 sm:max-w-[540px] sm:text-lg sm:leading-8 ${
                     isDark ? "text-[#efe1d6]/62" : "text-black/58"
                   }`}
                 >
@@ -553,10 +555,10 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="mt-9 flex flex-wrap items-center gap-3 sm:gap-4">
+            <div className="mt-7 grid w-full max-w-[18.75rem] grid-cols-2 gap-3 sm:mt-9 sm:flex sm:max-w-none sm:flex-wrap sm:items-center sm:gap-4">
               <Link
                 href="/projects"
-                className="group inline-flex h-14 items-center gap-2 rounded-full border border-[#a35a66] bg-[#8b4652] px-6 text-sm font-semibold text-[#f7ebe3] shadow-[0_10px_30px_rgba(111,47,61,0.24)] transition duration-300 hover:scale-[1.02] hover:border-[#b66c78] hover:bg-[#9a5360] sm:px-7 sm:text-[15px]"
+                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full border border-[#a35a66] bg-[#8b4652] px-5 text-sm font-semibold text-[#f7ebe3] shadow-[0_10px_30px_rgba(111,47,61,0.24)] transition duration-300 hover:scale-[1.02] hover:border-[#b66c78] hover:bg-[#9a5360] sm:px-7 sm:text-[15px]"
               >
                 Explore work
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -566,7 +568,7 @@ export default function Home() {
                 href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
                 target="_blank"
                 rel="noreferrer"
-                className={`inline-flex h-14 items-center gap-2 rounded-full border px-6 text-sm backdrop-blur-sm transition duration-300 sm:px-7 sm:text-[15px] ${
+                className={`inline-flex h-14 items-center justify-center gap-2 rounded-full border px-5 text-sm backdrop-blur-sm transition duration-300 sm:px-7 sm:text-[15px] ${
                   isDark
                     ? "border-[#d4b29f]/12 bg-white/[0.01] text-[#efe1d6]/78 hover:border-[#d4b29f]/30 hover:bg-[#d4b29f]/[0.04] hover:text-[#f5e7db]"
                     : "border-[#7e3f4c]/12 bg-white/35 text-black/76 hover:border-[#7e3f4c]/30 hover:bg-[#7e3f4c]/[0.05] hover:text-black"
@@ -577,8 +579,8 @@ export default function Home() {
               </a>
             </div>
 
-            <div className="pointer-events-none absolute right-[-2.1rem] top-[4.7rem] z-0 opacity-90 md:hidden">
-              <div className="scale-[0.74] sm:scale-[0.82]">
+            <div className="pointer-events-none absolute right-[-0.9rem] top-[6rem] z-0 opacity-55 md:hidden">
+              <div className="scale-[0.68]">
                 <McpFlowVisual dark={isDark} compact />
               </div>
             </div>
@@ -596,7 +598,7 @@ export default function Home() {
         }`}
       >
         <div
-          className={`mx-auto flex max-w-[1450px] items-center justify-between gap-4 px-4 py-4 text-[10px] uppercase tracking-[0.2em] sm:px-6 md:px-10 ${
+          className={`mx-auto flex max-w-[1450px] items-center justify-between gap-4 px-4 py-3 text-[10px] uppercase tracking-[0.18em] sm:px-6 md:px-10 md:py-4 md:tracking-[0.2em] ${
             isDark ? "text-[#efe1d6]/26" : "text-black/32"
           }`}
         >
