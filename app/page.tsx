@@ -480,16 +480,22 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="relative z-10 flex-1 px-4 py-5 sm:px-6 sm:py-8 md:px-10 md:py-16">
+      <section className="relative z-10 flex-1 px-4 pt-3 sm:px-6 sm:py-8 md:px-10 md:py-16">
         <div className="mx-auto grid h-full max-w-[1450px] items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(460px,0.96fr)]">
           <motion.div
             initial={{ opacity: 0, y: 26 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.78 }}
-            className="relative flex min-h-[calc(100svh-11rem)] max-w-[760px] flex-col justify-center md:min-h-0"
+            className="relative z-10 flex min-h-[calc(100svh-9.5rem)] max-w-[760px] flex-col justify-start pt-2 md:min-h-0 md:justify-center md:pt-0"
           >
+            <div className="pointer-events-none absolute right-[-1.75rem] top-[0.4rem] z-0 opacity-40 md:hidden">
+              <div className="scale-[0.72]">
+                <McpFlowVisual dark={isDark} compact />
+              </div>
+            </div>
+
             <div
-              className={`max-w-[15.25rem] text-[10px] uppercase tracking-[0.22em] sm:max-w-none sm:text-xs sm:tracking-[0.24em] ${
+              className={`relative z-10 max-w-[15rem] text-[10px] uppercase tracking-[0.22em] sm:max-w-none sm:text-xs sm:tracking-[0.24em] ${
                 isDark ? "text-[#efe1d6]/56" : "text-black/48"
               }`}
             >
@@ -513,26 +519,26 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="mt-5 max-w-[19rem] pr-8 sm:mt-6 sm:max-w-[760px] sm:pr-0">
-              <h1 className="text-[clamp(3.05rem,12vw,7.8rem)] font-semibold leading-[0.92] tracking-[-0.07em]">
+            <div className="relative z-10 mt-4 max-w-[18rem] pr-10 sm:mt-6 sm:max-w-[760px] sm:pr-0">
+              <h1 className="text-[clamp(2.85rem,12vw,7.8rem)] font-semibold leading-[0.92] tracking-[-0.07em]">
                 <span
                   className={`block ${
                     isDark ? "text-[#efe1d6]" : "text-[#261a1c]"
                   }`}
                 >
                   {typedHeading}
-                  <span className="ml-2 inline-block align-[8%] text-[0.28em] text-[#b88388] sm:ml-3 sm:text-[0.34em]">
+                  <span className="ml-2 inline-block align-[8%] text-[0.26em] text-[#b88388] sm:ml-3 sm:text-[0.34em]">
                     👩‍💻
                   </span>
                 </span>
               </h1>
             </div>
 
-            <div className="mt-6 flex max-w-[18.75rem] items-start gap-3 sm:mt-8 sm:max-w-[640px] sm:gap-5">
+            <div className="relative z-10 mt-5 flex max-w-[18.5rem] items-start gap-3 sm:mt-8 sm:max-w-[640px] sm:gap-5">
               <div className="mt-3 h-px w-8 shrink-0 bg-[#7e3f4c]/70 shadow-[0_0_20px_rgba(126,63,76,0.22)] sm:w-14" />
               <div>
                 <p
-                  className={`text-[1.55rem] leading-none sm:text-[2.2rem] ${
+                  className={`text-[1.45rem] leading-none sm:text-[2.2rem] ${
                     isDark ? "text-[#efe1d6]" : "text-[#24181a]"
                   }`}
                 >
@@ -555,7 +561,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="mt-7 grid w-full max-w-[18.75rem] grid-cols-2 gap-3 sm:mt-9 sm:flex sm:max-w-none sm:flex-wrap sm:items-center sm:gap-4">
+            <div className="relative z-10 mt-6 grid w-full max-w-[18.75rem] grid-cols-2 gap-3 sm:mt-9 sm:flex sm:max-w-none sm:flex-wrap sm:items-center sm:gap-4">
               <Link
                 href="/projects"
                 className="group inline-flex h-14 items-center justify-center gap-2 rounded-full border border-[#a35a66] bg-[#8b4652] px-5 text-sm font-semibold text-[#f7ebe3] shadow-[0_10px_30px_rgba(111,47,61,0.24)] transition duration-300 hover:scale-[1.02] hover:border-[#b66c78] hover:bg-[#9a5360] sm:px-7 sm:text-[15px]"
@@ -577,12 +583,6 @@ export default function Home() {
                 <FileText className="h-4 w-4" />
                 Resume
               </a>
-            </div>
-
-            <div className="pointer-events-none absolute right-[-0.9rem] top-[6rem] z-0 opacity-55 md:hidden">
-              <div className="scale-[0.68]">
-                <McpFlowVisual dark={isDark} compact />
-              </div>
             </div>
           </motion.div>
 
