@@ -571,14 +571,14 @@ export default function Home() {
             />
 
             <motion.aside
-              initial={{ x: -320, opacity: 0.92 }}
+              initial={{ x: 320, opacity: 0.92 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: -320, opacity: 0.92 }}
+              exit={{ x: 320, opacity: 0.92 }}
               transition={{ duration: 0.34, ease: [0.22, 1, 0.36, 1] }}
-              className={`fixed left-0 top-0 z-50 flex h-screen w-[84%] max-w-[320px] flex-col border-r px-5 pb-6 pt-5 shadow-[0_28px_80px_rgba(0,0,0,0.18)] md:hidden ${
+              className={`fixed right-0 top-0 z-50 flex h-screen w-[84%] max-w-[320px] flex-col border-l px-5 pb-6 pt-5 shadow-[0_28px_80px_rgba(0,0,0,0.18)] md:hidden ${
                 isDark
-                  ? "border-[#d4b29f]/12 bg-[#140d10]/95 text-[#efe1d6]"
-                  : "border-[#7e3f4c]/10 bg-[#f6ede4]/96 text-[#24181a]"
+                  ? "border-[#d4b29f]/12 bg-[#140d10]/96 text-[#efe1d6]"
+                  : "border-[#7e3f4c]/10 bg-[#f6ede4]/97 text-[#24181a]"
               }`}
             >
               <div className="flex items-start justify-between gap-4">
@@ -628,30 +628,14 @@ export default function Home() {
                 </button>
               </div>
 
-              <div
-                className={`mt-6 rounded-[24px] border px-4 py-4 ${
-                  isDark
-                    ? "border-[#d4b29f]/10 bg-white/[0.02]"
-                    : "border-[#7e3f4c]/10 bg-white/58"
-                }`}
-              >
-                <p
-                  className={`text-[10px] uppercase tracking-[0.22em] ${
-                    isDark ? "text-[#efe1d6]/42" : "text-black/42"
-                  }`}
-                >
-                  Navigation
-                </p>
-                <p
-                  className={`mt-2 text-sm leading-6 ${
-                    isDark ? "text-[#efe1d6]/70" : "text-black/62"
-                  }`}
-                >
-                  A cleaner mobile menu for your work, writing, links and theme.
-                </p>
-              </div>
-
-              <div className="mt-6 space-y-3">
+              <div className="mt-8 space-y-3">
+                <MobilePanelLink
+                  href="/"
+                  label="Home"
+                  icon={<span className="text-sm font-semibold">MA</span>}
+                  isDark={isDark}
+                  onClick={() => setMobileMenuOpen(false)}
+                />
                 <MobilePanelLink
                   href="/projects"
                   label="Projects"
@@ -692,30 +676,69 @@ export default function Home() {
                 />
               </div>
 
-              <button
-                onClick={toggleTheme}
-                className={`mt-auto flex h-14 items-center justify-between rounded-full border px-5 transition ${
-                  isDark
-                    ? "border-[#d4b29f]/16 bg-white/[0.02] text-[#efe1d6]/82 hover:border-[#d4b29f]/34"
-                    : "border-[#7e3f4c]/12 bg-white/62 text-black/76 hover:border-[#7e3f4c]/28"
+              <div
+                className={`mt-auto flex items-center justify-between border-t pt-5 ${
+                  isDark ? "border-[#d4b29f]/10" : "border-[#7e3f4c]/10"
                 }`}
               >
-                <span className="flex items-center gap-3 text-sm">
+                <a
+                  href="https://github.com/mahekara28"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="GitHub"
+                  className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
+                    isDark
+                      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/76"
+                      : "border-[#7e3f4c]/12 bg-white/68 text-black/72"
+                  }`}
+                >
+                  <GitHubIcon className="h-[17px] w-[17px]" />
+                </a>
+
+                <a
+                  href="https://www.linkedin.com/in/mahek-ara/"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="LinkedIn"
+                  className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
+                    isDark
+                      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/76"
+                      : "border-[#7e3f4c]/12 bg-white/68 text-black/72"
+                  }`}
+                >
+                  <LinkedInIcon className="h-[17px] w-[17px]" />
+                </a>
+
+                <a
+                  href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Resume"
+                  className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
+                    isDark
+                      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/76"
+                      : "border-[#7e3f4c]/12 bg-white/68 text-black/72"
+                  }`}
+                >
+                  <FileText className="h-[17px] w-[17px]" />
+                </a>
+
+                <button
+                  onClick={toggleTheme}
+                  aria-label="Toggle theme"
+                  className={`flex h-11 w-11 items-center justify-center rounded-full border transition ${
+                    isDark
+                      ? "border-[#d4b29f]/12 bg-white/[0.02] text-[#efe1d6]/76"
+                      : "border-[#7e3f4c]/12 bg-white/68 text-black/72"
+                  }`}
+                >
                   {isDark ? (
                     <Sun className="h-[17px] w-[17px]" />
                   ) : (
                     <Moon className="h-[17px] w-[17px]" />
                   )}
-                  {isDark ? "Switch to day mode" : "Switch to dark mode"}
-                </span>
-                <span
-                  className={`text-[10px] uppercase tracking-[0.18em] ${
-                    isDark ? "text-[#efe1d6]/38" : "text-black/38"
-                  }`}
-                >
-                  Theme
-                </span>
-              </button>
+                </button>
+              </div>
             </motion.aside>
           </>
         )}
@@ -736,18 +759,20 @@ export default function Home() {
             </div>
 
             <div
-              className={`relative z-10 max-w-[15rem] text-[10px] uppercase tracking-[0.22em] sm:max-w-none sm:text-xs sm:tracking-[0.24em] ${
+              className={`relative z-10 text-[10px] uppercase tracking-[0.22em] sm:max-w-none sm:text-xs sm:tracking-[0.24em] ${
                 isDark ? "text-[#efe1d6]/56" : "text-black/48"
               }`}
             >
-              <div className="flex items-center gap-3 overflow-hidden">
-                <span className="relative flex h-2 w-2 shrink-0">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7e3f4c] opacity-70" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#d4b29f]" />
-                </span>
-                <span className="shrink-0">AI Engineer</span>
-                <span className={isDark ? "text-white/24" : "text-black/24"}>•</span>
-                <span className="min-w-0 truncate text-[#d4b29f]">
+              <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="relative flex h-2 w-2 shrink-0">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7e3f4c] opacity-70" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#d4b29f]" />
+                  </span>
+                  <span className="shrink-0">AI Engineer</span>
+                  <span className={isDark ? "text-white/24" : "text-black/24"}>•</span>
+                </div>
+                <span className="block text-[#d4b29f] sm:min-w-0 sm:truncate">
                   {typedStatus}
                   <motion.span
                     animate={{ opacity: [0, 1, 0] }}
