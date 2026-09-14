@@ -488,7 +488,7 @@ export default function Home() {
             transition={{ duration: 0.78 }}
             className="relative z-10 flex min-h-[calc(100svh-9.5rem)] max-w-[760px] flex-col justify-start pt-2 md:min-h-0 md:justify-center md:pt-0"
           >
-            <div className="pointer-events-none absolute right-[-1.75rem] top-[0.4rem] z-0 opacity-40 md:hidden">
+            <div className="pointer-events-none absolute right-[-1rem] top-[2.8rem] z-0 opacity-40 md:hidden">
               <div className="scale-[0.72]">
                 <McpFlowVisual dark={isDark} compact />
               </div>
@@ -561,10 +561,10 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative z-10 mt-6 grid w-full max-w-[18.75rem] grid-cols-2 gap-3 sm:mt-9 sm:flex sm:max-w-none sm:flex-wrap sm:items-center sm:gap-4">
+            <div className="relative z-10 mt-6 flex w-full max-w-[20.5rem] items-center gap-3 sm:mt-9 sm:max-w-none sm:flex-wrap sm:gap-4">
               <Link
                 href="/projects"
-                className="group inline-flex h-14 items-center justify-center gap-2 rounded-full border border-[#a35a66] bg-[#8b4652] px-5 text-sm font-semibold text-[#f7ebe3] shadow-[0_10px_30px_rgba(111,47,61,0.24)] transition duration-300 hover:scale-[1.02] hover:border-[#b66c78] hover:bg-[#9a5360] sm:px-7 sm:text-[15px]"
+                className="group inline-flex h-14 min-w-[9.75rem] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-[#a35a66] bg-[#8b4652] px-4 text-[15px] font-semibold text-[#f7ebe3] shadow-[0_10px_30px_rgba(111,47,61,0.24)] transition duration-300 hover:scale-[1.02] hover:border-[#b66c78] hover:bg-[#9a5360] sm:flex-none sm:px-7"
               >
                 Explore work
                 <ArrowUpRight className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -574,10 +574,10 @@ export default function Home() {
                 href="https://drive.google.com/file/d/1HB3XFQCsMgmZfF50zjjNN6900j-cZDok/view?usp=sharing"
                 target="_blank"
                 rel="noreferrer"
-                className={`inline-flex h-14 items-center justify-center gap-2 rounded-full border px-5 text-sm backdrop-blur-sm transition duration-300 sm:px-7 sm:text-[15px] ${
+                className={`inline-flex h-14 min-w-[8.9rem] flex-1 items-center justify-center gap-2 rounded-full border-[1.25px] px-4 text-[15px] backdrop-blur-sm shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] transition duration-300 sm:flex-none sm:px-7 ${
                   isDark
-                    ? "border-[#d4b29f]/12 bg-white/[0.01] text-[#efe1d6]/78 hover:border-[#d4b29f]/30 hover:bg-[#d4b29f]/[0.04] hover:text-[#f5e7db]"
-                    : "border-[#7e3f4c]/12 bg-white/35 text-black/76 hover:border-[#7e3f4c]/30 hover:bg-[#7e3f4c]/[0.05] hover:text-black"
+                    ? "border-[#d4b29f]/28 bg-white/[0.01] text-[#efe1d6]/82 hover:border-[#d4b29f]/42 hover:bg-[#d4b29f]/[0.04] hover:text-[#f5e7db]"
+                    : "border-[#7e3f4c]/22 bg-white/42 text-black/78 hover:border-[#7e3f4c]/36 hover:bg-[#7e3f4c]/[0.05] hover:text-black"
                 }`}
               >
                 <FileText className="h-4 w-4" />
