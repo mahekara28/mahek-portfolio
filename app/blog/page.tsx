@@ -14,7 +14,7 @@ const posts = [
     readTime: "6 min read",
     href: "/blog/llm-routing",
     status: "Published",
-    year: "2026",
+    
   },
 ];
 
@@ -154,13 +154,7 @@ export default function BlogPage() {
                     >
                       0{index + 1}
                     </div>
-                    <div
-                      className={`mt-0 text-[10px] uppercase tracking-[0.16em] lg:mt-4 ${
-                        isDark ? "text-[#efe1d6]/28" : "text-black/34"
-                      }`}
-                    >
-                      {post.year}
-                    </div>
+                    
                   </div>
 
                   <div className="min-w-0">

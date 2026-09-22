@@ -67,7 +67,7 @@ export default function LLMRoutingPage() {
               />
               <MetaBlock
                 label="Published"
-                value="September 2026"
+                value="August 2026"
                 isDark={isDark}
               />
               <MetaBlock
