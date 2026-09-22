@@ -17,14 +17,16 @@ import { useEffect, useState } from "react";
 import { useTheme } from "./theme-provider";
 
 const statusPhrases = [
-  "building useful systems",
-  "routing context",
-  "orchestrating tools",
+  "building practical AI systems",
+  "working across data and tooling",
   "designing developer experiences",
+  "turning experiments into products",
 ];
 
-const introLine =
-  "Building practical AI systems with LLMs, agents, automation and AI security.";
+const introParagraphs = [
+  "I like working on the practical side of tech, especially where AI, data and product thinking overlap and ideas have to survive beyond the first prototype.",
+  "A lot of what draws me in is understanding how systems behave in the real world: how workflows scale, how insights become useful, and how tools can feel clearer, faster and more human for the people using them.",
+];
 
 function useTypedLoop(phrases: string[], typingSpeed = 64, pause = 1300) {
   const [phraseIndex, setPhraseIndex] = useState(0);
@@ -442,7 +444,6 @@ export default function Home() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const typedStatus = useTypedLoop(statusPhrases, 58, 1200);
   const typedHeading = useTypeOnce("Hi, I'm Mahek Ara", 30, 70);
-  const typedIntro = useTypeOnce(introLine, 16, 520);
 
   return (
     <main
@@ -724,19 +725,20 @@ export default function Home() {
             >
               <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
                 <div className="flex items-center gap-3">
-                  <span className="relative flex h-2 w-2 shrink-0">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7e3f4c] opacity-70" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-[#d4b29f]" />
+                  <span className="relative flex h-5 w-2.5 shrink-0 items-center justify-center sm:h-2 sm:w-2">
+                    <span className="absolute h-5 w-[3px] rounded-full bg-[#d4b29f]/28 sm:hidden" />
+                    <span className="absolute inline-flex h-2.5 w-2.5 rounded-full bg-[#d4b29f]/24 blur-[2px] sm:h-full sm:w-full sm:animate-ping sm:bg-[#7e3f4c] sm:opacity-70 sm:blur-0" />
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#c88991] shadow-[0_0_10px_rgba(200,137,145,0.28)] sm:h-2 sm:w-2 sm:bg-[#d4b29f] sm:shadow-none" />
                   </span>
-                  <span className="shrink-0">AI Engineer</span>
+                  <span className="shrink-0">Tech, systems & curiosity</span>
                   <span className={isDark ? "text-white/24" : "text-black/24"}>•</span>
                 </div>
-                <span className="block text-[#d4b29f] sm:min-w-0 sm:truncate">
+                <span className="block text-[#c78f97] sm:min-w-0 sm:truncate sm:text-[#d4b29f]">
                   {typedStatus}
                   <motion.span
                     animate={{ opacity: [0, 1, 0] }}
                     transition={{ duration: 0.85, repeat: Infinity }}
-                    className="ml-1 inline-block"
+                    className="ml-1 inline-block text-[#b46b76] sm:text-inherit"
                   >
                     |
                   </motion.span>
@@ -763,26 +765,22 @@ export default function Home() {
               <div className="mt-3 h-px w-8 shrink-0 bg-[#7e3f4c]/70 shadow-[0_0_20px_rgba(126,63,76,0.22)] sm:w-14" />
               <div>
                 <p
-                  className={`text-[1.45rem] leading-none sm:text-[2.2rem] ${
+                  className={`max-w-[15rem] text-[1.38rem] leading-[1.02] sm:max-w-none sm:text-[2.05rem] ${
                     isDark ? "text-[#efe1d6]" : "text-[#24181a]"
                   }`}
                 >
-                  AI Engineer
+                  AI, Data & Developer Systems
                 </p>
-                <p
-                  className={`mt-4 max-w-[17rem] text-[0.98rem] leading-7 sm:mt-5 sm:max-w-[540px] sm:text-lg sm:leading-8 ${
-                    isDark ? "text-[#efe1d6]/62" : "text-black/58"
+                <div
+                  className={`mt-4 max-w-[18rem] space-y-4 text-[1rem] leading-7 sm:mt-5 sm:max-w-[590px] sm:text-[1.02rem] sm:leading-8 ${
+                    isDark ? "text-[#efe1d6]/68" : "text-black/61"
                   }`}
                 >
-                  {typedIntro}
-                  <motion.span
-                    animate={{ opacity: [0, 1, 0] }}
-                    transition={{ duration: 0.9, repeat: Infinity }}
-                    className="ml-1 inline-block"
-                  >
-                    |
-                  </motion.span>
-                </p>
+                  <p>{introParagraphs[0]}</p>
+                  <p className={isDark ? "text-[#d9a4ab]" : "text-[#9a5a66]"}>
+                    {introParagraphs[1]}
+                  </p>
+                </div>
               </div>
             </div>
 
