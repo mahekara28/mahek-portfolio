@@ -1,175 +1,185 @@
-"use client";
-
-import Link from "next/link";
+import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { useTheme } from "../../theme-provider";
+import Link from "next/link";
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { CopyButton, ReadingProgress } from "../../components/article-tools";
+import { routingPost } from "../../lib/content";
+
+export const metadata: Metadata = {
+  title: routingPost.title,
+  description: routingPost.description,
+};
+
+const contents = [
+  ["the-problem", "What this version does"],
+  ["basic-idea", "Before the model call"],
+  ["the-shift", "Keep the choice separate"],
+  ["routing-cost", "Routing is not free"],
+  ["escalation", "After the first answer"],
+  ["production", "What I would measure"],
+];
+
+function Section({
+  id,
+  title,
+  children,
+}: {
+  id: string;
+  title?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section id={id} className="essay-section">
+      {title && <h2>{title}</h2>}
+      {children}
+    </section>
+  );
+}
+
+function CodeBlock({
+  code,
+  language = "Python",
+}: {
+  code: string;
+  language?: string;
+}) {
+  return (
+    <div className="code-block">
+      <div className="code-header">
+        <span className="mono">{language}</span>
+        <CopyButton text={code} />
+      </div>
+      <pre>
+        <code>{code}</code>
+      </pre>
+    </div>
+  );
+}
+
+function RoutingDiagram({ escalation = false }: { escalation?: boolean }) {
+  return (
+    <figure className="routing-diagram">
+      <figcaption className="mono">
+        {escalation
+          ? "After the first answer / possible escalation"
+          : "Before inference / model selection"}
+      </figcaption>
+      <div className="diagram-flow">
+        <span>User request</span>
+        <ArrowDown size={17} aria-hidden="true" />
+        <span className="diagram-router">Router</span>
+        <ArrowDown size={17} aria-hidden="true" />
+        <div className="model-branches">
+          <span>Small model</span>
+          <span>General model</span>
+          <span>Large model</span>
+        </div>
+        {escalation && (
+          <>
+            <ArrowDown size={17} aria-hidden="true" />
+            <span>Evaluate the response</span>
+            <div className="evaluation-branches">
+              <span>
+                Acceptable
+                <br />
+                <strong>Return answer</strong>
+              </span>
+              <span>
+                Needs another pass
+                <br />
+                <strong>Escalate & re-evaluate</strong>
+              </span>
+            </div>
+          </>
+        )}
+      </div>
+    </figure>
+  );
+}
 
 export default function LLMRoutingPage() {
-  const { isDark } = useTheme();
-
   return (
-    <main
-      className={`min-h-screen transition-colors duration-500 ${
-        isDark ? "bg-[#140d10] text-[#efe1d6]" : "bg-[#f3e9df] text-[#24181a]"
-      }`}
-    >
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-0 h-[320px] w-[320px] rounded-full bg-[#5a4558]/18 blur-[130px]" />
-        <div className="absolute -right-44 top-16 h-[420px] w-[420px] rounded-full bg-[#6f2f3d]/22 blur-[130px]" />
-        <div className="absolute -left-36 bottom-0 h-[320px] w-[320px] rounded-full bg-[#4f3946]/18 blur-[120px]" />
+    <main id="main" className="essay-main">
+      <ReadingProgress />
+      <div className="essay-nav">
+        <Link href="/blog">
+          <ArrowLeft size={15} />
+          Back to writing
+        </Link>
+        <CopyButton label="Copy article link" />
       </div>
-
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(126,63,76,0.13),transparent_34%),radial-gradient(circle_at_top_right,rgba(212,178,159,0.04),transparent_28%)]" />
-
-      <nav
-        className={`relative z-20 border-b px-4 py-5 sm:px-6 md:px-10 ${
-          isDark ? "border-[#d4b29f]/10" : "border-black/10"
-        }`}
-      >
-        <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Link
-            href="/"
-            className={`flex h-10 w-10 items-center justify-center rounded-full border text-[11px] font-semibold tracking-[0.12em] transition ${
-              isDark
-                ? "border-[#d4b29f]/18 text-[#efe1d6] hover:border-[#d4b29f]/34 hover:text-[#f5e7db]"
-                : "border-[#7e3f4c]/16 text-[#24181a] hover:border-[#7e3f4c]/32 hover:text-[#7e3f4c]"
-            }`}
-          >
-            MA
-          </Link>
-
-          <Link
-            href="/blog"
-            className={`rounded-full border px-4 py-2 font-mono text-[11px] uppercase tracking-[0.16em] transition ${
-              isDark
-                ? "border-[#d4b29f]/12 text-[#efe1d6]/44 hover:border-[#d4b29f]/30 hover:bg-[#d4b29f]/[0.04] hover:text-[#f5e7db]"
-                : "border-[#7e3f4c]/12 text-black/45 hover:border-[#7e3f4c]/28 hover:bg-[#7e3f4c]/[0.04] hover:text-[#7e3f4c]"
-            }`}
-          >
-            Back to blog
-          </Link>
-        </div>
-      </nav>
-
-      <article className="relative z-10 px-4 sm:px-6 md:px-10">
-        <div className="mx-auto max-w-6xl">
-          <header
-            className={`grid gap-12 border-b pb-12 pt-14 md:grid-cols-[190px_minmax(0,1fr)] md:pb-16 md:pt-20 ${
-              isDark ? "border-[#d4b29f]/10" : "border-black/10"
-            }`}
-          >
-            <div className="space-y-6">
-              <MetaBlock
-                label="Category"
-                value="AI Engineering"
-                highlight
-                isDark={isDark}
-              />
-              <MetaBlock
-                label="Published"
-                value="August 2026"
-                isDark={isDark}
-              />
-              <MetaBlock
-                label="Read time"
-                value="6 min read"
-                isDark={isDark}
-              />
-            </div>
-
-            <div>
-              <div
-                className={`text-[10px] uppercase tracking-[0.22em] ${
-                  isDark ? "text-[#d4b29f]" : "text-[#8b4652]"
-                }`}
-              >
-                Essay 01
-              </div>
-
-              <h1 className="mt-6 max-w-4xl text-4xl font-medium leading-[1.02] tracking-[-0.05em] sm:text-5xl md:text-6xl">
-                Your LLM doesn&apos;t need more intelligence.
-                <span
-                  className={`block ${
-                    isDark ? "text-[#b88388]" : "text-[#8b4652]"
-                  }`}
-                >
-                  It needs better routing.
-                </span>
-              </h1>
-
-              <p
-                className={`mt-7 max-w-2xl text-base leading-8 sm:text-lg ${
-                  isDark ? "text-[#efe1d6]/60" : "text-black/62"
-                }`}
-              >
-                I kept coming back to one annoying question while building LLM
-                systems: why do we keep sending every request to the biggest
-                model we have, even when the task clearly doesn&apos;t need it?
+      <article>
+        <header className="essay-header">
+          <p className="mono eyebrow">Note 01 / AI engineering</p>
+          <h1>
+            Why I built an LLM router.
+            <span>And what it actually does.</span>
+          </h1>
+          <div className="essay-meta mono">
+            <span>By Mahek Ara</span>
+            <span>{routingPost.date}</span>
+            <span>{routingPost.readTime}</span>
+          </div>
+        </header>
+        <div className="essay-layout">
+          <aside className="essay-toc">
+            <p className="mono">In this note</p>
+            <nav aria-label="Article contents">
+              {contents.map(([id, title], index) => (
+                <a key={id} href={`#${id}`}>
+                  <span>0{index + 1}</span>
+                  {title}
+                </a>
+              ))}
+            </nav>
+          </aside>
+          <div className="essay-body" id="essay-body">
+            <p className="essay-lede">
+              RouterFlow is a small FastAPI app: send it a prompt, and it
+              chooses a local Ollama model. I built it to make that choice
+              visible, rather than hiding everything behind one model call.
+            </p>
+            <Section id="the-problem">
+              <p>
+                Choosing a model sounds simple until you have to explain the
+                choice. A short prompt isn&apos;t necessarily easy, and a long
+                prompt doesn&apos;t always need a bigger model.
               </p>
-            </div>
-          </header>
-
-          <div className="grid gap-14 py-12 md:grid-cols-[190px_minmax(0,1fr)] md:py-16">
-            <aside className="hidden md:block">
-              <div className="sticky top-24">
-                <div
-                  className={`text-[10px] uppercase tracking-[0.18em] ${
-                    isDark ? "text-[#efe1d6]/30" : "text-black/36"
-                  }`}
-                >
-                  In this note
-                </div>
-
-                <div
-                  className={`mt-5 space-y-3 text-sm ${
-                    isDark ? "text-[#efe1d6]/48" : "text-black/56"
-                  }`}
-                >
-                  <div>The real problem</div>
-                  <div>What a router should do</div>
-                  <div>Why cheap isn&apos;t the goal</div>
-                  <div>Where it gets interesting</div>
-                  <div>What I&apos;d measure</div>
-                </div>
-              </div>
+              <p>
+                This version takes a small step. It looks for keywords, picks a
+                route, and returns the reason along with the response time.
+              </p>
+              <p>
+                That gives me something to inspect. It doesn&apos;t tell me that
+                the chosen model was the best one, or that the answer is good.
+                Those are separate questions.
+              </p>
+            </Section>
+            <RoutingDiagram />
+            <aside
+              className="implementation-note"
+              aria-label="Current implementation"
+            >
+              <h2 className="mono">What RouterFlow does today</h2>
+              <p>
+                Right now, RouterFlow has three route labels but only two
+                models: Qwen 2.5 1.5B and Llama 3.2 3B. Medium and large both
+                use Llama. The diagrams show a broader design; response checking
+                and escalation aren&apos;t implemented in this prototype.
+              </p>
+              <Link className="text-link" href="/projects#llm-router">
+                Code and project notes <ArrowUpRight size={16} />
+              </Link>
             </aside>
-
-            <div className="max-w-3xl">
-              <Section isDark={isDark}>
-                <p>
-                  A simple question can be answered by a small model. A messy
-                  reasoning task probably can&apos;t.
-                </p>
-
-                <p>
-                  But a lot of LLM products still behave as if every prompt is
-                  equally difficult. Everything goes to the same expensive
-                  model, every time.
-                </p>
-
-                <p>
-                  That feels fine in a demo. It starts to feel wasteful the
-                  moment the product gets real users, real traffic, and real
-                  latency complaints.
-                </p>
-              </Section>
-
-              <Diagram isDark={isDark} />
-
-              <Section title="The basic idea" isDark={isDark}>
-                <p>
-                  Put a routing layer in front of the models. Let that layer
-                  decide where a request should go before inference starts.
-                </p>
-
-                <p>
-                  The logic itself is not the exciting part. It can be as simple
-                  as:
-                </p>
-
-                <CodeBlock
-                  isDark={isDark}
-                  code={`if complexity == "low":
+            <Section id="basic-idea" title="Before the model call">
+              <p>
+                The sketch below assumes you&apos;ve already assigned a
+                complexity label. RouterFlow uses keyword rules for that step;
+                this isn&apos;t a learned estimate of how hard a prompt is.
+              </p>
+              <p>The choice itself can be a few branches:</p>
+              <CodeBlock
+                code={`if complexity == "low":
     model = small_model
 
 elif complexity == "medium":
@@ -177,423 +187,121 @@ elif complexity == "medium":
 
 else:
     model = reasoning_model`}
-                />
-
-                <p>
-                  On paper, this looks obvious. What makes it useful is not the
-                  code. It&apos;s the change in mindset.
-                </p>
-              </Section>
-
-              <Section title="The shift that matters" isDark={isDark}>
-                <p>
-                  A router does not need to solve the user&apos;s problem. It only
-                  needs to make one decision well:
-                </p>
-
-                <Quote isDark={isDark}>
-                  Which model is worth using for this request?
-                </Quote>
-
-                <p>
-                  That one shift changes the economics of the whole system. The
-                  routing layer can be small, fast, and cheap, because it is not
-                  responsible for the final answer.
-                </p>
-
-                <p>
-                  Once I started looking at it this way, the router stopped
-                  feeling like a classifier and started feeling more like
-                  control logic.
-                </p>
-              </Section>
-
-              <Section title="Routing is not free" isDark={isDark}>
-                <p>
-                  There is still a cost to doing this. You are inserting another
-                  step before the answer, which means extra latency and another
-                  chance to make a bad call.
-                </p>
-
-                <p>
-                  So I would not optimize for &quot;always use the cheapest
-                  model.&quot; That goal sounds smart and usually produces a brittle
-                  system.
-                </p>
-
-                <p>I&apos;d rather optimize for a rough balance:</p>
-
-                <CodeBlock
-                  isDark={isDark}
-                  language="objective"
-                  code={`lowest reasonable cost
+              />
+              <p>
+                Most of the uncertainty sits in that complexity label. A short
+                set of rules is easy to read, but it can still send a request to
+                the wrong place.
+              </p>
+            </Section>
+            <Section id="the-shift" title="Keep the choice separate">
+              <p>
+                RouterFlow keeps classification in router.py and the Ollama call
+                in llm.py. That makes it easier to follow one question:
+              </p>
+              <blockquote>Which model should answer this request?</blockquote>
+              <p>
+                The API also returns a reason for the route and measures the
+                model call. I can check which rule fired without digging through
+                the rest of the request.
+              </p>
+              <p>
+                That separation is useful, but it isn&apos;t an evaluation.
+                Explaining a rule is different from showing that the rule makes
+                good choices.
+              </p>
+            </Section>
+            <Section id="routing-cost" title="Routing is not free">
+              <p>
+                Every routing step has to earn its place. Keyword checks are
+                small, but a separate model-based classifier would add another
+                call before the user gets an answer.
+              </p>
+              <p>
+                No cost-saving claim here: RouterFlow&apos;s cost field is
+                currently a fixed zero. It isn&apos;t a measurement, and latency
+                alone doesn&apos;t tell me whether a route was worth taking.
+              </p>
+              <p>What I&apos;d want to compare is:</p>
+              <CodeBlock
+                language="The trade-off"
+                code={`lowest reasonable cost
 +
-+lowest acceptable latency
+lowest acceptable latency
 +
-+answer quality that still holds up`}
-                />
-
-                <p>
-                  If a request genuinely needs a stronger model, send it there
-                  without hesitation. The point is not to avoid powerful models.
-                  The point is to stop treating them like the default answer to
-                  everything.
-                </p>
-              </Section>
-
-              <Section title="Where it gets more interesting" isDark={isDark}>
-                <p>
-                  The first version of routing is straightforward. The more
-                  interesting question is what happens after the model answers.
-                </p>
-
-                <p>
-                  If the response looks weak, incomplete, or uncertain, the
-                  system could escalate. At that point you are not just routing
-                  requests. You are managing inference as a pipeline.
-                </p>
-
-                <Diagram
-                  isDark={isDark}
-                  secondary
-                  code={`             user
-               |
-               v
-             router
-          /    |    \\
-         v     v     v
-      small   mid   large
-         \\     |     /
-          \\    |    /
-               v
-            evaluate
-               |
-         good  |  retry
-           \\   |   /
-            \\  |  /
-         stronger model`}
-                />
-
-                <p>
-                  That is the version I find more compelling. Not just model
-                  selection, but a system that knows how to spend intelligence
-                  carefully.
-                </p>
-              </Section>
-
-              <Section title="What I&apos;d watch in production" isDark={isDark}>
-                <p>
-                  If I shipped this for real, I&apos;d care less about how clever
-                  the router looked and more about whether the numbers stayed
-                  honest.
-                </p>
-
-                <List
-                  isDark={isDark}
-                  items={[
-                    "routing accuracy",
-                    "average latency",
-                    "cost per request",
-                    "answer quality",
-                    "escalation rate",
-                  ]}
-                />
-
-                <p>
-                  Saving tokens is not useful if answer quality drops. A cheaper
-                  path is not actually cheaper if the system keeps retrying and
-                  climbing to a bigger model anyway.
-                </p>
-              </Section>
-
-              <Section isDark={isDark}>
-                <p>
-                  I think this becomes more relevant as LLM products mature.
-                  Once you stop treating them like single-model wrappers, you
-                  start asking better systems questions.
-                </p>
-
-                <p>Not &quot;how do I make the model smarter?&quot;</p>
-
-                <p
-                  className={`text-xl leading-8 sm:text-2xl ${
-                    isDark ? "text-[#d4b29f]" : "text-[#8b4652]"
-                  }`}
-                >
-                  More like: how do I make the system better at deciding when
-                  intelligence is actually needed?
-                </p>
-              </Section>
-
-              <footer
-                className={`mt-16 border-t pt-10 ${
-                  isDark ? "border-[#d4b29f]/10" : "border-black/10"
-                }`}
-              >
-                <div
-                  className={`text-[10px] uppercase tracking-[0.18em] ${
-                    isDark ? "text-[#efe1d6]/30" : "text-black/36"
-                  }`}
-                >
-                  More writing
-                </div>
-
-                <div className="mt-5 flex flex-wrap items-center gap-4 text-sm">
-                  <Link
-                    href="/blog"
-                    className={`transition ${
-                      isDark
-                        ? "text-[#efe1d6]/48 hover:text-[#f5e7db]"
-                        : "text-black/55 hover:text-black"
-                    }`}
-                  >
-                    Back to archive
-                  </Link>
-
-                  <Link
-                    href="/projects"
-                    className={`transition ${
-                      isDark
-                        ? "text-[#d4b29f] hover:text-[#f5e7db]"
-                        : "text-[#8b4652] hover:text-[#7e3f4c]"
-                    }`}
-                  >
-                    View projects
-                  </Link>
-                </div>
-              </footer>
+answer quality that still holds up`}
+              />
+              <p>
+                Those measurements need to include mistakes and retries. A fast
+                first answer doesn&apos;t help much if the user has to ask again
+                or the system has to call a second model.
+              </p>
+            </Section>
+            <Section id="escalation" title="After the first answer">
+              <p>
+                A possible next step would be to check an answer before
+                accepting it. If it fails a task-specific check, the system
+                could retry with another model.
+              </p>
+              <p>
+                The hard part is deciding what counts as a failed answer. A
+                structured-output task can have a clear schema check; an
+                open-ended explanation needs a different evaluation. A model
+                sounding confident isn&apos;t enough.
+              </p>
+              <RoutingDiagram escalation />
+              <p>
+                RouterFlow doesn&apos;t do this yet. I&apos;d want to test the
+                checker before relying on it to trigger more inference calls.
+              </p>
+            </Section>
+            <Section id="production" title="What I would measure">
+              <p>
+                Before using this beyond a local prototype, I&apos;d need a set
+                of prompts with clear expectations. Then I could compare routing
+                against simply calling each model and look at these together:
+              </p>
+              <ul className="metric-list">
+                {[
+                  "Routing accuracy",
+                  "Average latency",
+                  "Cost per request",
+                  "Answer quality",
+                  "Escalation rate",
+                ].map((metric, index) => (
+                  <li key={metric}>
+                    <span>0{index + 1}</span>
+                    {metric}
+                  </li>
+                ))}
+              </ul>
+              <p>
+                Retries count too. If a small-model route often needs a second
+                attempt, its total time and cost matter more than the first
+                call&apos;s numbers.
+              </p>
+            </Section>
+            <Section id="closing">
+              <p>
+                This version answers a narrow question: which keyword rule sent
+                a request to which local model, and how long did that call take?
+              </p>
+              <p>The harder question is still open:</p>
+              <p className="essay-conclusion">
+                Did that choice lead to a better answer?
+              </p>
+            </Section>
+            <div className="essay-bottom">
+              <Link className="text-link" href="/projects#llm-router">
+                RouterFlow notes <ArrowUpRight size={16} />
+              </Link>
+              <Link className="text-link" href="/blog">
+                All writing <ArrowRight size={16} />
+              </Link>
             </div>
           </div>
         </div>
       </article>
     </main>
-  );
-}
-
-function MetaBlock({
-  label,
-  value,
-  highlight = false,
-  isDark,
-}: {
-  label: string;
-  value: string;
-  highlight?: boolean;
-  isDark: boolean;
-}) {
-  return (
-    <div>
-      <div
-        className={`text-[10px] uppercase tracking-[0.18em] ${
-          isDark ? "text-[#efe1d6]/30" : "text-black/36"
-        }`}
-      >
-        {label}
-      </div>
-      <div
-        className={`mt-2 text-sm ${
-          highlight
-            ? isDark
-              ? "text-[#d4b29f]"
-              : "text-[#8b4652]"
-            : isDark
-              ? "text-[#efe1d6]/60"
-              : "text-black/60"
-        }`}
-      >
-        {value}
-      </div>
-    </div>
-  );
-}
-
-function Section({
-  title,
-  children,
-  isDark,
-}: {
-  title?: string;
-  children: ReactNode;
-  isDark: boolean;
-}) {
-  return (
-    <section className="mb-14">
-      {title && (
-        <h2 className="mb-5 text-xl font-medium tracking-tight sm:text-2xl">
-          {title}
-        </h2>
-      )}
-      <div
-        className={`space-y-5 text-[16px] leading-8 ${
-          isDark ? "text-[#efe1d6]/60" : "text-black/66"
-        }`}
-      >
-        {children}
-      </div>
-    </section>
-  );
-}
-
-function Quote({
-  children,
-  isDark,
-}: {
-  children: ReactNode;
-  isDark: boolean;
-}) {
-  return (
-    <div
-      className={`my-8 border-l pl-5 text-lg leading-8 ${
-        isDark
-          ? "border-[#8b4652]/50 text-[#efe1d6]/82"
-          : "border-[#8b4652]/40 text-black/82"
-      }`}
-    >
-      {children}
-    </div>
-  );
-}
-
-function List({
-  items,
-  isDark,
-}: {
-  items: string[];
-  isDark: boolean;
-}) {
-  return (
-    <ul
-      className={`my-8 space-y-3 text-[15px] ${
-        isDark ? "text-[#efe1d6]/58" : "text-black/66"
-      }`}
-    >
-      {items.map((item, index) => (
-        <li key={item} className="flex items-center gap-3">
-          <span
-            className={`font-mono text-xs ${
-              isDark ? "text-[#d4b29f]/76" : "text-[#8b4652]/76"
-            }`}
-          >
-            0{index + 1}
-          </span>
-          <span>{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function Diagram({
-  secondary = false,
-  code,
-  isDark,
-}: {
-  secondary?: boolean;
-  code?: string;
-  isDark: boolean;
-}) {
-  const diagramCode =
-    code ||
-    `             user request
-                  |
-                  v
-               router
-           /      |      \\
-          v       v       v
-       small   general   large
-       model    model    model`;
-
-  return (
-    <div
-      className={`my-14 overflow-hidden rounded-[24px] border ${
-        secondary
-          ? isDark
-            ? "border-[#d4b29f]/10 bg-white/[0.02]"
-            : "border-black/10 bg-white/55"
-          : isDark
-            ? "border-[#8b4652]/18 bg-[#191115]"
-            : "border-[#8b4652]/14 bg-[#fbf4ef]"
-      }`}
-    >
-      <div
-        className={`flex items-center justify-between border-b px-5 py-3 ${
-          isDark ? "border-[#d4b29f]/8" : "border-black/8"
-        }`}
-      >
-        <span
-          className={`font-mono text-[10px] uppercase tracking-[0.18em] ${
-            isDark ? "text-[#efe1d6]/34" : "text-black/40"
-          }`}
-        >
-          {secondary ? "escalation flow" : "routing sketch"}
-        </span>
-        <span
-          className={`font-mono text-[10px] ${
-            isDark ? "text-[#efe1d6]/22" : "text-black/28"
-          }`}
-        >
-          {secondary ? "system view" : "architecture"}
-        </span>
-      </div>
-
-      <div className="overflow-x-auto p-6 sm:p-8">
-        <pre
-          className={`min-w-[420px] font-mono text-xs leading-7 sm:text-sm ${
-            isDark ? "text-[#efe1d6]/54" : "text-black/62"
-          }`}
-        >
-          {diagramCode}
-        </pre>
-      </div>
-    </div>
-  );
-}
-
-function CodeBlock({
-  code,
-  language = "python",
-  isDark,
-}: {
-  code: string;
-  language?: string;
-  isDark: boolean;
-}) {
-  return (
-    <div
-      className={`my-8 overflow-hidden rounded-[24px] border ${
-        isDark
-          ? "border-[#d4b29f]/10 bg-white/[0.02]"
-          : "border-black/10 bg-white/60"
-      }`}
-    >
-      <div
-        className={`flex items-center justify-between border-b px-4 py-3 ${
-          isDark ? "border-[#d4b29f]/8" : "border-black/8"
-        }`}
-      >
-        <span
-          className={`font-mono text-[10px] uppercase tracking-[0.18em] ${
-            isDark ? "text-[#efe1d6]/34" : "text-black/40"
-          }`}
-        >
-          {language}
-        </span>
-        <span
-          className={`font-mono text-[10px] ${
-            isDark ? "text-[#efe1d6]/22" : "text-black/28"
-          }`}
-        >
-          snippet
-        </span>
-      </div>
-
-      <pre
-        className={`overflow-x-auto p-5 font-mono text-[13px] leading-7 ${
-          isDark ? "text-[#efe1d6]/68" : "text-black/72"
-        }`}
-      >
-        <code>{code}</code>
-      </pre>
-    </div>
   );
 }

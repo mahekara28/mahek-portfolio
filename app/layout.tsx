@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "./theme-provider";
+import { SiteFooter, SiteHeader } from "./components/site-shell";
 
 export const metadata: Metadata = {
-  title: "Mahek Ara",
-  description: "AI Engineer portfolio",
+  title: {
+    default: "Mahek Ara | AI tools, code & notes",
+    template: "%s | Mahek Ara",
+  },
+  description:
+    "I'm Mahek. I build AI tools in Python and write about how they work. My projects include RouterFlow, Context Relay and MCP Impact, with code, tests and notes.",
 };
 
 export default function RootLayout({
@@ -14,8 +19,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body suppressHydrationWarning>
-        <ThemeProvider>{children}</ThemeProvider>
+      <body>
+        <ThemeProvider>
+          <SiteHeader />
+          {children}
+          <SiteFooter />
+        </ThemeProvider>
       </body>
     </html>
   );
