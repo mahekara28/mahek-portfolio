@@ -173,27 +173,27 @@
 .filament {
   stroke-width: 0.85;
   opacity: 0.24;
-  transition: opacity 0.6s;
+  transition: opacity 0.22s;
 }
 .spine {
   stroke-width: 1.1;
   opacity: 0.42;
-  transition: opacity 0.6s;
+  transition: opacity 0.22s;
 }
 .underlight {
   stroke-width: 10;
   opacity: 0;
   filter: blur(4px);
-  transition: opacity 0.6s;
+  transition: opacity 0.22s;
 }
 .channel[data-active="true"] .filament {
-  opacity: 0.6;
+  opacity: 0.72;
 }
 .channel[data-active="true"] .spine {
   opacity: 0.95;
 }
 .channel[data-active="true"] .underlight {
-  opacity: 0.08;
+  opacity: 0.12;
 }
 .channel[data-route="true"][data-selected="false"] {
   color: var(--ghost);
@@ -221,10 +221,25 @@
 .halo {
   stroke: none;
   opacity: 0.2;
-  transition: opacity 0.45s;
+  transition: opacity 0.24s;
 }
 .fold {
   opacity: 0.8;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 0.2s;
+}
+.aperture[data-selected="true"] .fold {
+  transform: scaleX(1.22);
+  opacity: 1;
+}
+.lens {
+  transition: stroke-width 0.2s;
+}
+.aperture[data-selected="true"] .lens {
+  stroke-width: 1.5;
 }
 .slit {
   stroke-width: 1.6;
@@ -253,21 +268,35 @@
   stroke: var(--paper);
 }
 .signal {
+  --dash: 24;
   fill: none;
   stroke: var(--signal);
-  stroke-width: 3;
+  stroke-width: 3.5;
   stroke-linecap: round;
-  stroke-dasharray: 40 1000;
-  stroke-dashoffset: 40;
+  stroke-dasharray: var(--dash) 1100;
+  stroke-dashoffset: var(--dash);
   vector-effect: non-scaling-stroke;
-  animation: carry 1.25s cubic-bezier(0.25, 0.2, 0.35, 1) 1 both;
+  animation: carry 0.72s cubic-bezier(0.35, 0, 0.25, 1) 1 both;
+  animation-play-state: inherit;
+}
+.signalTrail {
+  --dash: 130;
+  stroke-width: 7;
+  opacity: 0.28;
+  filter: blur(1.5px);
+}
+.sourceSignal {
+  --dash: 50;
+  stroke-width: 2;
+  animation-duration: 0.54s;
+  animation-delay: 0.08s;
 }
 .feedbackSignal {
   stroke: var(--feedback);
 }
 @keyframes carry {
   from {
-    stroke-dashoffset: 40;
+    stroke-dashoffset: var(--dash);
   }
   to {
     stroke-dashoffset: -1000;
@@ -337,7 +366,7 @@
   background: var(--paper);
   text-align: center;
   z-index: 1;
-  transition: opacity 0.3s;
+  transition: opacity 0.2s;
 }
 .toolLabel {
   font:

@@ -160,7 +160,7 @@ export const initialStory: StoryState = {
   pass: 0,
 };
 export type StoryEvent =
-  | { type: "example"; id: ExampleId }
+  | { type: "example"; id: ExampleId; autoplay?: boolean }
   | { type: "play" }
   | { type: "pause" }
   | { type: "tick" }
@@ -171,7 +171,12 @@ export type StoryEvent =
 export function storyReducer(state: StoryState, event: StoryEvent): StoryState {
   switch (event.type) {
     case "example":
-      return { ...initialStory, exampleId: event.id, pass: state.pass + 1 };
+      return {
+        ...initialStory,
+        exampleId: event.id,
+        pass: state.pass + 1,
+        status: event.autoplay ? "playing" : "idle",
+      };
     case "play":
       if (state.status === "playing") return { ...state, status: "paused" };
       return {

@@ -19,7 +19,7 @@ On laptops the introduction, scene and compact contact footer fit within the fir
 
 The woven paths and folded apertures retain the limestone and ink themes. Teal identifies the selected path; a warm clay loop carries feedback back into context. The two local examples read a sample setup guide or count fictional developer reports. A Windows-specific correction changes the actual lookup or filtered count. The interface clearly identifies sample data and the absence of AI model or external service calls.
 
-Run, pause, replay, step through or inspect any stage. Motion completes one sequence and stops; background tabs pause it. Native buttons support touch and keyboard navigation. Reduced motion uses manual advancement. Mobile has a dedicated vertical composition. There are no new dependencies, remote assets or perpetual effects. The original six project sketches remain in expanded project notes.
+An initial sequence plays once when the field is visible and finishes in roughly four seconds. Switching examples starts the new sequence immediately. Pause, replay, step through or inspect any stage. Brighter short trails show the chosen route; context signals converge and the selected aperture opens. Motion stops after one pass; background tabs and scrolling out of view pause it. Native buttons support touch and keyboard navigation. Reduced motion uses manual advancement. Mobile has a dedicated vertical composition. There are no new dependencies, remote assets or perpetual effects. The original six project sketches remain in expanded project notes.
 
 ## Content and routes
 

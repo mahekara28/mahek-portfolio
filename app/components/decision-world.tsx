@@ -25,6 +25,7 @@ import {
   initialStory,
   type PointId,
   type StoryState,
+  type ExampleId,
 } from "../lib/decision-sketch";
 import styles from "./decision-world.module.css";
 
@@ -36,6 +37,8 @@ function subscribeMotion(change: () => void) {
 }
 const readMotion = () => window.matchMedia(motionQuery).matches;
 const serverMotion = () => false;
+// A quick first pass; the result gets longer to land than the transitions.
+const stageDuration = [300, 1050, 900, 1500] as const;
 function position(id: PointId): CSSProperties {
   return {
     "--x": points.desktop[id].x + "%",
@@ -136,7 +139,10 @@ function StoryDrawing({
                 <path d="M 0 -8 V 8" />
               </g>
             ) : (
-              <g transform={`rotate(${index === 2 ? 25 : -23})`}>
+              <g
+                className={styles.lens}
+                transform={`rotate(${index === 2 ? 25 : -23})`}
+              >
                 <ellipse
                   className={styles.fold}
                   rx={index === 2 ? 22 : 18}
@@ -158,16 +164,30 @@ function StoryDrawing({
         <g
           key={`${state.exampleId}-${state.pass}-${state.step}`}
           className={styles.signalRun}
+          style={{
+            animationPlayState:
+              state.status === "paused" ? "paused" : "running",
+          }}
         >
+          <path
+            className={`${styles.signal} ${styles.signalTrail} ${carrying === "return" || carrying === "reflect" ? styles.feedbackSignal : ""}`}
+            d={storyPath(carrying, mobile)}
+            pathLength="1000"
+          />
           <path
             className={`${styles.signal} ${carrying === "return" || carrying === "reflect" ? styles.feedbackSignal : ""}`}
             d={storyPath(carrying, mobile)}
             pathLength="1000"
-            style={{
-              animationPlayState:
-                state.status === "paused" ? "paused" : "running",
-            }}
           />
+          {state.step === 1 &&
+            (["sourceOne", "sourceTwo"] as const).map((id) => (
+              <path
+                key={id}
+                className={`${styles.signal} ${styles.sourceSignal}`}
+                d={storyPath(id, mobile)}
+                pathLength="1000"
+              />
+            ))}
         </g>
       )}
     </svg>
@@ -184,6 +204,8 @@ export function DecisionWorld() {
   );
   const stageButtons = useRef<(HTMLButtonElement | null)[]>([]);
   const exampleButtons = useRef<(HTMLButtonElement | null)[]>([]);
+  const surface = useRef<HTMLDivElement | null>(null);
+  const autoPlayed = useRef(false);
   const example = runExample(state.exampleId, state.revised);
   const note = describeStage(state.step, state.exampleId, state.revised);
   const running = state.status === "playing" && !reduced;
@@ -201,19 +223,58 @@ export function DecisionWorld() {
     if (!running) return;
     const timer = window.setTimeout(
       () => dispatch({ type: "tick" }),
-      state.step === 3 ? 3000 : 2400,
+      stageDuration[Math.min(state.step, 3)],
     );
     return () => window.clearTimeout(timer);
   }, [running, state.step, state.pass]);
+
+  useEffect(() => {
+    const field = surface.current;
+    if (!field || reduced) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.intersectionRatio < 0.45) {
+          dispatch({ type: "pause" });
+          return;
+        }
+        // Play once when the drawing is visible, unless the visitor took control.
+        if (
+          !autoPlayed.current &&
+          !document.hidden &&
+          !window.matchMedia(motionQuery).matches
+        ) {
+          autoPlayed.current = true;
+          dispatch({ type: "play" });
+        }
+      },
+      { threshold: [0, 0.45] },
+    );
+    observer.observe(field);
+    return () => observer.disconnect();
+  }, [reduced]);
 
   useEffect(() => {
     // Do not let an example finish unseen in a background tab.
     const pauseHidden = () => {
       if (document.hidden) dispatch({ type: "pause" });
     };
+    const media = window.matchMedia(motionQuery);
+    const pauseReduced = () => {
+      if (media.matches) dispatch({ type: "pause" });
+    };
     document.addEventListener("visibilitychange", pauseHidden);
-    return () => document.removeEventListener("visibilitychange", pauseHidden);
+    media.addEventListener("change", pauseReduced);
+    return () => {
+      document.removeEventListener("visibilitychange", pauseHidden);
+      media.removeEventListener("change", pauseReduced);
+    };
   }, []);
+
+  function chooseExample(id: ExampleId) {
+    autoPlayed.current = true;
+    setHintStage(null);
+    dispatch({ type: "example", id, autoplay: !reduced });
+  }
 
   function move(
     event: KeyboardEvent<HTMLButtonElement>,
@@ -234,7 +295,7 @@ export function DecisionWorld() {
       dispatch({ type: "inspect", step: next });
       stageButtons.current[next]?.focus();
     } else {
-      dispatch({ type: "example", id: examples[next].id });
+      chooseExample(examples[next].id);
       exampleButtons.current[next]?.focus();
     }
   }
@@ -258,7 +319,11 @@ export function DecisionWorld() {
       data-step={state.step}
       data-revised={state.revised}
       data-playing={running}
+      onFocusCapture={() => {
+        autoPlayed.current = true;
+      }}
       onPointerDownCapture={(event) => {
+        autoPlayed.current = true;
         if (!(event.target as Element).closest("[data-stage]"))
           setHintStage(null);
       }}
@@ -281,7 +346,7 @@ export function DecisionWorld() {
               ref={(node) => {
                 exampleButtons.current[index] = node;
               }}
-              onClick={() => dispatch({ type: "example", id: item.id })}
+              onClick={() => chooseExample(item.id)}
               onKeyDown={(event) => move(event, index, "example")}
             >
               {item.label}
@@ -328,7 +393,11 @@ export function DecisionWorld() {
         </div>
       </div>
 
-      <div className={styles.worldSurface} data-testid="decision-world">
+      <div
+        ref={surface}
+        className={styles.worldSurface}
+        data-testid="decision-world"
+      >
         <StoryDrawing state={state} />
         <StoryDrawing state={state} mobile />
         {stages.map((stage, index) => (
@@ -357,6 +426,7 @@ export function DecisionWorld() {
             }}
             onPointerEnter={(event) => {
               if (event.pointerType === "mouse") {
+                autoPlayed.current = true;
                 dispatch({ type: "inspect", step: index });
                 setHintStage(index);
               }

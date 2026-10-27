@@ -350,9 +350,10 @@ try {
     await page
       .getByRole("button", { name: "Run a project", exact: true })
       .click();
-    await page
-      .getByRole("button", { name: "Run example", exact: true })
-      .click();
+    // Choosing another example starts its short sequence immediately.
+    await expect(
+      page.getByRole("button", { name: "Pause", exact: true }),
+    ).toBeVisible();
     await expect(page.locator("section[data-example]")).toHaveAttribute(
       "data-step",
       "1",

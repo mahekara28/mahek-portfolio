@@ -53,10 +53,16 @@ boundary is visible below the field.
 
 ## Interaction and motion
 
-Visitors can run, pause, continue, replay or advance one stage at a time. The
-sequence finishes in about ten seconds and stops. A short signal travels along
-the current path; previously reached paths remain legible. A background tab
-pauses the sequence instead of completing unseen.
+The first sequence starts once when at least 45% of the drawing is visible,
+unless the visitor has already taken control. It finishes in roughly four
+seconds and stops. Choosing another example starts it immediately. Visitors can
+pause, continue, replay or advance one stage at a time.
+
+A bright leading signal and softer trail travel along the selected route. Short
+source signals converge at context; the selected aperture opens slightly. These
+are finite movements tied to the current step, with quicker transitions and a
+longer hold for the computed result. Scrolling the field out of view or hiding
+the tab pauses playback. Turning on reduced motion also pauses it.
 
 Every stage is a native button. Hovering, focusing or tapping it pauses the
 sequence at that stage, reveals a nearby plain-English hint and updates the
@@ -119,6 +125,9 @@ exhaustive accessibility certification.
 Checked on 28 October 2026: 19 content/story tests and the complete browser
 suite passed, including 20 accessibility scans with no reported violations.
 Two additional scans covered the expanded disclosure on a touch viewport in
-both themes. There were no browser runtime errors or external requests during
+both themes. The faster entrance was also checked at 320×568: it waits until
+the field is visible, pauses on scroll-away, and does not restart over visitor
+control. Example switching, paused trails and changing reduced-motion settings
+during playback were checked directly. There were no browser runtime errors or external requests during
 the full suite. Protected project content, project/writing page files and route
 configuration were compared with their pre-pass contents and remain unchanged.
