@@ -9,10 +9,16 @@ import {
   STRANDS,
   STEPS,
 } from "../app/lib/trace-studies.ts";
-import { projects, featuredProjects, links } from "../app/lib/content.ts";
+import {
+  projects,
+  featuredProjects,
+  links,
+  sourceUrl,
+} from "../app/lib/content.ts";
+import { workConnections } from "../app/lib/work-connections.ts";
 
 const shapes = new Set();
-assert.equal(traceStudies.length, featuredProjects.length);
+assert.equal(traceStudies.length, 6);
 for (let study = 0; study < traceStudies.length; study++) {
   const points = Array.from({ length: STRANDS }, (_, line) =>
     Array.from({ length: STEPS + 1 }, (_, step) =>
@@ -29,8 +35,8 @@ for (let study = 0; study < traceStudies.length; study++) {
   assert(traceLabels(study).outputs.length > 0);
 }
 assert.equal(shapes.size, 6, "Each study has a distinct relationship");
-const securityIndex = featuredProjects.findIndex(
-  (project) => project.id === "prompt-injection-lab",
+const securityIndex = traceStudies.findIndex(
+  (study) => study.projectId === "prompt-injection-lab",
 );
 assert(
   tracePoint(securityIndex, 0, 1).x < 0.6,
@@ -69,7 +75,9 @@ async function visit(route) {
     waitUntil: "networkidle",
     timeout: 180000,
   });
-  assert.equal(response.status(), 200, route);
+  // Same-page anchors have no new HTTP response.
+  if (response) assert.equal(response.status(), 200, route);
+  await expect(page).toHaveURL(new URL(route, baseURL).href);
   await page.locator("h1").waitFor();
   await page.evaluate(() => document.fonts.ready);
 }
@@ -106,19 +114,87 @@ async function painted() {
   });
 }
 
-async function inspectStudies() {
+async function inspectConnections() {
+  const top = () =>
+    page
+      .locator(".featured-work")
+      .evaluate((el) => el.getBoundingClientRect().top + scrollY);
+  const before = await top();
   for (let index = 0; index < featuredProjects.length; index++) {
-    await page.locator(".preview-button").nth(index).click();
-    await expect(page.locator(".trace-operation")).toHaveText(
-      traceStudies[index].operation,
+    const project = featuredProjects[index];
+    const connection = workConnections[index];
+    await page
+      .getByRole("button", {
+        name: `Show connections for ${project.title}`,
+        exact: true,
+      })
+      .click();
+    await expect(page.locator(".map-project[aria-pressed='true']")).toHaveCount(
+      1,
     );
-    await expect(page.locator(".study-links a").last()).toHaveAttribute(
+    await expect(page.locator(".connection-active")).toHaveCount(
+      connection.topics.length,
+    );
+    await expect(page.locator("#connection-note p")).toContainText(
+      connection.note,
+    );
+    await expect(page.locator("#connection-note a")).toHaveAttribute(
       "href",
-      featuredProjects[index].github,
+      sourceUrl(project, connection.sourcePath),
     );
-    await page.waitForTimeout(600);
+    await expect(
+      page.locator(".featured-projects li[data-active='true'] h3"),
+    ).toHaveText(project.title);
+    assert(
+      Math.abs((await top()) - before) <= 1,
+      "Changing selection doesn't shift the page",
+    );
+  }
+  const layout = await page.locator(".map-surface").evaluate((field) => {
+    const bounds = field.getBoundingClientRect();
+    const labels = [
+      ...field.querySelectorAll(".map-project, .map-topic > span"),
+    ].map((el) => ({ text: el.textContent, r: el.getBoundingClientRect() }));
+    return {
+      outside: labels
+        .filter(
+          ({ r }) =>
+            r.left < bounds.left - 1 ||
+            r.right > bounds.right + 1 ||
+            r.top < bounds.top - 1 ||
+            r.bottom > bounds.bottom + 1,
+        )
+        .map((x) => x.text),
+      collisions: labels.flatMap(({ r: a, text }, i) =>
+        labels
+          .slice(i + 1)
+          .filter(
+            ({ r: b }) =>
+              Math.min(a.right, b.right) - Math.max(a.left, b.left) > 2 &&
+              Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 2,
+          )
+          .map((b) => [text, b.text]),
+      ),
+    };
+  });
+  assert.deepEqual(
+    layout,
+    { outside: [], collisions: [] },
+    "Graph labels are legible and contained",
+  );
+}
+
+async function inspectStudies() {
+  for (let index = 0; index < traceStudies.length; index++) {
+    const study = traceStudies[index];
+    const project = projects.find((p) => p.id === study.projectId);
+    await visit("/projects#" + project.id);
+    const detail = page.locator(`#${project.id}-details`);
+    await expect(detail.locator(".trace-operation")).toHaveText(
+      study.operation,
+    );
     await painted();
-    const layout = await page.locator(".field-surface").evaluate((field) => {
+    const layout = await detail.locator(".field-surface").evaluate((field) => {
       const bounds = field.getBoundingClientRect();
       const labels = [
         ...field.querySelectorAll(".trace-labels span, .trace-operation"),
@@ -144,50 +220,43 @@ async function inspectStudies() {
     });
     assert(
       layout.contained && !layout.collision,
-      featuredProjects[index].title + ": legible, contained labels",
+      project.title + ": legible, contained sketch labels",
     );
   }
 }
 
 try {
   await visit("/");
-  await expect(page.locator("#sketch-title")).toHaveText("RouterFlow");
-  await expect(page.locator(".explorer-projects li")).toHaveCount(6);
+  await expect(page.locator(".featured-projects li")).toHaveCount(3);
+  await expect(page.locator(".map-project")).toHaveCount(3);
   for (const project of featuredProjects) {
     await expect(
-      page.locator(`.explorer-projects h3 a[href='/projects#${project.id}']`),
-    ).toHaveText(project.title);
+      page.locator(`.featured-projects h3 a[href='/projects#${project.id}']`),
+    ).toContainText(project.title);
   }
-  await painted();
+  assert.equal(
+    await page.locator("canvas").count(),
+    0,
+    "The homepage has one lightweight SVG map",
+  );
   await capture({ path: ".qa/home-desktop.png", fullPage: true });
   console.log("Desktop screenshot saved");
   if (process.env.VISUAL_ONLY === "1") process.exitCode = 0;
   else {
     await assertLayout("Home desktop / light");
-    await inspectStudies();
-    const initial = await page
-      .locator("canvas")
-      .evaluate((canvas) => canvas.toDataURL());
-    await page
-      .getByRole("button", {
-        name: "Preview Prompt Injection Lab",
-        exact: true,
-      })
-      .click();
-    await page.locator("#sketch-title").waitFor();
-    await expect(page.locator("#sketch-title")).toHaveText(
-      "Prompt Injection Lab",
-    );
-    await page.waitForFunction(
-      (before) => document.querySelector("canvas").toDataURL() !== before,
-      initial,
-    );
-    await page
-      .locator(".preview-button[aria-pressed='true']")
-      .press("ArrowRight");
+    await inspectConnections();
+    await page.locator(".map-project[aria-pressed='true']").press("Home");
     await expect(
-      page.locator(".preview-button[aria-pressed='true']"),
-    ).toHaveAttribute("aria-label", "Preview Build, Buy or Borrow");
+      page.locator(".map-project[aria-pressed='true']"),
+    ).toHaveAttribute("aria-label", "Show connections for RouterFlow");
+    await page.locator(".map-project[aria-pressed='true']").press("ArrowRight");
+    await expect(
+      page.locator(".map-project[aria-pressed='true']"),
+    ).toHaveAttribute("aria-label", "Show connections for MCP Impact");
+    await page.locator(".map-project[aria-pressed='true']").press("End");
+    await expect(
+      page.locator(".map-project[aria-pressed='true']"),
+    ).toHaveAttribute("aria-label", "Show connections for Narrative Gap MCP");
     await page
       .getByRole("button", { name: "Toggle light and dark theme" })
       .first()
@@ -239,6 +308,7 @@ try {
     );
     await capture({ path: ".qa/projects-desktop.png", fullPage: true });
     await assertLayout("Projects desktop");
+    await inspectStudies();
     for (const route of ["/blog", "/blog/llm-routing", "/about"]) {
       await visit(route);
       await assertLayout(route + " desktop");
@@ -312,15 +382,19 @@ try {
         .click();
     }
     await visit("/");
-    await inspectStudies();
-    await page
-      .getByRole("button", {
-        name: "Preview Prompt Injection Lab",
-        exact: true,
-      })
-      .click();
-    await page.waitForTimeout(600);
-    await capture({ path: ".qa/security-mobile.png", fullPage: true });
+    await inspectConnections();
+    for (const width of [1024, 820, 760, 360, 320]) {
+      await page.setViewportSize({ width, height: 852 });
+      await inspectConnections();
+      assert.equal(
+        await page.evaluate(
+          () => document.documentElement.scrollWidth > innerWidth + 1,
+        ),
+        false,
+        "Graph responsive width " + width,
+      );
+    }
+    await page.setViewportSize({ width: 393, height: 852 });
     await page.getByRole("button", { name: "Open navigation" }).click();
     await expect(
       page.getByRole("dialog", { name: "Navigation" }),
@@ -344,6 +418,7 @@ try {
     await expect(page.getByRole("dialog")).not.toBeVisible();
     await page.setViewportSize({ width: 320, height: 568 });
     await assertLayout("Small phone");
+    await inspectConnections();
     await inspectStudies();
     await visit("/projects#context-relay");
     await expect(page.locator("#context-relay-details")).toBeVisible();
@@ -366,8 +441,23 @@ try {
     await visit("/");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page
-      .getByRole("button", { name: "Preview MCP Impact", exact: true })
+      .getByRole("button", {
+        name: "Show connections for MCP Impact",
+        exact: true,
+      })
       .click();
+    assert.equal(
+      await page
+        .locator(".connection-active")
+        .first()
+        .evaluate((el) => getComputedStyle(el).animationName),
+      "none",
+      "Reduced motion removes drawing animations",
+    );
+    await expect(page.locator("#connection-note p")).toContainText(
+      "GitHub diffs",
+    );
+    await visit("/projects#mcp-impact");
     await painted();
     const still = await page
       .locator("canvas")
@@ -376,7 +466,7 @@ try {
     assert.equal(
       await page.locator("canvas").evaluate((canvas) => canvas.toDataURL()),
       still,
-      "Reduced-motion scene must remain still",
+      "Reduced-motion sketch is still",
     );
     assert.deepEqual(errors, [], "Browser runtime errors");
     await writeFile(

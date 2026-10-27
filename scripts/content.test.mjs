@@ -9,6 +9,7 @@ import {
   focusAreas,
 } from "../app/lib/content.ts";
 import { traceStudies } from "../app/lib/trace-studies.ts";
+import { workConnections, workTopics } from "../app/lib/work-connections.ts";
 
 const now = new Date("2026-10-24T12:00:00.000Z");
 const payload = projects.map(({ repo }) => ({
@@ -26,11 +27,11 @@ const payload = projects.map(({ repo }) => ({
 const response = (body, status = 200) =>
   new Response(JSON.stringify(body), { status });
 
-test("project identity, focus and trace relationships stay aligned", () => {
+test("project identity, focus and source relationships stay aligned", () => {
   assert.equal(new Set(projects.map((p) => p.id)).size, projects.length);
-  assert.equal(featuredProjects.length, 6);
-  featuredProjects.forEach((project, index) =>
-    assert.equal(traceStudies[index].projectId, project.id),
+  assert.equal(featuredProjects.length, 3);
+  traceStudies.forEach((study) =>
+    assert(projects.some((p) => p.id === study.projectId)),
   );
   for (const project of projects) {
     assert.match(project.revision, /^[a-f\d]{40}$/);
@@ -54,18 +55,52 @@ test("project identity, focus and trace relationships stay aligned", () => {
 });
 
 test("the selection stays varied and project summaries stay brief", () => {
-  assert.equal(featuredProjects[0].id, "llm-router");
-  assert.equal(
-    featuredProjects[featuredProjects.length - 1].id,
-    "context-relay",
+  assert.deepEqual(
+    featuredProjects.map((p) => p.id),
+    ["llm-router", "mcp-impact", "narrative-gap-mcp"],
   );
   assert(featuredProjects.some((p) => p.focus.includes("developer")));
   assert(featuredProjects.some((p) => p.focus.includes("operations")));
-  assert(featuredProjects.some((p) => p.id === "prompt-injection-lab"));
+  assert(projects.some((p) => p.id === "prompt-injection-lab"));
+  assert(projects.some((p) => p.id === "context-relay"));
   assert(projects.every((p) => p.description.split(/\s+/).length <= 24));
   assert.equal(
     new Set(repositoryNotes.map((note) => note.project)).size,
     repositoryNotes.length,
+  );
+});
+
+test("map connections resolve to reviewed source and real shared technologies", () => {
+  assert.equal(workConnections.length, featuredProjects.length);
+  for (const [index, connection] of workConnections.entries()) {
+    const project = featuredProjects[index];
+    assert.equal(project.id, connection.projectId);
+    assert(
+      project.evidence.some((item) => item.path === connection.sourcePath),
+    );
+    assert(
+      connection.topics.every((id) =>
+        workTopics.some((topic) => topic.id === id),
+      ),
+    );
+    if (connection.topics.includes("python"))
+      assert(
+        project.stack.includes("Python") || project.stack.includes("FastAPI"),
+      );
+    if (connection.topics.includes("github"))
+      assert(project.stack.includes("GitHub API"));
+    if (connection.topics.includes("local-models"))
+      assert(project.stack.includes("Ollama"));
+    if (connection.topics.includes("contracts"))
+      assert(project.stack.includes("MCP contracts"));
+  }
+  assert.equal(
+    workConnections.filter((p) => p.topics.includes("python")).length,
+    2,
+  );
+  assert.equal(
+    workConnections.filter((p) => p.topics.includes("github")).length,
+    2,
   );
 });
 

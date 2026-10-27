@@ -32,9 +32,10 @@ export function TraceField({ study = 0 }: { study?: number }) {
     let frame = 0;
     let start: number | undefined;
     let progress = changed && !reduced.matches && !document.hidden ? 0 : 1;
-    const palette = isDark
-      ? ["#f07861", "#a9bcaa", "#8aace2"]
-      : ["#c34732", "#4c6659", "#597aa7"];
+    const styles = getComputedStyle(element);
+    const palette = ["--trace-one", "--trace-two", "--trace-three"].map(
+      (token) => styles.getPropertyValue(token).trim(),
+    );
 
     function draw() {
       if (!context) return;

@@ -316,7 +316,11 @@ export const projects: Project[] = [
   },
 ];
 
-export const featuredProjects = projects.slice(0, 6);
+export const featuredProjects = [
+  "llm-router",
+  "mcp-impact",
+  "narrative-gap-mcp",
+].map((id) => projects.find((project) => project.id === id)!);
 export const sourceUrl = (project: Project, path: string) =>
   `${project.github}/blob/${project.revision}/${path}`;
 

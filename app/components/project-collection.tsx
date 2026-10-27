@@ -13,6 +13,7 @@ import {
   type Focus,
 } from "../lib/content";
 import snapshot from "../lib/github-snapshot.json";
+import { ProjectSketch } from "./project-sketch";
 
 const shortDate = (value: string) =>
   new Intl.DateTimeFormat("en-GB", {
@@ -91,7 +92,12 @@ export function ProjectCollection() {
               project.repo as keyof typeof snapshot.repositories
             ];
           return (
-            <article className="project-study" key={project.id} id={project.id}>
+            <article
+              className="project-study"
+              key={project.id}
+              id={project.id}
+              data-expanded={open}
+            >
               <div className="project-identity">
                 <h2>{project.title}</h2>
                 <span className="project-status">{project.status}</span>
@@ -134,6 +140,7 @@ export function ProjectCollection() {
                 id={`${project.id}-details`}
                 hidden={!open}
               >
+                {open && <ProjectSketch projectId={project.id} />}
                 <div>
                   <h3 className="mono">How it works</h3>
                   <p>{project.approach}</p>

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
     template: "%s | Mahek Ara",
   },
   description:
-    "I'm Mahek. I build AI tools in Python and write about how they work. My projects include RouterFlow, Context Relay and MCP Impact, with code, tests and notes.",
+    "I'm Mahek. I build AI and developer tools and write about how they work. A few projects: RouterFlow, MCP Impact and Narrative Gap MCP. Code, experiments and notes.",
 };
 
 export default function RootLayout({

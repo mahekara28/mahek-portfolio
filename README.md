@@ -1,6 +1,6 @@
 # Mahek Ara - portfolio
 
-A personal portfolio with a short introduction, six selected projects, writing and a nine-project index. Project descriptions are backed by public source code.
+A personal portfolio with a short introduction, three selected projects, writing and a nine-project index. Project descriptions and graph connections are backed by public source code.
 
 ## Run locally
 
@@ -13,24 +13,25 @@ The application uses Next.js App Router, React, TypeScript, Tailwind CSS and the
 
 ## Design
 
-The homepage pairs a readable project list with a smaller sixty-line sketch. Names link directly to project notes; separate preview controls change the sketch. RouterFlow leads, followed by developer experience, MCP tooling, security and planning work. Context Relay is one of the six, not the homepage's subject.
+The homepage connects RouterFlow, MCP Impact and Narrative Gap MCP through the tools and concerns they actually share. Selecting a project traces its connections and reveals a pinned source link. Three concise entries lead to project details; all nine projects remain in the index, including Context Relay.
 
-These drawings are conceptual studies, not benchmark results or live project telemetry. Their labels and the accompanying text connect them to the actual work.
+The palette pairs warm limestone, charcoal ink, petrol teal and a restrained brass accent. Dark mode uses blue-black ink surfaces, warm text and softer teal. Both modes use shared semantic colour tokens, including the retained flow sketches inside project details.
 
-Motion is limited to a 540 ms transition after a project selection. Interrupted transitions continue from the visible geometry. The canvas stops drawing once settled, respects reduced motion, and caps rendering resolution. Preview controls support arrow keys. On phones, an explicit preview brings the sketch into view; project names still navigate directly to the implementation notes.
+The graph draws selected connections once in 500 ms, with no perpetual movement or pointer tracking. Its native buttons support keyboard, touch and arrow-key selection. Reduced motion settles immediately. Project names remain ordinary links, independent of the map. The original six flow sketches remain conceptual illustrations in expanded project notes, not live telemetry or benchmark results.
 
 ## Content and routes
 
 - `app/lib/content.ts`: nine projects, focus areas, implementation limits, reviewed revisions, evidence links, profiles, resume and article metadata.
 - `app/lib/github-snapshot.json`: validated public GitHub metadata, refreshed independently of descriptions.
 - `app/lib/trace-studies.ts`: conceptual relationships, endpoint labels and shared drawing geometry.
-- `/`: a personal introduction, six short project summaries and one writing link.
+- `app/lib/work-connections.ts`: curated project-topic relationships, positions and pinned source paths.
+- `/`: a personal introduction, one interactive map, three short project summaries and one writing link.
 - `/projects`: a compact filterable index with implementation details, honest limits, source evidence and a real repository screenshot. Filters support shareable `?focus=ai`, `?focus=developer` and `?focus=operations` URLs; project anchors open the relevant notes.
 - `/blog`: the existing article plus selected repository guides and validation writing.
 - `/blog/llm-routing`: full article, working contents links, routing diagrams and code copying.
 - `/about`: background and interests.
 
-See [the refinement notes](docs/portfolio-refinement.md) for research sources and the decisions behind the shorter presentation.
+See [the graph refinement notes](docs/graph-refinement.md) for the current direction and [the earlier refinement notes](docs/portfolio-refinement.md) for the copy reduction and portfolio research.
 
 Light mode is the first-visit default. An explicit theme choice persists across routes and reloads. Navigation is shared across all pages; the mobile drawer uses a native modal dialog with focus containment and Escape dismissal.
 
@@ -66,4 +67,4 @@ npx playwright install chromium
 npm run verify
 ```
 
-Use Node.js 24 for the checks, which also test the TypeScript geometry directly. Set `BASE_URL` for a different port. Optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Content tests cover evidence relationships, snapshot validation, caching, rate limits, missing repositories and network failures. Browser checks cover all routes, mobile overflow, six trace states and label collisions, shareable filters and browser history, field notes, the project image, persisted themes, short-screen drawer fit, reduced motion, canvas output and WCAG A/AA accessibility rules. Screenshots and results are written to the ignored `.qa/` directory.
+Use Node.js 24 for the checks, which also test the TypeScript geometry directly. Set `BASE_URL` for a different port. Optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Content tests cover the three-project limit, graph evidence, snapshot validation, caching, rate limits, missing repositories and network failures. Browser checks cover all routes, graph selection and label collisions, the six retained sketches, shareable filters and browser history, source links, the project image, persisted themes, short-screen drawer fit, reduced motion, canvas output and WCAG A/AA accessibility rules. Screenshots and results are written to the ignored `.qa/` directory.

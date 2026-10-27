@@ -41,12 +41,13 @@ confirmed as the application name inside `LLM---Router`.
 
 ## Selection and presentation
 
-The six existing trace shapes remain, in a supporting preview beside the project
-list. RouterFlow leads with a small Python application. Narrative Gap and MCP
-Impact connect engineering to developer experience. The security simulation is
-labelled honestly, and Build, Buy or Borrow adds decision-support work. Context
-Relay is sixth, with the same source-backed details as the other projects. The
-remaining three projects stay discoverable in the index with their original anchors.
+The homepage features three projects: RouterFlow, MCP Impact and Narrative Gap
+MCP. A curated map connects their real use of Python, local models, GitHub APIs,
+contract scans and developer feedback. It does not imply that these repositories
+depend on each other. Every selection links to its reviewed implementation.
+The complete nine-project collection retains all original anchors, including
+Context Relay. The six original flow sketches now sit inside expanded project
+notes. The security simulation remains clearly identified as a simulation.
 
 The writing archive retains the routing article and links to the staffing case
 study, MCP Impact's setup guide and Context Relay's validation notes. These are

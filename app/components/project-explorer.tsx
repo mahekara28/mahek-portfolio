@@ -1,30 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, ScanLine } from "lucide-react";
-import { useRef, useState, type KeyboardEvent } from "react";
-import { featuredProjects as projects } from "../lib/content";
-import { traceLabels, traceStudies } from "../lib/trace-studies";
-import { TraceField } from "./trace-field";
+import { ArrowUpRight } from "lucide-react";
+import { useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { featuredProjects as projects, sourceUrl } from "../lib/content";
+import {
+  connectionPath,
+  workConnections,
+  workTopics,
+} from "../lib/work-connections";
 
-export function ProjectExplorer() {
+export function ProjectExplorer({ introduction }: { introduction: ReactNode }) {
   const [active, setActive] = useState(0);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
+  const selected = workConnections[active];
   const project = projects[active];
-  const trace = traceStudies[active];
-  const labels = traceLabels(active);
-
-  function preview(index: number) {
-    setActive(index);
-    if (window.matchMedia("(max-width: 760px)").matches) {
-      document.getElementById("study-panel")?.scrollIntoView({
-        block: "nearest",
-        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
-          ? "instant"
-          : "smooth",
-      });
-    }
-  }
 
   function move(event: KeyboardEvent<HTMLButtonElement>, index: number) {
     let next = index;
@@ -41,108 +31,145 @@ export function ProjectExplorer() {
   }
 
   return (
-    <section className="project-explorer" aria-labelledby="selected-title">
-      <div className="section-heading">
-        <h2 id="selected-title">Selected projects</h2>
-        <Link className="text-link" href="/projects">
-          All projects <ArrowUpRight size={15} />
-        </Link>
-      </div>
-      <div className="explorer-layout">
-        <ul className="explorer-projects" aria-label="Selected projects">
-          {projects.map((item, index) => (
-            <li key={item.id} data-active={active === index}>
-              <div>
-                <h3>
-                  <Link
-                    href={`/projects#${item.id}`}
-                    onFocus={() => setActive(index)}
-                  >
-                    {item.title}
-                  </Link>
-                </h3>
-                <p>{item.description}</p>
-              </div>
+    <div className="personal-work">
+      <div className="intro-map">
+        {introduction}
+        <figure className="connection-map" aria-labelledby="map-title">
+          <div className="map-heading">
+            <h2 id="map-title">How the work connects</h2>
+            <span className="map-hint">Pick a project</span>
+          </div>
+          <div className="map-surface">
+            <svg
+              className="connection-lines"
+              viewBox="0 0 600 340"
+              preserveAspectRatio="none"
+              aria-hidden="true"
+            >
+              {workConnections.flatMap((item) =>
+                item.topics.map((id) => {
+                  const topic = workTopics.find((entry) => entry.id === id)!;
+                  return (
+                    <path
+                      className="connection-base"
+                      key={item.projectId + id}
+                      d={connectionPath(item, topic)}
+                    />
+                  );
+                }),
+              )}
+              <g key={selected.projectId} className="connection-selection">
+                {selected.topics.map((id) => {
+                  const topic = workTopics.find((entry) => entry.id === id)!;
+                  return (
+                    <path
+                      key={id}
+                      className="connection-active"
+                      pathLength="1"
+                      d={connectionPath(selected, topic)}
+                    />
+                  );
+                })}
+              </g>
+            </svg>
+            {workTopics.map((topic) => (
+              <span
+                key={topic.id}
+                className="map-topic"
+                data-connected={selected.topics.includes(topic.id)}
+                style={{ left: `${topic.x}%`, top: `${topic.y}%` }}
+              >
+                <i aria-hidden="true" />
+                <span>{topic.label}</span>
+              </span>
+            ))}
+            {projects.map((item, index) => (
               <button
-                className="preview-button icon-button"
+                key={item.id}
+                type="button"
+                className="map-project"
+                style={{
+                  left: `${workConnections[index].x}%`,
+                  top: `${workConnections[index].y}%`,
+                }}
                 ref={(node) => {
                   buttons.current[index] = node;
                 }}
-                aria-label={`Preview ${item.title}`}
+                aria-label={`Show connections for ${item.title}`}
                 aria-pressed={active === index}
-                aria-controls="study-panel"
-                onClick={() => preview(index)}
+                aria-controls="connection-note"
+                onClick={() => setActive(index)}
+                onFocus={() => setActive(index)}
                 onKeyDown={(event) => move(event, index)}
               >
-                <ScanLine size={19} aria-hidden="true" />
-                <span className="preview-tip" aria-hidden="true">
-                  Preview sketch
+                <span className="map-index" aria-hidden="true">
+                  0{index + 1}
                 </span>
+                <span>{item.title}</span>
               </button>
-            </li>
-          ))}
-        </ul>
-        <div
-          id="study-panel"
-          role="region"
-          aria-labelledby="sketch-title"
-          tabIndex={0}
-          className="study-panel"
-        >
-          <div className="study-heading">
-            <span className="mono">{project.status}</span>
-            <h3 id="sketch-title">{project.title}</h3>
+            ))}
           </div>
-          <figure className="trace-study">
-            <div className="field-surface">
-              <TraceField study={active} />
-              <span className="trace-operation mono">{trace.operation}</span>
-              <div className="trace-labels">
-                {labels.inputs.map((label) => (
-                  <span
-                    key={label.text}
-                    className="trace-input"
-                    style={{
-                      left: `${label.x * 100}%`,
-                      top: `${label.y * 100}%`,
-                    }}
-                  >
-                    {label.text}
-                  </span>
-                ))}
-                {labels.outputs.map((label, index) => (
-                  <span
-                    key={label.text}
-                    className={`trace-output trace-group-${index}`}
-                    style={{
-                      left: `${label.x * 100}%`,
-                      top: `${label.y * 100}%`,
-                    }}
-                  >
-                    {label.text}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <figcaption className="mono">
-              A flow sketch, not live data.
-            </figcaption>
-          </figure>
-          <div className="study-links">
-            <Link className="text-link" href={`/projects#${project.id}`}>
-              Project notes <ArrowRight size={16} />
-            </Link>
+          <figcaption className="connection-caption" id="connection-note">
+            <p aria-live="polite" aria-atomic="true">
+              <span className="sr-only">{project.title}. </span>
+              {selected.note}
+            </p>
             <a
               className="text-link"
-              href={project.github}
+              href={sourceUrl(project, selected.sourcePath)}
               target="_blank"
               rel="noreferrer"
             >
-              GitHub <ArrowUpRight size={16} />
+              {selected.sourceLabel}{" "}
+              <ArrowUpRight size={14} aria-hidden="true" />
             </a>
-          </div>
-        </div>
+          </figcaption>
+        </figure>
       </div>
-    </section>
+
+      <section className="featured-work" aria-labelledby="selected-title">
+        <div className="section-heading">
+          <h2 id="selected-title">A few projects</h2>
+          <Link className="text-link" href="/projects">
+            All projects <ArrowUpRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
+        <ol className="featured-projects">
+          {projects.map((item, index) => (
+            <li key={item.id} data-active={active === index}>
+              <div className="featured-meta">
+                <span
+                  className="project-index"
+                  data-active={active === index}
+                  aria-hidden="true"
+                >
+                  0{index + 1}
+                </span>
+                <span>{item.category}</span>
+              </div>
+              <h3>
+                <Link
+                  href={`/projects#${item.id}`}
+                  onFocus={() => setActive(index)}
+                >
+                  {item.title}
+                  <ArrowUpRight size={18} aria-hidden="true" />
+                </Link>
+              </h3>
+              <p>{item.description}</p>
+              <a
+                className="project-repo"
+                href={item.github}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={`${item.title} on GitHub`}
+              >
+                GitHub <ArrowUpRight size={14} aria-hidden="true" />
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
   );
 }
