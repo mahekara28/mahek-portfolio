@@ -5,25 +5,15 @@ type TraceStudy = {
   operation: string;
   input: string[];
   output: [string, string, string] | [string];
-  note: string;
 };
 
 export const traceStudies: TraceStudy[] = [
-  {
-    projectId: "context-relay",
-    shape: 2,
-    operation: "Carry intent forward",
-    input: ["Current intent", "Tool proposal", "Checks"],
-    output: ["Checked action"],
-    note: "Check a proposed tool call against the current instruction before running it. The application supplies its own check of the result; the library doesn't verify every outcome on its own.",
-  },
   {
     projectId: "llm-router",
     shape: 0,
     operation: "Choose a model path",
     input: ["Request"],
     output: ["Small route", "Medium route", "Large route"],
-    note: "Three keyword-based routes, but only two local models. Medium and large both use Llama. The API returns the route and how long the call took.",
   },
   {
     projectId: "narrative-gap-mcp",
@@ -31,7 +21,6 @@ export const traceStudies: TraceStudy[] = [
     operation: "Review the mismatch",
     input: ["Issues", "Pull requests", "Contributors"],
     output: ["Review prompts"],
-    note: "Issues, pull requests and contributors feed a set of rules for reviewing docs and onboarding. The findings suggest where to look; they don't measure a community's health.",
   },
   {
     projectId: "mcp-impact",
@@ -39,7 +28,6 @@ export const traceStudies: TraceStudy[] = [
     operation: "Follow references",
     input: ["Contract change"],
     output: ["Prompts", "Agents", "Workflows"],
-    note: "Follow a changed tool contract into the files that mention it. These references tell you what to check, not what will definitely break.",
   },
   {
     projectId: "prompt-injection-lab",
@@ -47,7 +35,6 @@ export const traceStudies: TraceStudy[] = [
     operation: "Test the boundary",
     input: ["Attack scenarios"],
     output: ["Blocked", "Exploited", "Risk report"],
-    note: "Each predefined attack gets a repeatable, simulated result. The lab makes the scenarios easier to compare; it doesn't test a live model's defenses.",
   },
   {
     projectId: "build-buy-borrow",
@@ -55,7 +42,13 @@ export const traceStudies: TraceStudy[] = [
     operation: "Compare readiness",
     input: ["Project brief"],
     output: ["Develop skills", "Hire", "Contract"],
-    note: "Train, hire, contract, or combine them. Compare time, cost and capacity using fictional people, with the assumptions kept alongside the plan.",
+  },
+  {
+    projectId: "context-relay",
+    shape: 2,
+    operation: "Carry intent forward",
+    input: ["Current intent", "Tool proposal", "Checks"],
+    output: ["Checked action"],
   },
 ];
 

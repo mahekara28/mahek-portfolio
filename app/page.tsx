@@ -1,62 +1,55 @@
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { ProjectExplorer } from "./components/project-explorer";
-import { routingPost } from "./lib/content";
+import { links, routingPost } from "./lib/content";
 
 export default function Home() {
   return (
     <main id="main" className="home-main">
-      <section className="introduction">
-        <div className="intro-name">
-          <p className="mono eyebrow">AI tools / Developer experience</p>
-          <h1>
-            Mahek Ara<span className="name-period">.</span>
-          </h1>
-        </div>
-        <div className="intro-thought">
+      <section className="introduction" aria-labelledby="intro-title">
+        <p className="hello">Hi, I&apos;m</p>
+        <h1 id="intro-title">
+          Mahek Ara<span className="name-period">.</span>
+        </h1>
+        <div className="intro-bottom">
           <p>
-            I build AI tools in Python, from a local model router to checks
-            around agent actions.{" "}
-            <span>
-              I write about the decisions, and the parts that still need work.
-            </span>
+            I build AI tools, experiment with how they behave, and write about
+            what I learn.
           </p>
+          <Link className="text-link" href="/about">
+            A little about me <ArrowUpRight size={16} />
+          </Link>
+        </div>
+        <div className="intro-links">
+          <a href={links.github} target="_blank" rel="noreferrer">
+            GitHub <ArrowUpRight size={14} />
+          </a>
+          <a href={links.linkedin} target="_blank" rel="noreferrer">
+            LinkedIn <ArrowUpRight size={14} />
+          </a>
+          <a
+            href={links.x}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Mahek Ara on X"
+          >
+            X <ArrowUpRight size={14} />
+          </a>
         </div>
       </section>
       <ProjectExplorer />
-      <section className="home-notes" aria-label="Writing and background">
-        <div className="note-label mono">
-          <span>From my notes</span>
-          <span>01 / Writing</span>
+      <section className="home-writing" aria-labelledby="home-writing-title">
+        <div className="section-heading">
+          <h2 id="home-writing-title">A few notes</h2>
+          <Link className="text-link" href="/blog">
+            All writing <ArrowUpRight size={15} />
+          </Link>
         </div>
-        <Link className="featured-note" href={routingPost.href}>
-          <span className="mono">
-            {routingPost.date} / {routingPost.readTime}
-          </span>
-          <h2>
-            Why I built an LLM router.
-            <br />
-            <em>And what it actually does.</em>
-          </h2>
-          <span className="text-link">
-            Read the note <ArrowUpRight size={18} aria-hidden="true" />
-          </span>
+        <Link className="home-note" href={routingPost.href}>
+          <span className="mono">{routingPost.date}</span>
+          <h3>{routingPost.title}</h3>
+          <ArrowUpRight size={20} aria-hidden="true" />
         </Link>
-        <div className="personal-note">
-          <span className="mono">A little context</span>
-          <p>
-            Narrative Gap MCP looks at GitHub activity for clues about docs and
-            onboarding. That side of building interests me too: helping
-            developers get unstuck, then using what they ask to improve the
-            tool.
-          </p>
-          <Link className="text-link" href="/about">
-            More about me <ArrowRight size={17} aria-hidden="true" />
-          </Link>
-          <Link className="text-link" href="/projects?focus=developer">
-            Tools for developers <ArrowRight size={17} aria-hidden="true" />
-          </Link>
-        </div>
       </section>
     </main>
   );

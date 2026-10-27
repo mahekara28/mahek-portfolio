@@ -110,11 +110,7 @@ export default function LLMRoutingPage() {
       </div>
       <article>
         <header className="essay-header">
-          <p className="mono eyebrow">Note 01 / AI engineering</p>
-          <h1>
-            Why I built an LLM router.
-            <span>And what it actually does.</span>
-          </h1>
+          <h1>{routingPost.title}</h1>
           <div className="essay-meta mono">
             <span>By Mahek Ara</span>
             <span>{routingPost.date}</span>

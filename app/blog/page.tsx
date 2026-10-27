@@ -14,30 +14,23 @@ export default function BlogPage() {
   return (
     <main id="main" className="page-main writing-main">
       <header className="page-intro">
-        <p className="mono eyebrow">Writing / Notes & guides</p>
         <h1>
-          Notes from the work<span className="name-period">.</span>
+          Writing<span className="name-period">.</span>
         </h1>
         <p className="intro-deck">
-          Model-routing notes, Python setup guides and the details that
-          don&apos;t fit in a README introduction.
+          Notes from building, testing and trying again.
         </p>
       </header>
       <article className="writing-entry">
         <div className="writing-meta mono">
-          <span>01</span>
           <span>{routingPost.date}</span>
-          <span>AI engineering</span>
           <span>{routingPost.readTime}</span>
         </div>
         <Link href={routingPost.href} className="writing-link">
-          <h2>
-            Why I built an LLM router.
-            <em>And what it actually does.</em>
-          </h2>
+          <h2>{routingPost.title}</h2>
           <p>{routingPost.description}</p>
           <span className="text-link">
-            Read the note <ArrowUpRight size={18} aria-hidden="true" />
+            Read the note <ArrowUpRight size={17} aria-hidden="true" />
           </span>
         </Link>
       </article>
@@ -45,12 +38,7 @@ export default function BlogPage() {
         className="repository-writing"
         aria-labelledby="repository-writing-title"
       >
-        <div className="repository-writing-heading">
-          <h2 id="repository-writing-title">Alongside the code</h2>
-          <p>
-            How to run things, what the tests cover, and what they don&apos;t.
-          </p>
-        </div>
+        <h2 id="repository-writing-title">In the repositories</h2>
         {repositoryNotes.map((note) => {
           const project = projects.find((item) => item.id === note.project)!;
           return (
@@ -62,10 +50,7 @@ export default function BlogPage() {
               rel="noreferrer"
             >
               <span className="mono">{note.kind}</span>
-              <div>
-                <h3>{note.title}</h3>
-                <p>{note.description}</p>
-              </div>
+              <h3>{note.title}</h3>
               <ArrowUpRight size={18} aria-hidden="true" />
             </a>
           );

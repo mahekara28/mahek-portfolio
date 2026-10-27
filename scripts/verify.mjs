@@ -108,7 +108,7 @@ async function painted() {
 
 async function inspectStudies() {
   for (let index = 0; index < featuredProjects.length; index++) {
-    await page.getByRole("tab").nth(index).click();
+    await page.locator(".preview-button").nth(index).click();
     await expect(page.locator(".trace-operation")).toHaveText(
       traceStudies[index].operation,
     );
@@ -151,6 +151,13 @@ async function inspectStudies() {
 
 try {
   await visit("/");
+  await expect(page.locator("#sketch-title")).toHaveText("RouterFlow");
+  await expect(page.locator(".explorer-projects li")).toHaveCount(6);
+  for (const project of featuredProjects) {
+    await expect(
+      page.locator(`.explorer-projects h3 a[href='/projects#${project.id}']`),
+    ).toHaveText(project.title);
+  }
   await painted();
   await capture({ path: ".qa/home-desktop.png", fullPage: true });
   console.log("Desktop screenshot saved");
@@ -161,18 +168,26 @@ try {
     const initial = await page
       .locator("canvas")
       .evaluate((canvas) => canvas.toDataURL());
-    await page.getByRole("tab", { name: /Prompt Injection Lab/ }).click();
     await page
-      .getByRole("heading", { name: "Where should an agent stop?" })
-      .waitFor();
+      .getByRole("button", {
+        name: "Preview Prompt Injection Lab",
+        exact: true,
+      })
+      .click();
+    await page.locator("#sketch-title").waitFor();
+    await expect(page.locator("#sketch-title")).toHaveText(
+      "Prompt Injection Lab",
+    );
     await page.waitForFunction(
       (before) => document.querySelector("canvas").toDataURL() !== before,
       initial,
     );
-    await page.getByRole("tab", { selected: true }).press("ArrowRight");
-    await expect(page.getByRole("tab", { selected: true })).toContainText(
-      "Build, Buy or Borrow",
-    );
+    await page
+      .locator(".preview-button[aria-pressed='true']")
+      .press("ArrowRight");
+    await expect(
+      page.locator(".preview-button[aria-pressed='true']"),
+    ).toHaveAttribute("aria-label", "Preview Build, Buy or Borrow");
     await page
       .getByRole("button", { name: "Toggle light and dark theme" })
       .first()
@@ -184,6 +199,7 @@ try {
     await assertLayout("Home desktop / dark");
     await visit("/projects");
     assert.equal(await page.locator("html").getAttribute("data-theme"), "dark");
+    await assertLayout("Projects desktop / dark");
     await page.reload({ waitUntil: "networkidle" });
     assert.equal(await page.locator("html").getAttribute("data-theme"), "dark");
     await page
@@ -210,7 +226,10 @@ try {
       .getByRole("button", { name: "All projects", exact: true })
       .click();
     await expect(page.locator(".project-study")).toHaveCount(projects.length);
-    await page.getByRole("button", { name: "Show details" }).first().click();
+    await page
+      .locator("#context-relay")
+      .getByRole("button", { name: "Show details" })
+      .click();
     await expect(page.locator("#context-relay-details")).toBeVisible();
     await expect(
       page.locator("#context-relay-details .source-evidence a").first(),
@@ -232,6 +251,19 @@ try {
         path: `.qa/${route.split("/").filter(Boolean).join("-")}-desktop.png`,
         fullPage: true,
       });
+      await page
+        .getByRole("button", { name: "Toggle light and dark theme" })
+        .first()
+        .click();
+      await assertLayout(route + " desktop / dark");
+      await capture({
+        path: `.qa/${route.split("/").filter(Boolean).join("-")}-dark.png`,
+        fullPage: true,
+      });
+      await page
+        .getByRole("button", { name: "Toggle light and dark theme" })
+        .first()
+        .click();
     }
     await visit("/projects#mcp-impact");
     await expect(page.locator("#mcp-impact-details")).toBeVisible();
@@ -269,10 +301,24 @@ try {
         path: `.qa/${route === "/" ? "home" : route.split("/").filter(Boolean).join("-")}-mobile.png`,
         fullPage: true,
       });
+      await page
+        .getByRole("button", { name: "Toggle light and dark theme" })
+        .first()
+        .click();
+      await assertLayout(route + " mobile / dark");
+      await page
+        .getByRole("button", { name: "Toggle light and dark theme" })
+        .first()
+        .click();
     }
     await visit("/");
     await inspectStudies();
-    await page.getByRole("tab", { name: /Prompt Injection Lab/ }).click();
+    await page
+      .getByRole("button", {
+        name: "Preview Prompt Injection Lab",
+        exact: true,
+      })
+      .click();
     await page.waitForTimeout(600);
     await capture({ path: ".qa/security-mobile.png", fullPage: true });
     await page.getByRole("button", { name: "Open navigation" }).click();
@@ -319,7 +365,9 @@ try {
       .press("Escape");
     await visit("/");
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.getByRole("tab", { name: /MCP Impact/ }).click();
+    await page
+      .getByRole("button", { name: "Preview MCP Impact", exact: true })
+      .click();
     await painted();
     const still = await page
       .locator("canvas")

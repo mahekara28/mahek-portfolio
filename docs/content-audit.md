@@ -41,16 +41,21 @@ confirmed as the application name inside `LLM---Router`.
 
 ## Selection and presentation
 
-The six existing trace slots remain. Context Relay leads as the most extensively
-documented agent-tooling project; RouterFlow supplies a small, inspectable Python
-application. Narrative Gap and MCP Impact connect engineering to developer
-experience. The security simulation is labelled honestly. Build, Buy or Borrow
-adds concrete decision-support and operations work. All three other projects
-remain discoverable in the work index with their original anchors.
+The six existing trace shapes remain, in a supporting preview beside the project
+list. RouterFlow leads with a small Python application. Narrative Gap and MCP
+Impact connect engineering to developer experience. The security simulation is
+labelled honestly, and Build, Buy or Borrow adds decision-support work. Context
+Relay is sixth, with the same source-backed details as the other projects. The
+remaining three projects stay discoverable in the index with their original anchors.
 
-The writing archive retains the existing article and adds links to real repository
-guides, validation notes and a case study. These are labelled as documentation,
-not invented blog posts, talks or community achievements.
+The writing archive retains the routing article and links to the staffing case
+study, MCP Impact's setup guide and Context Relay's validation notes. These are
+labelled as documentation, not invented blog posts, talks or community achievements.
+
+On 27 October 2026, the public inventory was checked again (28 repositories),
+along with the latest commit and primary implementation file for each of the nine
+listed projects. All nine heads still matched the reviewed revisions above. The
+shortened descriptions do not introduce new capability or deployment claims.
 
 The planning screenshot is the original `preview-studio.png` at revision
 `bd642ab465fa10c5487707cde4e46c0ed0495912`, stored locally as

@@ -53,6 +53,22 @@ test("project identity, focus and trace relationships stay aligned", () => {
   );
 });
 
+test("the selection stays varied and project summaries stay brief", () => {
+  assert.equal(featuredProjects[0].id, "llm-router");
+  assert.equal(
+    featuredProjects[featuredProjects.length - 1].id,
+    "context-relay",
+  );
+  assert(featuredProjects.some((p) => p.focus.includes("developer")));
+  assert(featuredProjects.some((p) => p.focus.includes("operations")));
+  assert(featuredProjects.some((p) => p.id === "prompt-injection-lab"));
+  assert(projects.every((p) => p.description.split(/\s+/).length <= 24));
+  assert.equal(
+    new Set(repositoryNotes.map((note) => note.project)).size,
+    repositoryNotes.length,
+  );
+});
+
 test("official GitHub metadata is allowlisted and stripped to public display fields", async () => {
   const result = await fetchSnapshot({
     now,

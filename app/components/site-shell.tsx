@@ -69,10 +69,7 @@ export function SiteHeader() {
             <i />
             <i />
           </span>
-          <span>
-            Mahek Ara
-            <span className="wordmark-sub">Code, tests & notes</span>
-          </span>
+          <span>Mahek Ara</span>
         </Link>
         <nav className="desktop-nav" aria-label="Main navigation">
           {navigation.map(({ href, label }) => (
@@ -181,9 +178,10 @@ export function SiteFooter() {
   return (
     <footer className="site-footer" id="contact">
       <div>
-        <span className="mono">Want to talk through a project?</span>
+        <span className="footer-greeting">Say hello.</span>
         <a className="contact-link" href={links.email}>
-          Email me <ArrowUpRight aria-hidden="true" />
+          {links.email.replace("mailto:", "")}{" "}
+          <ArrowUpRight size={15} aria-hidden="true" />
         </a>
       </div>
       <div className="footer-links">
@@ -207,7 +205,7 @@ export function SiteFooter() {
       </div>
       <div className="footer-bottom">
         <span>Mahek Ara</span>
-        <span>2026</span>
+        <span>{new Date().getFullYear()}</span>
       </div>
     </footer>
   );

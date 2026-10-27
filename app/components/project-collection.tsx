@@ -92,19 +92,11 @@ export function ProjectCollection() {
             ];
           return (
             <article className="project-study" key={project.id} id={project.id}>
-              <div className="project-number mono">{project.number}</div>
               <div className="project-identity">
-                <p className="mono">{project.category}</p>
                 <h2>{project.title}</h2>
-                <p className="project-question">{project.question}</p>
-                <ul className="tech-list" aria-label="Technologies">
-                  {project.stack.map((tech) => (
-                    <li key={tech}>{tech}</li>
-                  ))}
-                </ul>
+                <span className="project-status">{project.status}</span>
               </div>
               <div className="project-evidence">
-                <span className="project-status mono">{project.status}</span>
                 <p>{project.description}</p>
                 <div className="project-actions">
                   <button
@@ -133,8 +125,7 @@ export function ProjectCollection() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    Source on GitHub{" "}
-                    <ArrowUpRight size={16} aria-hidden="true" />
+                    GitHub <ArrowUpRight size={16} aria-hidden="true" />
                   </a>
                 </div>
               </div>
@@ -144,12 +135,13 @@ export function ProjectCollection() {
                 hidden={!open}
               >
                 <div>
-                  <h3 className="mono">Why I built it</h3>
-                  <p>{project.detail}</p>
-                </div>
-                <div>
                   <h3 className="mono">How it works</h3>
                   <p>{project.approach}</p>
+                  <ul className="tech-list" aria-label="Technologies">
+                    {project.stack.map((tech) => (
+                      <li key={tech}>{tech}</li>
+                    ))}
+                  </ul>
                 </div>
                 <div className="project-boundary">
                   <h3 className="mono">The limits</h3>
