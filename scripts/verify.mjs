@@ -9,13 +9,13 @@ import {
   STRANDS,
   STEPS,
 } from "../app/lib/trace-studies.ts";
+import { projects, links } from "../app/lib/content.ts";
 import {
-  projects,
-  featuredProjects,
-  links,
-  sourceUrl,
-} from "../app/lib/content.ts";
-import { workConnections } from "../app/lib/work-connections.ts";
+  sketchCases,
+  sketchStages,
+  decideSketch,
+  inspectStage,
+} from "../app/lib/decision-sketch.ts";
 
 const shapes = new Set();
 assert.equal(traceStudies.length, 6);
@@ -64,6 +64,14 @@ page.setDefaultTimeout(30000);
 const errors = [];
 page.on("pageerror", (error) => errors.push(error.message));
 const report = [];
+const remoteRequests = [];
+page.on("request", (request) => {
+  if (
+    /^https?:/.test(request.url()) &&
+    new URL(request.url()).origin !== new URL(baseURL).origin
+  )
+    remoteRequests.push(request.url());
+});
 
 async function capture(options) {
   await page.screenshot({ timeout: 90000, animations: "disabled", ...options });
@@ -114,46 +122,38 @@ async function painted() {
   });
 }
 
-async function inspectConnections() {
-  const top = () =>
-    page
-      .locator(".featured-work")
-      .evaluate((el) => el.getBoundingClientRect().top + scrollY);
-  const before = await top();
-  for (let index = 0; index < featuredProjects.length; index++) {
-    const project = featuredProjects[index];
-    const connection = workConnections[index];
+async function inspectWorld() {
+  const world = page.getByTestId("decision-world");
+  await expect(world.locator("svg:visible")).toHaveCount(1);
+  for (const example of sketchCases) {
+    const decision = decideSketch(example);
     await page
-      .getByRole("button", {
-        name: `Show connections for ${project.title}`,
-        exact: true,
-      })
+      .getByRole("button", { name: example.label, exact: true })
       .click();
-    await expect(page.locator(".map-project[aria-pressed='true']")).toHaveCount(
-      1,
+    await expect(page.locator("section[data-case]")).toHaveAttribute(
+      "data-outcome",
+      decision.outcome,
     );
-    await expect(page.locator(".connection-active")).toHaveCount(
-      connection.topics.length,
-    );
-    await expect(page.locator("#connection-note p")).toContainText(
-      connection.note,
-    );
-    await expect(page.locator("#connection-note a")).toHaveAttribute(
-      "href",
-      sourceUrl(project, connection.sourcePath),
-    );
+    await expect(page.getByRole("status")).toHaveText(decision.result);
     await expect(
-      page.locator(".featured-projects li[data-active='true'] h3"),
-    ).toHaveText(project.title);
-    assert(
-      Math.abs((await top()) - before) <= 1,
-      "Changing selection doesn't shift the page",
-    );
+      world.locator("svg:visible [data-edge][data-active='true']"),
+    ).toHaveCount(decision.edges.length);
+    for (const stage of sketchStages) {
+      await page
+        .getByRole("button", { name: `Inspect ${stage.label}`, exact: true })
+        .click();
+      await expect(page.locator("#decision-insight h3")).toHaveText(
+        inspectStage(stage.id, example).title,
+      );
+      await expect(page.locator("#decision-insight code")).toHaveText(
+        inspectStage(stage.id, example).excerpt,
+      );
+    }
   }
-  const layout = await page.locator(".map-surface").evaluate((field) => {
+  const layout = await world.evaluate((field) => {
     const bounds = field.getBoundingClientRect();
     const labels = [
-      ...field.querySelectorAll(".map-project, .map-topic > span"),
+      ...field.querySelectorAll("[data-stage], [data-endpoint]"),
     ].map((el) => ({ text: el.textContent, r: el.getBoundingClientRect() }));
     return {
       outside: labels
@@ -180,7 +180,7 @@ async function inspectConnections() {
   assert.deepEqual(
     layout,
     { outside: [], collisions: [] },
-    "Graph labels are legible and contained",
+    "Decision labels and hit targets remain distinct and contained",
   );
 }
 
@@ -227,36 +227,79 @@ async function inspectStudies() {
 
 try {
   await visit("/");
-  await expect(page.locator(".featured-projects li")).toHaveCount(3);
-  await expect(page.locator(".map-project")).toHaveCount(3);
-  for (const project of featuredProjects) {
-    await expect(
-      page.locator(`.featured-projects h3 a[href='/projects#${project.id}']`),
-    ).toContainText(project.title);
-  }
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Hi, I'm Mahek Ara.",
+  );
+  await expect(
+    page.locator(".featured-projects, .home-writing, .project-explorer"),
+  ).toHaveCount(0);
+  await expect(page.locator("main a[href='/projects']")).toBeVisible();
+  await expect(page.locator("main a[href='/about']")).toBeVisible();
+  await expect(
+    page.getByRole("group", { name: "Change the context" }).getByRole("button"),
+  ).toHaveCount(3);
   assert.equal(
     await page.locator("canvas").count(),
     0,
-    "The homepage has one lightweight SVG map",
+    "The homepage uses a local SVG world",
   );
   await capture({ path: ".qa/home-desktop.png", fullPage: true });
   console.log("Desktop screenshot saved");
   if (process.env.VISUAL_ONLY === "1") process.exitCode = 0;
   else {
     await assertLayout("Home desktop / light");
-    await inspectConnections();
-    await page.locator(".map-project[aria-pressed='true']").press("Home");
+    await inspectWorld();
+    await page
+      .getByRole("button", { name: "Injected instruction", exact: true })
+      .press("Home");
     await expect(
-      page.locator(".map-project[aria-pressed='true']"),
-    ).toHaveAttribute("aria-label", "Show connections for RouterFlow");
-    await page.locator(".map-project[aria-pressed='true']").press("ArrowRight");
+      page.getByRole("button", { name: "Useful context", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await page
+      .getByRole("button", { name: "Useful context", exact: true })
+      .press("ArrowRight");
+    await expect(page.getByRole("status")).toHaveText(
+      "Ask for the error log first.",
+    );
+    await page
+      .getByRole("button", { name: "Inspect Context", exact: true })
+      .focus();
+    await page
+      .getByRole("button", { name: "Inspect Context", exact: true })
+      .press("End");
     await expect(
-      page.locator(".map-project[aria-pressed='true']"),
-    ).toHaveAttribute("aria-label", "Show connections for MCP Impact");
-    await page.locator(".map-project[aria-pressed='true']").press("End");
+      page.getByRole("button", { name: "Inspect Trust boundary", exact: true }),
+    ).toBeFocused();
     await expect(
-      page.locator(".map-project[aria-pressed='true']"),
-    ).toHaveAttribute("aria-label", "Show connections for Narrative Gap MCP");
+      page.getByRole("button", { name: "Inspect Trust boundary", exact: true }),
+    ).toHaveAttribute("aria-pressed", "true");
+    await page
+      .getByRole("button", { name: "Follow the path again", exact: true })
+      .click();
+    await expect
+      .poll(() =>
+        page
+          .getByTestId("decision-world")
+          .evaluate((el) =>
+            el
+              .getAnimations({ subtree: true })
+              .some((a) => a.playState === "running"),
+          ),
+      )
+      .toBe(true);
+    await expect
+      .poll(
+        () =>
+          page
+            .getByTestId("decision-world")
+            .evaluate((el) =>
+              el
+                .getAnimations({ subtree: true })
+                .some((a) => a.playState === "running"),
+            ),
+        { timeout: 5000 },
+      )
+      .toBe(false);
     await page
       .getByRole("button", { name: "Toggle light and dark theme" })
       .first()
@@ -266,6 +309,7 @@ try {
     );
     await capture({ path: ".qa/home-dark.png", fullPage: true });
     await assertLayout("Home desktop / dark");
+    await inspectWorld();
     await visit("/projects");
     assert.equal(await page.locator("html").getAttribute("data-theme"), "dark");
     await assertLayout("Projects desktop / dark");
@@ -382,16 +426,16 @@ try {
         .click();
     }
     await visit("/");
-    await inspectConnections();
+    await inspectWorld();
     for (const width of [1024, 820, 760, 360, 320]) {
       await page.setViewportSize({ width, height: 852 });
-      await inspectConnections();
+      await inspectWorld();
       assert.equal(
         await page.evaluate(
           () => document.documentElement.scrollWidth > innerWidth + 1,
         ),
         false,
-        "Graph responsive width " + width,
+        "Decision world responsive width " + width,
       );
     }
     await page.setViewportSize({ width: 393, height: 852 });
@@ -418,7 +462,7 @@ try {
     await expect(page.getByRole("dialog")).not.toBeVisible();
     await page.setViewportSize({ width: 320, height: 568 });
     await assertLayout("Small phone");
-    await inspectConnections();
+    await inspectWorld();
     await inspectStudies();
     await visit("/projects#context-relay");
     await expect(page.locator("#context-relay-details")).toBeVisible();
@@ -441,21 +485,24 @@ try {
     await visit("/");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page
-      .getByRole("button", {
-        name: "Show connections for MCP Impact",
-        exact: true,
-      })
+      .getByRole("button", { name: "Missing context", exact: true })
       .click();
+    await expect(page.getByRole("status")).toHaveText(
+      "Ask for the error log first.",
+    );
+    await expect(
+      page.getByRole("button", { name: "Follow the path again", exact: true }),
+    ).not.toBeVisible();
     assert.equal(
       await page
-        .locator(".connection-active")
-        .first()
-        .evaluate((el) => getComputedStyle(el).animationName),
-      "none",
-      "Reduced motion removes drawing animations",
-    );
-    await expect(page.locator("#connection-note p")).toContainText(
-      "GitHub diffs",
+        .getByTestId("decision-world")
+        .evaluate((el) =>
+          el
+            .getAnimations({ subtree: true })
+            .some((a) => a.playState === "running"),
+        ),
+      false,
+      "Reduced-motion sketch stays still",
     );
     await visit("/projects#mcp-impact");
     await painted();
@@ -469,6 +516,11 @@ try {
       "Reduced-motion sketch is still",
     );
     assert.deepEqual(errors, [], "Browser runtime errors");
+    assert.deepEqual(
+      remoteRequests,
+      [],
+      "The visualization does not need external network access",
+    );
     await writeFile(
       ".qa/report.json",
       JSON.stringify({ report, errors }, null, 2),

@@ -375,6 +375,7 @@
 }
 @media (max-width: 1000px) {
   .identity {
+    display: block;
     padding: 26px 0;
   }
   .toolbar {
@@ -405,6 +406,7 @@
   }
   .identity a {
     font-size: 12px;
+    margin-top: 4px;
   }
   .toolbar {
     display: block;
@@ -456,7 +458,7 @@
     font-size: 10px;
   }
   .request {
-    transform: translate(-30%, 12px);
+    transform: translate(-30%, -28px);
   }
   .sceneHint {
     left: 0;

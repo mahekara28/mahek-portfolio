@@ -146,7 +146,7 @@ function WorldDrawing({
 
 export function DecisionWorld() {
   const [caseId, setCaseId] = useState<CaseId>("context");
-  const [inspected, setInspected] = useState<StageId>("route");
+  const [inspected, setInspected] = useState<StageId>("context");
   const [run, setRun] = useState(0);
   const caseButtons = useRef<(HTMLButtonElement | null)[]>([]);
   const nodeButtons = useRef<(HTMLButtonElement | null)[]>([]);
@@ -224,12 +224,14 @@ export function DecisionWorld() {
         <WorldDrawing caseId={caseId} inspected={inspected} run={run} mobile />
         <span
           className={`${styles.endpoint} ${styles.request}`}
+          data-endpoint="request"
           style={position("request")}
         >
           Request
         </span>
         <span
           className={`${styles.endpoint} ${styles.answer}`}
+          data-endpoint="answer"
           data-reached={decision.outcome === "explain"}
           style={position("answer")}
         >
@@ -237,6 +239,7 @@ export function DecisionWorld() {
         </span>
         <span
           className={`${styles.endpoint} ${styles.ask}`}
+          data-endpoint="ask"
           data-reached={decision.outcome === "ask"}
           style={position("ask")}
         >

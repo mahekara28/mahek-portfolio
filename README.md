@@ -1,6 +1,6 @@
 # Mahek Ara - portfolio
 
-A personal portfolio with a short introduction, three selected projects, writing and a nine-project index. Project descriptions and graph connections are backed by public source code.
+A personal portfolio with an interactive technical introduction, a separate nine-project index, writing and an About page. Project descriptions are backed by public source code.
 
 ## Run locally
 
@@ -13,25 +13,26 @@ The application uses Next.js App Router, React, TypeScript, Tailwind CSS and the
 
 ## Design
 
-The homepage connects RouterFlow, MCP Impact and Narrative Gap MCP through the tools and concerns they actually share. Selecting a project traces its connections and reveals a pinned source link. Three concise entries lead to project details; all nine projects remain in the index, including Context Relay.
+The homepage asks one question: what changes when the evidence changes? A large SVG sketch lets visitors follow the same build question with a useful log, no log, or an instruction quoted inside the log. The paths and outcome follow deterministic local rules. Selecting a decision point explains its role in that case. No project cards or gallery are displayed on the homepage.
 
-The palette pairs warm limestone, charcoal ink, petrol teal and a restrained brass accent. Dark mode uses blue-black ink surfaces, warm text and softer teal. Both modes use shared semantic colour tokens, including the retained flow sketches inside project details.
+The homepage retains the site's limestone and ink themes. Teal carries the evidence path, amber marks a request for more context, and rust marks untrusted instructions. Its colour additions and layout live in a CSS module; the rest of the site's styles are unchanged by this pass.
 
-The graph draws selected connections once in 500 ms, with no perpetual movement or pointer tracking. Its native buttons support keyboard, touch and arrow-key selection. Reduced motion settles immediately. Project names remain ordinary links, independent of the map. The original six flow sketches remain conceptual illustrations in expanded project notes, not live telemetry or benchmark results.
+Signals travel once on load or after changing a case. A replay control follows the current route again. There is no perpetual movement, pointer tracking, API dependency or model inference. Native buttons support touch, Tab, Enter and arrow keys. Reduced motion keeps the final paths visible and removes the animated signal and replay control. Mobile uses a separate vertical topology with full-size labels. The original six project sketches remain in expanded project notes.
 
 ## Content and routes
 
 - `app/lib/content.ts`: nine projects, focus areas, implementation limits, reviewed revisions, evidence links, profiles, resume and article metadata.
 - `app/lib/github-snapshot.json`: validated public GitHub metadata, refreshed independently of descriptions.
 - `app/lib/trace-studies.ts`: conceptual relationships, endpoint labels and shared drawing geometry.
-- `app/lib/work-connections.ts`: curated project-topic relationships, positions and pinned source paths.
-- `/`: a personal introduction, one interactive map, three short project summaries and one writing link.
+- `app/lib/decision-sketch.ts`: predefined examples, deterministic decisions, inspection notes and desktop/mobile path geometry.
+- `app/components/decision-world.tsx` and its CSS module: the homepage's interactive scene.
+- `/`: a short personal introduction and a conceptual decision sketch. The wider portfolio is available through shared navigation.
 - `/projects`: a compact filterable index with implementation details, honest limits, source evidence and a real repository screenshot. Filters support shareable `?focus=ai`, `?focus=developer` and `?focus=operations` URLs; project anchors open the relevant notes.
 - `/blog`: the existing article plus selected repository guides and validation writing.
 - `/blog/llm-routing`: full article, working contents links, routing diagrams and code copying.
 - `/about`: background and interests.
 
-See [the graph refinement notes](docs/graph-refinement.md) for the current direction and [the earlier refinement notes](docs/portfolio-refinement.md) for the copy reduction and portfolio research.
+See [the introduction notes](docs/introduction-world.md) for the current homepage. [The graph refinement notes](docs/graph-refinement.md) and [earlier refinement notes](docs/portfolio-refinement.md) document previous passes.
 
 Light mode is the first-visit default. An explicit theme choice persists across routes and reloads. Navigation is shared across all pages; the mobile drawer uses a native modal dialog with focus containment and Escape dismissal.
 
@@ -67,4 +68,4 @@ npx playwright install chromium
 npm run verify
 ```
 
-Use Node.js 24 for the checks, which also test the TypeScript geometry directly. Set `BASE_URL` for a different port. Optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Content tests cover the three-project limit, graph evidence, snapshot validation, caching, rate limits, missing repositories and network failures. Browser checks cover all routes, graph selection and label collisions, the six retained sketches, shareable filters and browser history, source links, the project image, persisted themes, short-screen drawer fit, reduced motion, canvas output and WCAG A/AA accessibility rules. Screenshots and results are written to the ignored `.qa/` directory.
+Use Node.js 24 for the checks, which also test the TypeScript geometry directly. Set `BASE_URL` for a different port. Optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Tests cover decision invariants, example limitations, preserved project evidence, snapshot validation, caching and network failure handling. Browser checks cover all cases and inspection points, keyboard controls, bounded animation, mobile label collisions, no external requests, all routes and existing project/navigation features, both themes, reduced motion and WCAG A/AA rules. Screenshots and results are written to the ignored `.qa/` directory.
