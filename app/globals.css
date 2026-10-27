@@ -1801,3 +1801,29 @@ svg {
     transition: none !important;
   }
 }
+
+/* The homepage ends with a quiet contact line, not another section. */
+.site-footer.home-footer {
+  min-height: 72px;
+  padding-block: 12px;
+  gap: 12px 24px;
+  align-items: center;
+}
+.home-footer .contact-link {
+  margin-top: 0;
+  font-size: 12px;
+}
+.home-footer .footer-links {
+  font-size: 12px;
+  gap: 22px;
+}
+@media (max-width: 760px) {
+  .site-footer.home-footer {
+    grid-template-columns: 1fr;
+    padding-block: 16px;
+    gap: 4px;
+  }
+  .home-footer .footer-links {
+    gap: 20px;
+  }
+}

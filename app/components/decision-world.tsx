@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowRight, ArrowUpRight, Play, Pause, RotateCcw } from "lucide-react";
 import {
   useEffect,
@@ -268,12 +267,7 @@ export function DecisionWorld() {
       }}
     >
       <div className={styles.toolbar}>
-        <div className={styles.question}>
-          <h2 id="world-title">
-            Ideas <span>→</span> Intelligence <span>→</span> Action
-          </h2>
-          <p>A question picks up context. A useful next step takes shape.</p>
-        </div>
+        <span className={styles.worldKicker}>Follow the thread</span>
         <div
           className={styles.choices}
           role="group"
@@ -296,12 +290,7 @@ export function DecisionWorld() {
         </div>
       </div>
       <div className={styles.promptBar}>
-        <p>
-          <span className={styles.promptMark} aria-hidden="true">
-            “
-          </span>
-          {example.question}
-        </p>
+        <h2 id="world-title">{example.question}</h2>
         <div className={styles.playControls}>
           <button
             className={styles.play}
@@ -430,34 +419,12 @@ export function DecisionWorld() {
         aria-atomic="true"
       >
         <div className={styles.insight}>
-          <span className={styles.stepCount}>
-            0{state.step + 1} / 05 · {stages[state.step].label}
-            {state.revised ? " · second pass" : ""}
-          </span>
+          <span className={styles.stepCount}>0{state.step + 1} / 05</span>
           <h3>{note.title}</h3>
-          <p>{note.text}</p>
         </div>
         <div className={styles.evidence} data-testid="story-evidence">
-          {state.step < 3 ? (
-            <>
-              <span className={styles.evidenceLabel}>
-                {state.step === 0
-                  ? "The question"
-                  : state.step === 1
-                    ? "Available context"
-                    : "Selected route"}
-              </span>
-              <p>{note.excerpt}</p>
-            </>
-          ) : (
-            <>
-              <span className={styles.evidenceLabel}>
-                Local result ·{" "}
-                {state.revised ? "with your feedback" : "first pass"}
-              </span>
-              <p>{example.result}</p>
-              <pre>{example.detail}</pre>
-            </>
+          {state.step > 0 && (
+            <p>{state.step < 3 ? note.excerpt : example.result}</p>
           )}
           {state.step === 4 && !state.revised && (
             <button
@@ -469,13 +436,29 @@ export function DecisionWorld() {
               <ArrowUpRight size={15} aria-hidden="true" />
             </button>
           )}
+          <details
+            className={styles.inside}
+            onToggle={(event) => {
+              if (event.currentTarget.open) dispatch({ type: "pause" });
+            }}
+          >
+            <summary>
+              Look inside <span aria-hidden="true">+</span>
+            </summary>
+            <div className={styles.insideBody}>
+              <p>{note.text}</p>
+              <pre>{state.step < 3 ? note.excerpt : example.detail}</pre>
+              {state.revised && (
+                <p className={styles.passNote}>
+                  Second pass · your feedback changed the context.
+                </p>
+              )}
+            </div>
+          </details>
         </div>
       </div>
       <div className={styles.worldFooter}>
-        <p>Local sample data. No AI model or external service calls.</p>
-        <Link href="/projects">
-          The things I build <ArrowUpRight size={15} aria-hidden="true" />
-        </Link>
+        <p>Local sketch · sample data · no model calls</p>
       </div>
     </section>
   );

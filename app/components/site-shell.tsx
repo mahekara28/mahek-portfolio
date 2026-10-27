@@ -177,10 +177,14 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  const isHome = usePathname() === "/";
   return (
-    <footer className="site-footer" id="contact">
+    <footer
+      className={`site-footer${isHome ? " home-footer" : ""}`}
+      id="contact"
+    >
       <div>
-        <span className="footer-greeting">Say hello.</span>
+        {!isHome && <span className="footer-greeting">Say hello.</span>}
         <a className="contact-link" href={links.email}>
           {links.email.replace("mailto:", "")}{" "}
           <ArrowUpRight size={15} aria-hidden="true" />
@@ -205,10 +209,12 @@ export function SiteFooter() {
           Resume <ArrowUpRight size={14} />
         </a>
       </div>
-      <div className="footer-bottom">
-        <span>Mahek Ara</span>
-        <span>{new Date().getFullYear()}</span>
-      </div>
+      {!isHome && (
+        <div className="footer-bottom">
+          <span>Mahek Ara</span>
+          <span>{new Date().getFullYear()}</span>
+        </div>
+      )}
     </footer>
   );
 }

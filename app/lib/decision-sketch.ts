@@ -99,7 +99,7 @@ export function describeStage(step: number, id: ExampleId, revised: boolean) {
   const example = runExample(id, revised);
   const notes = [
     {
-      title: "Start with one clear question.",
+      title: "Run it, or explore a point on the thread.",
       text: "An idea becomes a task the system can actually work on.",
       excerpt: example.question,
     },
@@ -153,7 +153,7 @@ export type StoryState = {
   pass: number;
 };
 export const initialStory: StoryState = {
-  exampleId: "setup",
+  exampleId: "patterns",
   step: 0,
   revised: false,
   status: "idle",

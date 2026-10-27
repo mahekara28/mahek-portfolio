@@ -59,6 +59,11 @@ const context = await browser.newContext({
   viewport: { width: 1440, height: 1000 },
   deviceScaleFactor: 1,
 });
+await context.addInitScript(() => {
+  try {
+    localStorage.setItem("theme", "light");
+  } catch {}
+});
 const page = await context.newPage();
 page.setDefaultTimeout(30000);
 const errors = [];
@@ -167,9 +172,15 @@ async function inspectWorld() {
     await expect(page.getByTestId("story-evidence")).toContainText(
       runExample(example.id, true).result,
     );
-    await expect(page.getByTestId("story-evidence").locator("pre")).toHaveText(
+    const disclosure = page.getByTestId("story-evidence").locator("details");
+    await expect(disclosure).not.toHaveAttribute("open", "");
+    await disclosure.locator("summary").click();
+    await expect(disclosure.locator("pre")).toBeVisible();
+    await expect(disclosure.locator("pre")).toHaveText(
       runExample(example.id, true).detail,
     );
+    await disclosure.locator("summary").click();
+    await expect(disclosure.locator("pre")).not.toBeVisible();
     await expect(
       world.locator('svg:visible [data-edge="return"]'),
     ).toHaveAttribute("data-active", "true");
@@ -257,11 +268,31 @@ try {
   await expect(
     page.locator(".featured-projects, .home-writing, .project-explorer"),
   ).toHaveCount(0);
-  await expect(page.locator("main a[href='/projects']")).toBeVisible();
+  await expect(page.locator("main a[href^='/projects']").first()).toBeVisible();
   await expect(page.locator("a[href='/about']")).toHaveCount(0);
   const introduction = page.getByTestId("home-introduction");
-  await expect(introduction).toContainText("B.Tech background in AI");
-  await expect(introduction).toContainText("DevRel and developer communities");
+  await expect(
+    introduction.getByRole("link", {
+      name: "local model routing",
+      exact: true,
+    }),
+  ).toHaveAttribute("href", "/projects#llm-router");
+  await expect(
+    introduction.getByRole("link", {
+      name: "MCP contract changes",
+      exact: true,
+    }),
+  ).toHaveAttribute("href", "/projects#mcp-impact");
+  await expect(introduction).not.toContainText(
+    /open to work|DevRel|AI Engineer/i,
+  );
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  const initialHTML = await (await context.request.get(baseURL)).text();
+  assert.match(
+    initialHTML,
+    /<html[^>]*data-theme="dark"/,
+    "Dark is present in server-rendered HTML before JavaScript",
+  );
   await expect(introduction).toBeInViewport({ ratio: 1 });
   await expect(page.getByTestId("decision-world")).toBeInViewport({ ratio: 1 });
   const legacyAbout = await context.request.get(baseURL + "/about", {
@@ -288,7 +319,7 @@ try {
   console.log("Desktop screenshot saved");
   if (process.env.VISUAL_ONLY === "1") process.exitCode = 0;
   else {
-    await assertLayout("Home desktop / light");
+    await assertLayout("Home desktop / dark");
     await inspectWorld();
     await page
       .getByRole("button", { name: "Find a pattern", exact: true })
@@ -397,16 +428,21 @@ try {
       .first()
       .click();
     await page.waitForFunction(
-      () => document.documentElement.dataset.theme === "dark",
+      () => document.documentElement.dataset.theme === "light",
     );
-    await capture({ path: ".qa/home-dark.png", fullPage: true });
-    await assertLayout("Home desktop / dark");
+    await capture({ path: ".qa/home-light.png", fullPage: true });
+    await assertLayout("Home desktop / light");
     await inspectWorld();
-    await visit("/projects");
-    assert.equal(await page.locator("html").getAttribute("data-theme"), "dark");
-    await assertLayout("Projects desktop / dark");
+    await page
+      .getByRole("navigation", { name: "Main navigation", exact: true })
+      .getByRole("link", { name: "Projects", exact: true })
+      .click();
+    await expect(page).toHaveURL(baseURL + "/projects");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+    await assertLayout("Projects desktop / light via client navigation");
     await page.reload({ waitUntil: "networkidle" });
-    assert.equal(await page.locator("html").getAttribute("data-theme"), "dark");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+    await assertLayout("Projects desktop / dark after reload");
     await page
       .getByRole("button", { name: "Toggle light and dark theme" })
       .first()
@@ -447,7 +483,7 @@ try {
     await inspectStudies();
     for (const route of ["/blog", "/blog/llm-routing"]) {
       await visit(route);
-      await assertLayout(route + " desktop");
+      await assertLayout(route + " desktop / dark");
       assert.equal(
         await page.locator("canvas").count(),
         0,
@@ -461,7 +497,7 @@ try {
         .getByRole("button", { name: "Toggle light and dark theme" })
         .first()
         .click();
-      await assertLayout(route + " desktop / dark");
+      await assertLayout(route + " desktop / light");
       await capture({
         path: `.qa/${route.split("/").filter(Boolean).join("-")}-dark.png`,
         fullPage: true,
@@ -493,6 +529,24 @@ try {
     await expect(
       page.locator(".site-footer a[aria-label='Mahek Ara on X']"),
     ).toHaveAttribute("href", links.x);
+    for (const viewport of [
+      { width: 1366, height: 768 },
+      { width: 1280, height: 720 },
+      { width: 1366, height: 650 },
+      { width: 1024, height: 768 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await visit("/");
+      await inspectWorld();
+      assert.equal(
+        await page.evaluate(
+          () => document.documentElement.scrollHeight > innerHeight + 1,
+        ),
+        false,
+        "Compact home fits laptop " + JSON.stringify(viewport),
+      );
+      await expect(page.locator(".home-footer")).toBeInViewport({ ratio: 1 });
+    }
     await page.setViewportSize({ width: 393, height: 852 });
     for (const route of ["/", "/projects", "/blog", "/blog/llm-routing"]) {
       await visit(route);
@@ -506,7 +560,7 @@ try {
           ratio: 0.25,
         });
       }
-      await assertLayout(route + " mobile");
+      await assertLayout(route + " mobile / dark");
       await capture({
         path: `.qa/${route === "/" ? "home" : route.split("/").filter(Boolean).join("-")}-mobile.png`,
         fullPage: true,
@@ -515,7 +569,7 @@ try {
         .getByRole("button", { name: "Toggle light and dark theme" })
         .first()
         .click();
-      await assertLayout(route + " mobile / dark");
+      await assertLayout(route + " mobile / light");
       await page
         .getByRole("button", { name: "Toggle light and dark theme" })
         .first()

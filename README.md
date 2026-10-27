@@ -13,7 +13,9 @@ The application uses Next.js App Router, React, TypeScript, Tailwind CSS and the
 
 ## Design
 
-The homepage introduces Mahek through two short paragraphs about her AI background, tools, systems thinking and interest in developer communities. The interactive field beneath them follows **Ideas → Intelligence → Action**: a question gathers context, takes a useful tool route, produces a result and receives feedback. No project cards or gallery are displayed on the homepage.
+The homepage pairs a short personal introduction with an interactive thread. The introduction links directly to local model routing, MCP contract changes and developer questions in GitHub issues. The scene follows a question through context, a tool choice, a result and feedback. It opens with the developer-report example. No role targets, project cards or gallery are displayed on the homepage.
+
+On laptops the introduction, scene and compact contact footer fit within the first viewport. Phones use a stacked composition and a dedicated vertical drawing. Source and tool labels appear as they become relevant. A concise result stays visible; the native “Look inside” disclosure reveals the implementation explanation and sample output without crowding the initial view.
 
 The woven paths and folded apertures retain the limestone and ink themes. Teal identifies the selected path; a warm clay loop carries feedback back into context. The two local examples read a sample setup guide or count fictional developer reports. A Windows-specific correction changes the actual lookup or filtered count. The interface clearly identifies sample data and the absence of AI model or external service calls.
 
@@ -34,7 +36,7 @@ Run, pause, replay, step through or inspect any stage. Motion completes one sequ
 
 See [the introduction notes](docs/introduction-world.md) for the current homepage. [The graph refinement notes](docs/graph-refinement.md) and [earlier refinement notes](docs/portfolio-refinement.md) document previous passes.
 
-Light mode is the first-visit default. An explicit theme choice persists across routes and reloads. Navigation is shared across all pages; the mobile drawer uses a native modal dialog with focus containment and Escape dismissal.
+Every fresh document starts in dark mode, including when an older light preference exists in local storage or the OS uses light mode. The server HTML and next-themes startup script agree on dark. The secondary theme switch works throughout client-side navigation; a reload or fresh visit intentionally resets it to dark. Navigation is shared across all pages; the mobile drawer uses a native modal dialog with focus containment and Escape dismissal.
 
 The resume URL is preserved from the original homepage. Contact uses the email on the public GitHub profile. GitHub, LinkedIn and the user-supplied personal X profile are linked in shared navigation and footer areas.
 
@@ -68,4 +70,4 @@ npx playwright install chromium
 npm run verify
 ```
 
-Use Node.js 24 for the checks, which also test the TypeScript geometry directly. Set `BASE_URL` for a different port. Optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Tests cover decision invariants, example limitations, preserved project evidence, snapshot validation, caching and network failure handling. Browser checks cover all cases and inspection points, keyboard controls, bounded animation, mobile label collisions, no external requests, all routes and existing project/navigation features, both themes, reduced motion and WCAG A/AA rules. Screenshots and results are written to the ignored `.qa/` directory.
+Use Node.js 24 for the checks, which also test the TypeScript geometry directly. Set `BASE_URL` for a different port. Optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Tests cover decision invariants, example limitations, preserved project evidence, snapshot validation, caching and network failure handling. Browser checks cover both examples and their feedback, the detail disclosure, keyboard controls, bounded animation, laptop viewport fit, mobile label collisions, no external requests, all routes and existing project/navigation features, dark-first loads with an old saved light preference, manual theme changes across client navigation, reduced motion and WCAG A/AA rules. Screenshots and results are written to the ignored `.qa/` directory.
