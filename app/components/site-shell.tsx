@@ -11,7 +11,6 @@ const navigation = [
   { href: "/", label: "Home" },
   { href: "/projects", label: "Projects" },
   { href: "/blog", label: "Writing" },
-  { href: "/about", label: "About" },
 ];
 
 export function ThemeSwitch() {
@@ -147,7 +146,10 @@ export function SiteHeader() {
               rel="noreferrer"
               onClick={closeMenu}
             >
-              <span className="mono">05</span>Resume
+              <span className="mono">
+                {String(navigation.length + 1).padStart(2, "0")}
+              </span>
+              Resume
               <ArrowUpRight size={20} />
             </a>
           </nav>

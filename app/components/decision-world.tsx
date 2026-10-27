@@ -1,66 +1,64 @@
 "use client";
 
-import { RotateCcw, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import { ArrowRight, ArrowUpRight, Play, Pause, RotateCcw } from "lucide-react";
 import {
+  useEffect,
+  useId,
+  useReducer,
   useRef,
   useState,
+  useSyncExternalStore,
   type CSSProperties,
   type KeyboardEvent,
 } from "react";
 import {
-  decideSketch,
-  inspectStage,
-  sketchCases,
-  sketchEdges,
-  sketchPath,
-  sketchPoints,
-  sketchStages,
-  type CaseId,
+  examples,
+  stages,
+  points,
+  edges,
+  storyPath,
+  edgeState,
+  currentEdge,
+  runExample,
+  describeStage,
+  storyReducer,
+  initialStory,
   type PointId,
-  type StageId,
+  type StoryState,
 } from "../lib/decision-sketch";
 import styles from "./decision-world.module.css";
 
+const motionQuery = "(prefers-reduced-motion: reduce)";
+function subscribeMotion(change: () => void) {
+  const media = window.matchMedia(motionQuery);
+  media.addEventListener("change", change);
+  return () => media.removeEventListener("change", change);
+}
+const readMotion = () => window.matchMedia(motionQuery).matches;
+const serverMotion = () => false;
 function position(id: PointId): CSSProperties {
-  const desktop = sketchPoints.desktop[id],
-    mobile = sketchPoints.mobile[id];
   return {
-    "--x": `${desktop.x}%`,
-    "--y": `${desktop.y}%`,
-    "--mx": `${mobile.x}%`,
-    "--my": `${mobile.y}%`,
+    "--x": points.desktop[id].x + "%",
+    "--y": points.desktop[id].y + "%",
+    "--mx": points.mobile[id].x + "%",
+    "--my": points.mobile[id].y + "%",
   } as CSSProperties;
 }
 
-function WorldDrawing({
-  caseId,
-  inspected,
-  run,
+function StoryDrawing({
+  state,
   mobile = false,
 }: {
-  caseId: CaseId;
-  inspected: StageId;
-  run: number;
+  state: StoryState;
   mobile?: boolean;
 }) {
-  const example = sketchCases.find((item) => item.id === caseId)!;
-  const decision = decideSketch(example);
-  const points = sketchPoints[mobile ? "mobile" : "desktop"];
-  const width = mobile ? 360 : 1000,
-    height = mobile ? 500 : 430;
-  const mainPath = sketchEdges
-    .filter(
-      (edge) =>
-        decision.edges.includes(edge.id) && edge.id !== "context-boundary",
-    )
-    .map((edge) => sketchPath(edge, mobile))
-    .join(" ");
-  const boundaryPath = sketchPath(
-    sketchEdges.find((edge) => edge.id === "context-boundary")!,
-    mobile,
-  );
-
+  const gradient = useId().replace(/:/g, "");
+  const mode = mobile ? "mobile" : "desktop",
+    width = mobile ? 360 : 1000,
+    height = mobile ? 550 : 400;
+  const example = runExample(state.exampleId, state.revised);
+  const carrying = currentEdge(state);
   return (
     <svg
       className={mobile ? styles.mobileDrawing : styles.desktopDrawing}
@@ -69,236 +67,412 @@ function WorldDrawing({
       aria-hidden="true"
       focusable="false"
     >
-      {sketchEdges.map((edge) => {
-        const active = decision.edges.includes(edge.id);
+      <defs>
+        <radialGradient id={gradient}>
+          <stop offset="0" stopColor="var(--signal)" stopOpacity=".24" />
+          <stop offset=".65" stopColor="var(--signal)" stopOpacity=".06" />
+          <stop offset="1" stopColor="var(--signal)" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id={gradient + "fold"} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="var(--stage-paper)" />
+          <stop offset=".5" stopColor="var(--aperture)" stopOpacity=".7" />
+          <stop offset="1" stopColor="var(--paper)" stopOpacity=".2" />
+        </linearGradient>
+      </defs>
+      {edges.map((edge) => {
+        const source = edge.id.startsWith("source");
+        const route = edge.id === "lookup" || edge.id === "count";
+        const selected = route && edge.id === example.tool;
         return (
           <g
             key={edge.id}
+            className={`${styles.channel} ${edge.id === "return" || edge.id === "reflect" ? styles.feedbackChannel : ""}`}
             data-edge={edge.id}
-            data-active={active}
-            data-near={edge.from === inspected || edge.to === inspected}
-            className={`${styles.channel} ${edge.id === "route-ask" ? styles.caution : edge.id === "context-boundary" ? styles.rejected : ""}`}
+            data-active={edgeState(edge.id, state)}
+            data-route={route}
+            data-selected={selected}
           >
-            {Array.from({ length: mobile ? 7 : 11 }, (_, index) => {
-              const strand = index - (mobile ? 3 : 5);
-              return (
-                <path
-                  key={index}
-                  d={sketchPath(edge, mobile, strand)}
-                  className={strand === 0 ? styles.spine : styles.filament}
-                  vectorEffect="non-scaling-stroke"
-                />
-              );
-            })}
+            {!source && (
+              <path
+                className={styles.underlight}
+                d={storyPath(edge.id, mobile)}
+              />
+            )}
+            {Array.from(
+              { length: source ? 1 : mobile ? 7 : 11 },
+              (_, index) => {
+                const strand = source ? 0 : index - (mobile ? 3 : 5);
+                return (
+                  <path
+                    key={index}
+                    className={strand === 0 ? styles.spine : styles.filament}
+                    d={storyPath(edge.id, mobile, strand)}
+                    vectorEffect="non-scaling-stroke"
+                  />
+                );
+              },
+            )}
           </g>
         );
       })}
-      {(["context", "route", "check"] as const).map((id) => {
-        const point = points[id];
+      {stages.map((stage, index) => {
+        const p = points[mode][stage.id];
         return (
           <g
-            key={id}
+            key={stage.id}
+            transform={`translate(${(p.x * width) / 100} ${(p.y * height) / 100})`}
             className={styles.aperture}
-            data-selected={inspected === id}
-            data-muted={id === "check" && !example.hasLog}
-            transform={`translate(${(point.x * width) / 100} ${(point.y * height) / 100}) rotate(${mobile ? 24 : -24})`}
+            data-selected={state.step === index}
+            data-passed={state.step > index}
           >
-            <ellipse rx={mobile ? 23 : 26} ry={mobile ? 34 : 48} />
-            <ellipse rx={mobile ? 17 : 19} ry={mobile ? 28 : 40} />
+            <ellipse
+              className={styles.halo}
+              rx={mobile ? 48 : 66}
+              ry={mobile ? 50 : 62}
+              fill={`url(#${gradient})`}
+            />
+            {index === 0 ? (
+              <g className={styles.seed}>
+                <path d="M 0 -13 Q 17 0 0 13 Q -17 0 0 -13 Z" />
+                <path d="M 0 -8 V 8" />
+              </g>
+            ) : (
+              <g transform={`rotate(${index === 2 ? 25 : -23})`}>
+                <ellipse
+                  className={styles.fold}
+                  rx={index === 2 ? 22 : 18}
+                  ry={index === 2 ? 39 : 31}
+                  fill={`url(#${gradient}fold)`}
+                />
+                <ellipse
+                  rx={index === 2 ? 16 : 12}
+                  ry={index === 2 ? 32 : 25}
+                  fill="none"
+                />
+                <path className={styles.slit} d="M 0 -14 V 14" />
+              </g>
+            )}
           </g>
         );
       })}
-      {(["request", "answer", "ask", "boundary"] as const).map((id) => {
-        const point = points[id];
-        const active =
-          id === "request" ||
-          (id === "answer" && example.hasLog) ||
-          (id === "ask" && !example.hasLog) ||
-          (id === "boundary" && example.quotedDirective);
-        return (
-          <circle
-            key={id}
-            cx={(point.x * width) / 100}
-            cy={(point.y * height) / 100}
-            r={id === "request" ? 3 : 5}
-            data-active={active}
-            className={`${styles.terminal} ${id === "ask" ? styles.caution : id === "boundary" ? styles.rejected : ""}`}
-          />
-        );
-      })}
-      <g key={`${caseId}-${run}`} className={styles.signalRun}>
-        <path
-          className={`${styles.signal} ${!example.hasLog ? styles.caution : ""}`}
-          d={mainPath}
-          pathLength="1000"
-        />
-        {example.quotedDirective && (
+      {carrying && (
+        <g
+          key={`${state.exampleId}-${state.pass}-${state.step}`}
+          className={styles.signalRun}
+        >
           <path
-            className={`${styles.signal} ${styles.rejected} ${styles.rejectedSignal}`}
-            d={boundaryPath}
+            className={`${styles.signal} ${carrying === "return" || carrying === "reflect" ? styles.feedbackSignal : ""}`}
+            d={storyPath(carrying, mobile)}
             pathLength="1000"
+            style={{
+              animationPlayState:
+                state.status === "paused" ? "paused" : "running",
+            }}
           />
-        )}
-      </g>
+        </g>
+      )}
     </svg>
   );
 }
 
 export function DecisionWorld() {
-  const [caseId, setCaseId] = useState<CaseId>("context");
-  const [inspected, setInspected] = useState<StageId>("context");
-  const [run, setRun] = useState(0);
-  const caseButtons = useRef<(HTMLButtonElement | null)[]>([]);
-  const nodeButtons = useRef<(HTMLButtonElement | null)[]>([]);
-  const example = sketchCases.find((item) => item.id === caseId)!;
-  const decision = decideSketch(example);
-  const insight = inspectStage(inspected, example);
+  const [state, dispatch] = useReducer(storyReducer, initialStory);
+  const [hintStage, setHintStage] = useState<number | null>(null);
+  const reduced = useSyncExternalStore(
+    subscribeMotion,
+    readMotion,
+    serverMotion,
+  );
+  const stageButtons = useRef<(HTMLButtonElement | null)[]>([]);
+  const exampleButtons = useRef<(HTMLButtonElement | null)[]>([]);
+  const example = runExample(state.exampleId, state.revised);
+  const note = describeStage(state.step, state.exampleId, state.revised);
+  const running = state.status === "playing" && !reduced;
+  const quickNotes = [
+    "Turn an idea into a question the system can work with.",
+    "Bring in the facts the question depends on.",
+    example.tool === "lookup"
+      ? "Read the docs for exact steps instead of guessing."
+      : "Count the reports with code instead of asking a model to guess.",
+    "The selected tool produces a result you can use.",
+    "A correction becomes new context for the next pass.",
+  ];
 
-  function chooseCase(id: CaseId) {
-    setCaseId(id);
-    setInspected(
-      id === "injected" ? "boundary" : id === "context" ? "context" : "route",
+  useEffect(() => {
+    if (!running) return;
+    const timer = window.setTimeout(
+      () => dispatch({ type: "tick" }),
+      state.step === 3 ? 3000 : 2400,
     );
-    setRun((value) => value + 1);
-  }
+    return () => window.clearTimeout(timer);
+  }, [running, state.step, state.pass]);
+
+  useEffect(() => {
+    // Do not let an example finish unseen in a background tab.
+    const pauseHidden = () => {
+      if (document.hidden) dispatch({ type: "pause" });
+    };
+    document.addEventListener("visibilitychange", pauseHidden);
+    return () => document.removeEventListener("visibilitychange", pauseHidden);
+  }, []);
+
   function move(
     event: KeyboardEvent<HTMLButtonElement>,
     index: number,
-    kind: "case" | "node",
+    kind: "stage" | "example",
   ) {
-    const count = kind === "case" ? sketchCases.length : sketchStages.length;
+    const list = kind === "stage" ? stages : examples;
     let next = index;
     if (event.key === "ArrowRight" || event.key === "ArrowDown")
-      next = (index + 1) % count;
+      next = (index + 1) % list.length;
     else if (event.key === "ArrowLeft" || event.key === "ArrowUp")
-      next = (index + count - 1) % count;
+      next = (index + list.length - 1) % list.length;
     else if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = count - 1;
+    else if (event.key === "End") next = list.length - 1;
     else return;
     event.preventDefault();
-    if (kind === "case") {
-      chooseCase(sketchCases[next].id);
-      caseButtons.current[next]?.focus();
+    if (kind === "stage") {
+      dispatch({ type: "inspect", step: next });
+      stageButtons.current[next]?.focus();
     } else {
-      setInspected(sketchStages[next].id);
-      nodeButtons.current[next]?.focus();
+      dispatch({ type: "example", id: examples[next].id });
+      exampleButtons.current[next]?.focus();
     }
   }
+  const playLabel = reduced
+    ? state.step === 4
+      ? "Start over"
+      : "Next stage"
+    : running
+      ? "Pause"
+      : state.step === 4
+        ? "Replay example"
+        : state.status === "paused"
+          ? "Continue"
+          : "Run example";
 
   return (
     <section
       className={styles.world}
-      aria-labelledby="world-question"
-      data-case={caseId}
-      data-outcome={decision.outcome}
+      aria-labelledby="world-title"
+      data-example={state.exampleId}
+      data-step={state.step}
+      data-revised={state.revised}
+      data-playing={running}
+      onPointerDownCapture={(event) => {
+        if (!(event.target as Element).closest("[data-stage]"))
+          setHintStage(null);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "Escape") setHintStage(null);
+      }}
     >
       <div className={styles.toolbar}>
         <div className={styles.question}>
-          <span>An interactive sketch</span>
-          <h2 id="world-question">Why did this build fail?</h2>
+          <h2 id="world-title">
+            Ideas <span>→</span> Intelligence <span>→</span> Action
+          </h2>
+          <p>A question picks up context. A useful next step takes shape.</p>
         </div>
         <div
           className={styles.choices}
           role="group"
-          aria-label="Change the context"
+          aria-label="Choose an example"
         >
-          {sketchCases.map((item, index) => (
+          {examples.map((item, index) => (
             <button
               key={item.id}
               type="button"
+              aria-pressed={state.exampleId === item.id}
               ref={(node) => {
-                caseButtons.current[index] = node;
+                exampleButtons.current[index] = node;
               }}
-              aria-pressed={caseId === item.id}
-              onClick={() => chooseCase(item.id)}
-              onKeyDown={(event) => move(event, index, "case")}
+              onClick={() => dispatch({ type: "example", id: item.id })}
+              onKeyDown={(event) => move(event, index, "example")}
             >
               {item.label}
             </button>
           ))}
         </div>
       </div>
+      <div className={styles.promptBar}>
+        <p>
+          <span className={styles.promptMark} aria-hidden="true">
+            “
+          </span>
+          {example.question}
+        </p>
+        <div className={styles.playControls}>
+          <button
+            className={styles.play}
+            type="button"
+            onClick={() =>
+              reduced
+                ? dispatch(
+                    state.step === 4
+                      ? { type: "restart", reduced: true }
+                      : { type: "next" },
+                  )
+                : dispatch({ type: "play" })
+            }
+          >
+            {running ? (
+              <Pause size={14} aria-hidden="true" />
+            ) : state.step === 4 ? (
+              <RotateCcw size={14} aria-hidden="true" />
+            ) : (
+              <Play size={14} aria-hidden="true" />
+            )}
+            {playLabel}
+          </button>
+          {!reduced && (
+            <button
+              className={styles.next}
+              type="button"
+              aria-label="Next stage"
+              disabled={state.step === 4}
+              onClick={() => dispatch({ type: "next" })}
+            >
+              <ArrowRight size={18} aria-hidden="true" />
+            </button>
+          )}
+        </div>
+      </div>
 
       <div className={styles.worldSurface} data-testid="decision-world">
-        <WorldDrawing caseId={caseId} inspected={inspected} run={run} />
-        <WorldDrawing caseId={caseId} inspected={inspected} run={run} mobile />
-        <span
-          className={`${styles.endpoint} ${styles.request}`}
-          data-endpoint="request"
-          style={position("request")}
-        >
-          Request
-        </span>
-        <span
-          className={`${styles.endpoint} ${styles.answer}`}
-          data-endpoint="answer"
-          data-reached={decision.outcome === "explain"}
-          style={position("answer")}
-        >
-          Explain
-        </span>
-        <span
-          className={`${styles.endpoint} ${styles.ask}`}
-          data-endpoint="ask"
-          data-reached={decision.outcome === "ask"}
-          style={position("ask")}
-        >
-          Ask first
-        </span>
-        {sketchStages.map((stage, index) => (
+        <StoryDrawing state={state} />
+        <StoryDrawing state={state} mobile />
+        {stages.map((stage, index) => (
           <button
             key={stage.id}
             type="button"
             className={styles.node}
             style={position(stage.id)}
             data-stage={stage.id}
-            data-selected={inspected === stage.id}
-            data-reached={stage.id !== "check" || example.hasLog}
-            aria-label={`Inspect ${stage.label}`}
-            aria-pressed={inspected === stage.id}
+            data-selected={state.step === index}
+            data-passed={state.step > index}
+            aria-label={`Explore ${stage.label}`}
+            aria-pressed={state.step === index}
             aria-controls="decision-insight"
+            aria-describedby={
+              hintStage === index && state.step === index && !running
+                ? "story-stage-tip"
+                : undefined
+            }
             ref={(node) => {
-              nodeButtons.current[index] = node;
+              stageButtons.current[index] = node;
             }}
-            onFocus={() => setInspected(stage.id)}
-            onClick={() => setInspected(stage.id)}
-            onKeyDown={(event) => move(event, index, "node")}
+            onClick={() => {
+              dispatch({ type: "inspect", step: index });
+              setHintStage(index);
+            }}
+            onPointerEnter={(event) => {
+              if (event.pointerType === "mouse") {
+                dispatch({ type: "inspect", step: index });
+                setHintStage(index);
+              }
+            }}
+            onFocus={() => {
+              dispatch({ type: "inspect", step: index });
+              setHintStage(index);
+            }}
+            onBlur={() => setHintStage(null)}
+            onKeyDown={(event) => move(event, index, "stage")}
           >
+            <span className={styles.nodeNumber}>0{index + 1}</span>
             <span className={styles.nodeLabel}>{stage.label}</span>
-            <span className={styles.nodeDot} aria-hidden="true" />
+            <span className={styles.nodeHint}>{stage.hint}</span>
           </button>
         ))}
-        <span className={styles.sceneHint}>Select a decision point</span>
+        {hintStage === state.step && !running && (
+          <div
+            id="story-stage-tip"
+            role="tooltip"
+            className={styles.stageTip}
+            data-tip={stages[state.step].id}
+            style={position(stages[state.step].id)}
+          >
+            {quickNotes[state.step]}
+          </div>
+        )}
+        {(["lookup", "count"] as const).map((tool) => (
+          <span
+            key={tool}
+            className={styles.toolLabel}
+            style={position(tool)}
+            data-tool={tool}
+            data-active={example.tool === tool && state.step >= 2}
+          >
+            {tool === "lookup" ? "Read docs" : "Count issues"}
+          </span>
+        ))}
+        {(["sourceOne", "sourceTwo"] as const).map((id, index) => (
+          <span
+            key={id}
+            className={styles.source}
+            style={position(id)}
+            data-source={id}
+            data-active={state.step >= 1}
+          >
+            {example.sources[index]}
+          </span>
+        ))}
       </div>
 
-      <div className={styles.readout}>
-        <div
-          className={styles.insight}
-          id="decision-insight"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          <h3>{insight.title}</h3>
-          <p>{insight.text}</p>
-          <code>{insight.excerpt}</code>
+      <p className="sr-only" role="status">
+        Step {state.step + 1} of 5: {stages[state.step].label}.
+        {state.revised ? " Second pass, with your feedback." : ""}
+      </p>
+      <div
+        className={styles.readout}
+        id="decision-insight"
+        aria-live={running ? "off" : "polite"}
+        aria-atomic="true"
+      >
+        <div className={styles.insight}>
+          <span className={styles.stepCount}>
+            0{state.step + 1} / 05 · {stages[state.step].label}
+            {state.revised ? " · second pass" : ""}
+          </span>
+          <h3>{note.title}</h3>
+          <p>{note.text}</p>
         </div>
-        <div className={styles.outcome} data-kind={decision.outcome}>
-          <span>Outcome</span>
-          <p role="status" aria-live="polite">
-            {decision.result}
-          </p>
-          <button
-            type="button"
-            className={styles.replay}
-            onClick={() => setRun((value) => value + 1)}
-            aria-label="Follow the path again"
-          >
-            <RotateCcw size={13} aria-hidden="true" /> Follow again
-          </button>
+        <div className={styles.evidence} data-testid="story-evidence">
+          {state.step < 3 ? (
+            <>
+              <span className={styles.evidenceLabel}>
+                {state.step === 0
+                  ? "The question"
+                  : state.step === 1
+                    ? "Available context"
+                    : "Selected route"}
+              </span>
+              <p>{note.excerpt}</p>
+            </>
+          ) : (
+            <>
+              <span className={styles.evidenceLabel}>
+                Local result ·{" "}
+                {state.revised ? "with your feedback" : "first pass"}
+              </span>
+              <p>{example.result}</p>
+              <pre>{example.detail}</pre>
+            </>
+          )}
+          {state.step === 4 && !state.revised && (
+            <button
+              className={styles.feedbackButton}
+              type="button"
+              onClick={() => dispatch({ type: "feedback", reduced })}
+            >
+              Add: “{example.feedback}”{" "}
+              <ArrowUpRight size={15} aria-hidden="true" />
+            </button>
+          )}
         </div>
       </div>
       <div className={styles.worldFooter}>
-        <p>Interactive sketch · predefined cases, no model calls.</p>
+        <p>Local sample data. No AI model or external service calls.</p>
         <Link href="/projects">
           The things I build <ArrowUpRight size={15} aria-hidden="true" />
         </Link>

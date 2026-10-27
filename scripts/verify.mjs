@@ -11,10 +11,10 @@ import {
 } from "../app/lib/trace-studies.ts";
 import { projects, links } from "../app/lib/content.ts";
 import {
-  sketchCases,
-  sketchStages,
-  decideSketch,
-  inspectStage,
+  examples,
+  stages,
+  runExample,
+  describeStage,
 } from "../app/lib/decision-sketch.ts";
 
 const shapes = new Set();
@@ -124,36 +124,60 @@ async function painted() {
 
 async function inspectWorld() {
   const world = page.getByTestId("decision-world");
+  const section = page.locator("section[data-example]");
   await expect(world.locator("svg:visible")).toHaveCount(1);
-  for (const example of sketchCases) {
-    const decision = decideSketch(example);
+  for (const example of examples) {
     await page
       .getByRole("button", { name: example.label, exact: true })
       .click();
-    await expect(page.locator("section[data-case]")).toHaveAttribute(
-      "data-outcome",
-      decision.outcome,
-    );
-    await expect(page.getByRole("status")).toHaveText(decision.result);
-    await expect(
-      world.locator("svg:visible [data-edge][data-active='true']"),
-    ).toHaveCount(decision.edges.length);
-    for (const stage of sketchStages) {
+    for (let step = 0; step < stages.length; step++) {
       await page
-        .getByRole("button", { name: `Inspect ${stage.label}`, exact: true })
+        .getByRole("button", {
+          name: `Explore ${stages[step].label}`,
+          exact: true,
+        })
         .click();
+      await expect(section).toHaveAttribute("data-step", String(step));
       await expect(page.locator("#decision-insight h3")).toHaveText(
-        inspectStage(stage.id, example).title,
+        describeStage(step, example.id, false).title,
       );
-      await expect(page.locator("#decision-insight code")).toHaveText(
-        inspectStage(stage.id, example).excerpt,
-      );
+      if (step === 3) {
+        await expect(page.getByTestId("story-evidence")).toContainText(
+          runExample(example.id).result,
+        );
+        const tool = runExample(example.id).tool;
+        await expect(
+          world.locator(`svg:visible [data-edge="${tool}"]`),
+        ).toHaveAttribute("data-active", "true");
+        await expect(
+          world.locator(
+            `svg:visible [data-edge="${tool === "lookup" ? "count" : "lookup"}"]`,
+          ),
+        ).toHaveAttribute("data-active", "false");
+      }
     }
+    await page
+      .getByRole("button", { name: `Add: “${example.feedback}”`, exact: true })
+      .click();
+    await expect(section).toHaveAttribute("data-revised", "true");
+    await expect(section).toHaveAttribute("data-step", "1");
+    await page
+      .getByRole("button", { name: "Explore Action", exact: true })
+      .click();
+    await expect(page.getByTestId("story-evidence")).toContainText(
+      runExample(example.id, true).result,
+    );
+    await expect(page.getByTestId("story-evidence").locator("pre")).toHaveText(
+      runExample(example.id, true).detail,
+    );
+    await expect(
+      world.locator('svg:visible [data-edge="return"]'),
+    ).toHaveAttribute("data-active", "true");
   }
   const layout = await world.evaluate((field) => {
     const bounds = field.getBoundingClientRect();
     const labels = [
-      ...field.querySelectorAll("[data-stage], [data-endpoint]"),
+      ...field.querySelectorAll("[data-stage], [data-tool], [data-source]"),
     ].map((el) => ({ text: el.textContent, r: el.getBoundingClientRect() }));
     return {
       outside: labels
@@ -180,7 +204,7 @@ async function inspectWorld() {
   assert.deepEqual(
     layout,
     { outside: [], collisions: [] },
-    "Decision labels and hit targets remain distinct and contained",
+    "Stage labels, sources and hit targets remain distinct and contained",
   );
 }
 
@@ -234,10 +258,27 @@ try {
     page.locator(".featured-projects, .home-writing, .project-explorer"),
   ).toHaveCount(0);
   await expect(page.locator("main a[href='/projects']")).toBeVisible();
-  await expect(page.locator("main a[href='/about']")).toBeVisible();
+  await expect(page.locator("a[href='/about']")).toHaveCount(0);
+  const introduction = page.getByTestId("home-introduction");
+  await expect(introduction).toContainText("B.Tech background in AI");
+  await expect(introduction).toContainText("DevRel and developer communities");
+  await expect(introduction).toBeInViewport({ ratio: 1 });
+  await expect(page.getByTestId("decision-world")).toBeInViewport({ ratio: 1 });
+  const legacyAbout = await context.request.get(baseURL + "/about", {
+    maxRedirects: 0,
+  });
+  assert.equal(
+    legacyAbout.status(),
+    308,
+    "Old About URLs redirect permanently",
+  );
+  assert.equal(new URL(legacyAbout.headers().location, baseURL).pathname, "/");
+  await page.goto(baseURL + "/about", { waitUntil: "networkidle" });
+  await expect(page).toHaveURL(baseURL + "/");
+  await expect(introduction).toBeVisible();
   await expect(
-    page.getByRole("group", { name: "Change the context" }).getByRole("button"),
-  ).toHaveCount(3);
+    page.getByRole("group", { name: "Choose an example" }).getByRole("button"),
+  ).toHaveCount(2);
   assert.equal(
     await page.locator("canvas").count(),
     0,
@@ -250,32 +291,42 @@ try {
     await assertLayout("Home desktop / light");
     await inspectWorld();
     await page
-      .getByRole("button", { name: "Injected instruction", exact: true })
+      .getByRole("button", { name: "Find a pattern", exact: true })
       .press("Home");
     await expect(
-      page.getByRole("button", { name: "Useful context", exact: true }),
+      page.getByRole("button", { name: "Run a project", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
     await page
-      .getByRole("button", { name: "Useful context", exact: true })
+      .getByRole("button", { name: "Run a project", exact: true })
       .press("ArrowRight");
-    await expect(page.getByRole("status")).toHaveText(
-      "Ask for the error log first.",
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-example",
+      "patterns",
     );
     await page
-      .getByRole("button", { name: "Inspect Context", exact: true })
+      .getByRole("button", { name: "Explore Input", exact: true })
       .focus();
     await page
-      .getByRole("button", { name: "Inspect Context", exact: true })
+      .getByRole("button", { name: "Explore Input", exact: true })
       .press("End");
     await expect(
-      page.getByRole("button", { name: "Inspect Trust boundary", exact: true }),
+      page.getByRole("button", { name: "Explore Feedback", exact: true }),
     ).toBeFocused();
-    await expect(
-      page.getByRole("button", { name: "Inspect Trust boundary", exact: true }),
-    ).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("tooltip")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("tooltip")).not.toBeVisible();
+
     await page
-      .getByRole("button", { name: "Follow the path again", exact: true })
+      .getByRole("button", { name: "Run a project", exact: true })
       .click();
+    await page
+      .getByRole("button", { name: "Run example", exact: true })
+      .click();
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-step",
+      "1",
+      { timeout: 5000 },
+    );
     await expect
       .poll(() =>
         page
@@ -287,6 +338,39 @@ try {
           ),
       )
       .toBe(true);
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-playing",
+      "false",
+    );
+    const pausedStep = await page
+      .locator("section[data-example]")
+      .getAttribute("data-step");
+    await page.waitForTimeout(2700);
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-step",
+      pausedStep,
+    );
+    assert.equal(
+      await page
+        .getByTestId("decision-world")
+        .evaluate((el) =>
+          el
+            .getAnimations({ subtree: true })
+            .some((a) => a.playState === "running"),
+        ),
+      false,
+    );
+    await page.getByRole("button", { name: "Continue", exact: true }).click();
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-step",
+      "4",
+      { timeout: 12000 },
+    );
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-playing",
+      "false",
+    );
     await expect
       .poll(
         () =>
@@ -297,9 +381,17 @@ try {
                 .getAnimations({ subtree: true })
                 .some((a) => a.playState === "running"),
             ),
-        { timeout: 5000 },
+        { timeout: 2500 },
       )
       .toBe(false);
+    await page
+      .getByRole("button", { name: "Replay example", exact: true })
+      .click();
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-step",
+      "0",
+    );
+    await page.getByRole("button", { name: "Pause", exact: true }).click();
     await page
       .getByRole("button", { name: "Toggle light and dark theme" })
       .first()
@@ -353,7 +445,7 @@ try {
     await capture({ path: ".qa/projects-desktop.png", fullPage: true });
     await assertLayout("Projects desktop");
     await inspectStudies();
-    for (const route of ["/blog", "/blog/llm-routing", "/about"]) {
+    for (const route of ["/blog", "/blog/llm-routing"]) {
       await visit(route);
       await assertLayout(route + " desktop");
       assert.equal(
@@ -402,14 +494,18 @@ try {
       page.locator(".site-footer a[aria-label='Mahek Ara on X']"),
     ).toHaveAttribute("href", links.x);
     await page.setViewportSize({ width: 393, height: 852 });
-    for (const route of [
-      "/",
-      "/projects",
-      "/blog",
-      "/blog/llm-routing",
-      "/about",
-    ]) {
+    for (const route of ["/", "/projects", "/blog", "/blog/llm-routing"]) {
       await visit(route);
+      await expect(page.locator("a[href='/about']")).toHaveCount(0);
+      if (route === "/") {
+        await expect(introduction).toBeInViewport({ ratio: 1 });
+        await expect(
+          page.getByRole("group", { name: "Choose an example" }),
+        ).toBeInViewport({ ratio: 1 });
+        await expect(page.getByTestId("decision-world")).toBeInViewport({
+          ratio: 0.25,
+        });
+      }
       await assertLayout(route + " mobile");
       await capture({
         path: `.qa/${route === "/" ? "home" : route.split("/").filter(Boolean).join("-")}-mobile.png`,
@@ -485,14 +581,33 @@ try {
     await visit("/");
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page
-      .getByRole("button", { name: "Missing context", exact: true })
+      .getByRole("button", { name: "Run a project", exact: true })
       .click();
-    await expect(page.getByRole("status")).toHaveText(
-      "Ask for the error log first.",
+    for (let step = 1; step <= 4; step++) {
+      await page
+        .getByRole("button", { name: "Next stage", exact: true })
+        .click();
+      await expect(page.locator("section[data-example]")).toHaveAttribute(
+        "data-step",
+        String(step),
+      );
+    }
+    await page
+      .getByRole("button", { name: "Add: “I'm on Windows.”", exact: true })
+      .click();
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-step",
+      "1",
     );
-    await expect(
-      page.getByRole("button", { name: "Follow the path again", exact: true }),
-    ).not.toBeVisible();
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-playing",
+      "false",
+    );
+    await page.waitForTimeout(2600);
+    await expect(page.locator("section[data-example]")).toHaveAttribute(
+      "data-step",
+      "1",
+    );
     assert.equal(
       await page
         .getByTestId("decision-world")
@@ -502,7 +617,7 @@ try {
             .some((a) => a.playState === "running"),
         ),
       false,
-      "Reduced-motion sketch stays still",
+      "Reduced-motion sequence advances only on request",
     );
     await visit("/projects#mcp-impact");
     await painted();

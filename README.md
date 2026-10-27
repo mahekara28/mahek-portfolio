@@ -1,6 +1,6 @@
 # Mahek Ara - portfolio
 
-A personal portfolio with an interactive technical introduction, a separate nine-project index, writing and an About page. Project descriptions are backed by public source code.
+A personal portfolio with an About Me homepage and interactive technical sketch, a separate nine-project index, and writing. Project descriptions are backed by public source code.
 
 ## Run locally
 
@@ -13,24 +13,24 @@ The application uses Next.js App Router, React, TypeScript, Tailwind CSS and the
 
 ## Design
 
-The homepage asks one question: what changes when the evidence changes? A large SVG sketch lets visitors follow the same build question with a useful log, no log, or an instruction quoted inside the log. The paths and outcome follow deterministic local rules. Selecting a decision point explains its role in that case. No project cards or gallery are displayed on the homepage.
+The homepage introduces Mahek through two short paragraphs about her AI background, tools, systems thinking and interest in developer communities. The interactive field beneath them follows **Ideas → Intelligence → Action**: a question gathers context, takes a useful tool route, produces a result and receives feedback. No project cards or gallery are displayed on the homepage.
 
-The homepage retains the site's limestone and ink themes. Teal carries the evidence path, amber marks a request for more context, and rust marks untrusted instructions. Its colour additions and layout live in a CSS module; the rest of the site's styles are unchanged by this pass.
+The woven paths and folded apertures retain the limestone and ink themes. Teal identifies the selected path; a warm clay loop carries feedback back into context. The two local examples read a sample setup guide or count fictional developer reports. A Windows-specific correction changes the actual lookup or filtered count. The interface clearly identifies sample data and the absence of AI model or external service calls.
 
-Signals travel once on load or after changing a case. A replay control follows the current route again. There is no perpetual movement, pointer tracking, API dependency or model inference. Native buttons support touch, Tab, Enter and arrow keys. Reduced motion keeps the final paths visible and removes the animated signal and replay control. Mobile uses a separate vertical topology with full-size labels. The original six project sketches remain in expanded project notes.
+Run, pause, replay, step through or inspect any stage. Motion completes one sequence and stops; background tabs pause it. Native buttons support touch and keyboard navigation. Reduced motion uses manual advancement. Mobile has a dedicated vertical composition. There are no new dependencies, remote assets or perpetual effects. The original six project sketches remain in expanded project notes.
 
 ## Content and routes
 
 - `app/lib/content.ts`: nine projects, focus areas, implementation limits, reviewed revisions, evidence links, profiles, resume and article metadata.
 - `app/lib/github-snapshot.json`: validated public GitHub metadata, refreshed independently of descriptions.
 - `app/lib/trace-studies.ts`: conceptual relationships, endpoint labels and shared drawing geometry.
-- `app/lib/decision-sketch.ts`: predefined examples, deterministic decisions, inspection notes and desktop/mobile path geometry.
+- `app/lib/decision-sketch.ts`: sample data, local tools, playback state, stage explanations and desktop/mobile path geometry.
 - `app/components/decision-world.tsx` and its CSS module: the homepage's interactive scene.
-- `/`: a short personal introduction and a conceptual decision sketch. The wider portfolio is available through shared navigation.
+- `/`: the complete essential About Me introduction and a conceptual decision sketch. Projects and writing are available through shared navigation.
 - `/projects`: a compact filterable index with implementation details, honest limits, source evidence and a real repository screenshot. Filters support shareable `?focus=ai`, `?focus=developer` and `?focus=operations` URLs; project anchors open the relevant notes.
 - `/blog`: the existing article plus selected repository guides and validation writing.
 - `/blog/llm-routing`: full article, working contents links, routing diagrams and code copying.
-- `/about`: background and interests.
+- `/about`: a permanent redirect to `/` for existing bookmarks; there is no separate About page or navigation entry.
 
 See [the introduction notes](docs/introduction-world.md) for the current homepage. [The graph refinement notes](docs/graph-refinement.md) and [earlier refinement notes](docs/portfolio-refinement.md) document previous passes.
 

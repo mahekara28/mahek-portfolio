@@ -1,83 +1,95 @@
-# One question, different evidence
+# Ideas → Intelligence → Action
 
-This pass changes only the homepage experience. All shared styles, other routes,
-project content, theme handling, header/footer and existing project sketches remain
-as they were at the start of the pass. The old homepage gallery is no longer rendered.
+The homepage is Mahek's About Me page. Her two introductory paragraphs remain
+unchanged and visible before the interactive field. There is no separate About
+page or homepage project gallery. Existing /about links redirect home.
 
-## The idea
+## The visual idea
 
-The same question can need a different next step when its context changes. The
-homepage expresses that through an open field of paths and inspectable decision
-points, rather than a list of technologies or a project gallery.
+The woven path now tells a five-stage story: Input, Context, Route, Action and
+Feedback. The open field, restrained palette and folded apertures extend the
+existing visual direction. Teal carries the selected tool path; a warm clay path
+carries feedback back to context. Inactive branches are finer and dashed, so
+colour is not the only way to see which route is selected.
 
-The question is deliberately ordinary: “Why did this build fail?” A predefined
-Python import error provides evidence that a non-specialist can understand.
-Visitors can change the context and inspect Context, Next step, Evidence and
-Trust boundary. Notes describe what a path supports and what remains unknown.
+Rather than becoming a diagram of every possible AI component, the field follows
+one small question. Sources join the context, one of two tool branches becomes
+active, and a useful result appears. A correction travels back through the
+feedback loop. There are no decorative particles, metrics or live-feed claims.
 
-The three examples are:
+## Two honest, working examples
 
-- Useful context: the supplied log identifies a failed import. Inspect it and
-  explain only that claim, without claiming a verified fix or a full diagnosis.
-- Missing context: the explanation branch is not reached. Ask for the log.
-- Injected instruction: the log still contains the import error, but also quotes
-  a deployment instruction. That instruction is treated as data. The supported
-  explanation is unchanged; no deployment is performed or authorised.
+- **Run a project:** a lookup reads setup commands from a tiny local fixture for
+  an illustrative Python app. Adding “I'm on Windows” switches the platform and
+  retrieves the PowerShell activation command. No shell commands are executed.
+- **Find a pattern:** a local function groups six fictional developer reports by
+  topic. Adding “Just the Windows reports” filters that same fixture and
+  recalculates the totals. These are not statistics from Mahek's repositories.
 
-The application uses predefined booleans and local deterministic rules. It does
-not classify arbitrary text, call an LLM, invoke tools, measure confidence or test
-a real security boundary. These limitations are visible in the interface. The
-scenario is illustrative, not a claim about any portfolio project's capabilities.
+The routing policy uses the selected predefined task, not a classifier. Exact
+instructions go to a lookup; counts go to code. The explanation distinguishes
+those jobs from what a model might contribute. No LLM, external service, tool
+server or GitHub API is invoked by the visualization.
 
-## Visual and interaction decisions
+Feedback changes the inputs for a second pass. It does not train a model or imply
+that an AI system learns automatically from any feedback. The sample-data and
+no-model boundary is visible below the field.
 
-Parallel strands express one path, not an amount of traffic or a measured score.
-The apertures mark places where interpretation or verification matters. Teal is
-the evidence path, amber is the request for more evidence, and rust is untrusted
-instruction text. Active and inactive routes also differ in line density and
-endpoint fill; state is described in ordinary text.
+## Interaction and motion
 
-The visual occupies most of the first screen. The name and introduction are small,
-and existing navigation provides access to projects, writing, About and the resume.
-Social and contact links remain in the shared footer and mobile menu.
+Visitors can run, pause, continue, replay or advance one stage at a time. The
+sequence finishes in about ten seconds and stops. A short signal travels along
+the current path; previously reached paths remain legible. A background tab
+pauses the sequence instead of completing unseen.
 
-Changing a case changes the route and outcome. Selecting a decision point reveals
-a concise explanation for that case. A short signal travels once, then stops;
-“Follow again” replays that route. There are no random particles or perpetual loops.
+Every stage is a native button. Hovering, focusing or tapping it pauses the
+sequence at that stage, reveals a nearby plain-English hint and updates the
+detailed explanation. Arrow keys, Home and End move between stages and between
+example choices. Escape dismisses the nearby hint.
 
-Desktop paths run across the page; phone paths turn downward with repositioned
-nodes and preserved label sizes. Native buttons, pressed states, live descriptions
-and keyboard navigation support exploration without a pointer. Reduced motion
-shows the settled paths immediately and hides the unnecessary replay control.
+The feedback control appears at the final stage, carrying a real correction back
+to context. Changing examples clears the previous example's feedback.
+
+Reduced motion replaces timed playback with a Next stage control. All paths,
+explanations, results and feedback remain available without animated signals.
+Mobile has a dedicated vertical path and repositioned sources and branches,
+rather than a scaled-down desktop drawing.
 
 ## Implementation
 
-- `app/page.tsx`: short server-rendered introduction and scene.
-- `app/components/decision-world.tsx`: one small interactive client boundary.
-- `app/components/decision-world.module.css`: isolated homepage styling.
-- `app/lib/decision-sketch.ts`: pure decisions, descriptions and SVG geometry.
+- app/page.tsx: the preserved server-rendered About Me introduction.
+- app/components/decision-world.tsx: SVG scene, playback and stage exploration.
+- app/components/decision-world.module.css: isolated responsive presentation.
+- app/lib/decision-sketch.ts: sample data, lookup/count functions, pure playback
+  reducer, stage descriptions and responsive geometry.
+- scripts/decision-sketch.test.mjs: routing, feedback, result and state invariants.
+- scripts/verify.mjs: browser interactions, accessibility and regression coverage.
 
-The scene uses only existing React, CSS and SVG capabilities. There are no new
-dependencies, remote assets, live feeds, secrets or external API calls.
-
-Decision tests cover missing evidence, injected text, continuous paths, honest
-inspection notes and responsive geometry. Browser tests cover the visual state,
-labels, keyboard controls, replay settling, reduced motion and all existing routes.
+No dependencies were added. Projects, writing, navigation, themes, content,
+public links and the About redirect remain unchanged by this pass.
 
 ## Verification
 
-Validated on 27 October 2026:
+Unit coverage checks real fixture results, exclusive routing, feedback guards,
+pause/resume, bounded playback, reset behavior and responsive path geometry.
+Browser coverage checks both examples, both feedback results, nearby hints,
+keyboard navigation, pause/replay, mobile label collisions, reduced motion,
+themes, old About links and all existing project and writing interactions.
 
-- ESLint and the production Next.js build pass.
-- All 18 content and decision tests pass.
-- The full browser suite passes with no runtime errors or external requests.
-- All 23 automated accessibility scans report zero violations; a final scan of
-  the initial Context selection also reports zero violations.
-- Browser checks cover three cases, four decision points, keyboard controls,
-  replay completion, reduced motion and viewport widths from 320 to 1440 pixels.
-- Existing routes, project interactions, mobile navigation and theme persistence
-  remain covered. Fourteen shared and non-homepage source files were compared
-  against their contents at the start of this pass and remain unchanged.
+Validated on 28 October 2026:
 
-Automated scans complement visual and interaction checks; they are not a claim
-of exhaustive accessibility certification.
+- ESLint and the production build pass.
+- All 19 content and story tests pass.
+- The full browser suite passes: 19 automated accessibility scans with zero
+  violations, no browser errors and no external requests.
+- Two additional touch-device accessibility scans pass in light and dark mode.
+  Tapping stages, dismissing nearby hints and applying Windows-only feedback
+  were checked with touch input and reduced motion enabled.
+- Stage/source labels and touch targets fit without collisions at widths of
+  320, 360, 393, 760, 820, 1024 and 1440 pixels.
+- The introduction, navigation, other pages, project content, shared styles,
+  themes and About redirect were compared with their contents before this pass
+  and remain unchanged.
+
+Automated scans supplement visual, keyboard and touch checks; they are not an
+exhaustive accessibility certification.
