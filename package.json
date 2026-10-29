@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "verify": "node --test scripts/content.test.mjs scripts/smallest-change.test.mjs && node scripts/verify.mjs",
+    "verify": "node --test scripts/content.test.mjs scripts/evidence-study.test.mjs && node scripts/verify-interface.mjs",
     "content:refresh": "node scripts/github-snapshot.mjs"
   },
   "dependencies": {

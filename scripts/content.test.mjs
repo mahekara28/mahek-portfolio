@@ -36,6 +36,8 @@ test("project identity, focus and source relationships stay aligned", () => {
   for (const project of projects) {
     assert.match(project.revision, /^[a-f\d]{40}$/);
     assert(project.boundary && project.status && project.evidence.length);
+    assert(project.question.endsWith("?") && project.scope);
+    assert.equal(project.steps.length, 3);
     assert(
       project.focus.every((id) => focusAreas.some((focus) => focus.id === id)),
     );

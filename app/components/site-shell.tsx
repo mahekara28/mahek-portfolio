@@ -61,16 +61,8 @@ export function SiteHeader() {
       <a href="#main" className="skip-link">
         Skip to content
       </a>
-      <header className="site-header">
+      <header className={`site-header${pathname === "/" ? " is-home" : ""}`}>
         <Link href="/" className="wordmark" aria-label="Mahek Ara, home">
-          <svg
-            className="seam-mark"
-            viewBox="0 0 30 30"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path d="M4 3h6l2 2 2-2h10v5H4zM1 10h9l2 2 2-2h15v5H1zM7 17h3l2 2 2-2h10v5H7zM3 24h7l2 2 2-2h13v5H3z" />
-          </svg>
           <span>Mahek Ara</span>
         </Link>
         <nav className="desktop-nav" aria-label="Main navigation">
@@ -85,14 +77,6 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="header-actions">
-          <a
-            className="resume-link"
-            href={links.resume}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Resume <ArrowUpRight size={15} aria-hidden="true" />
-          </a>
           <ThemeSwitch />
           <button
             ref={opener}
@@ -143,18 +127,6 @@ export function SiteHeader() {
                 <ArrowUpRight size={20} />
               </Link>
             ))}
-            <a
-              href={links.resume}
-              target="_blank"
-              rel="noreferrer"
-              onClick={closeMenu}
-            >
-              <span className="mono">
-                {String(navigation.length + 1).padStart(2, "0")}
-              </span>
-              Resume
-              <ArrowUpRight size={20} />
-            </a>
           </nav>
           <div className="mobile-menu-footer">
             <a href={links.github} target="_blank" rel="noreferrer">
@@ -194,23 +166,22 @@ export function SiteFooter() {
         </a>
       </div>
       <div className="footer-links">
-        <a href={links.github} target="_blank" rel="noreferrer">
-          GitHub <ArrowUpRight size={14} />
-        </a>
-        <a href={links.linkedin} target="_blank" rel="noreferrer">
-          LinkedIn <ArrowUpRight size={14} />
-        </a>
-        <a
-          href={links.x}
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Mahek Ara on X"
-        >
-          X <ArrowUpRight size={14} />
-        </a>
-        <a href={links.resume} target="_blank" rel="noreferrer">
-          Resume <ArrowUpRight size={14} />
-        </a>
+        {isHome ? <span>{new Date().getFullYear()} · Mahek Ara</span> : <>
+          <a href={links.github} target="_blank" rel="noreferrer">
+            GitHub <ArrowUpRight size={14} />
+          </a>
+          <a href={links.linkedin} target="_blank" rel="noreferrer">
+            LinkedIn <ArrowUpRight size={14} />
+          </a>
+          <a
+            href={links.x}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Mahek Ara on X"
+          >
+            X <ArrowUpRight size={14} />
+          </a>
+        </>}
       </div>
       {!isHome && (
         <div className="footer-bottom">

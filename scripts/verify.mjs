@@ -10,7 +10,14 @@ import {
   STEPS,
 } from "../app/lib/trace-studies.ts";
 import { projects, links } from "../app/lib/content.ts";
-import { consumers } from "../app/lib/smallest-change.ts";
+import {
+  band,
+  field as observationField,
+  glyphIds,
+  observe,
+  rasterize,
+  cellSize,
+} from "../app/lib/unseen-part.ts";
 
 const shapes = new Set();
 assert.equal(traceStudies.length, 6);
@@ -74,6 +81,11 @@ page.on("request", (request) => {
 });
 
 async function capture(options) {
+  const observation = page.getByTestId("unseen-part");
+  if (await observation.count())
+    await expect(observation).toHaveAttribute("data-previewing", "false", {
+      timeout: 6000,
+    });
   await page.screenshot({ timeout: 90000, animations: "disabled", ...options });
 }
 
@@ -122,90 +134,75 @@ async function painted() {
   });
 }
 
-async function inspectChange() {
-  const world = page.getByTestId("smallest-change");
-  const toggle = () =>
-    world.getByRole("button", { name: /Make required|Make optional/ });
-  if ((await world.getAttribute("data-required")) === "true")
-    await toggle().click();
-  const close = world.getByRole("button", { name: "Close explanation" });
+async function setView(position) {
+  const drawing = page.getByTestId("observation-field");
+  await page.getByRole("slider", { name: "Observation band" }).focus();
+  await drawing.scrollIntoViewIfNeeded();
+  const rect = await drawing.boundingBox();
+  await page.mouse.click(
+    rect.x + rect.width * 0.55,
+    rect.y + (position / observationField.height) * rect.height,
+  );
+}
+
+async function inspectObservation() {
+  const world = page.getByTestId("unseen-part");
+  const slider = page.getByRole("slider", { name: "Observation band" });
+  const close = page.getByRole("button", {
+    name: "Close explanation",
+    exact: true,
+  });
   if (await close.isVisible()) await close.click();
-  const stationary = world.locator('[data-consumer="eval-03"] > span').last();
-  const material = () =>
-    stationary.evaluate((el) => {
-      const face = el.getBoundingClientRect(),
-        sheet = el.parentElement.getBoundingClientRect();
-      const css = getComputedStyle(el);
-      return {
-        x: face.x - sheet.x,
-        y: face.y - sheet.y,
-        w: face.width,
-        h: face.height,
-        transform: css.transform,
-        background: css.background,
-        text: el.textContent,
-      };
-    });
-  const before = await material();
-  await toggle().click();
-  await expect(world.locator('[data-status="review"]')).toHaveCount(3);
-  await expect(world.locator('[data-status="unflagged"]')).toHaveCount(1);
-  await expect(page.locator("#impact-result")).toContainText(
-    "3 places to check.",
-  );
-  await expect(page.locator("#impact-result")).toContainText(
-    "No consumers were executed.",
-  );
-  await page.waitForTimeout(480);
-  assert.deepEqual(
-    await material(),
-    before,
-    "Unflagged surface retains geometry, material and text",
-  );
-  for (const consumer of consumers) {
-    const sheet = world.locator('[data-consumer="' + consumer.id + '"]');
-    await sheet.click();
-    await expect(sheet).toHaveAttribute("aria-expanded", "true");
-    await expect(page.locator("#impact-note")).toContainText(
-      consumer.sourcePath,
+  await slider.focus();
+  await slider.press("Home");
+  const original = await world
+    .getByTestId("observed-ink")
+    .locator("path")
+    .getAttribute("d");
+  for (const position of [112, 244, 350, 112]) {
+    await setView(position);
+    const expected = observe(position);
+    await expect(world).toHaveAttribute("data-position", String(position));
+    await expect(world).toHaveAttribute(
+      "data-matches",
+      expected.matches.join(""),
     );
-    await expect(page.locator("#impact-note")).toContainText("Demo path");
-    await expect(page.locator("#impact-note")).toContainText(
-      consumer.id === "eval-03"
-        ? "This one stays still."
-        : "A reference, not a confirmed failure.",
+    await expect(page.getByTestId("observation-statement")).toHaveText(
+      expected.headline,
     );
-    await sheet.press("Escape");
-    await expect(sheet).toBeFocused();
-    await expect(sheet).toHaveAttribute("aria-expanded", "false");
+    for (const glyph of glyphIds)
+      await expect(
+        world.locator('[data-glyph="' + glyph + '"]'),
+      ).toHaveAttribute("data-match", String(expected.matches.includes(glyph)));
+    assert.equal(
+      await world.getByTestId("observed-ink").locator("path").getAttribute("d"),
+      original,
+      "Moving the view never changes the underlying shape",
+    );
+    await page.getByRole("button", { name: "Explain this view" }).click();
+    for (const entry of expected.evidence)
+      await expect(
+        page.locator('[data-candidate="' + entry.id + '"]'),
+      ).toContainText(entry.reason);
+    await expect(page.locator("#observation-evidence")).toContainText(
+      "sampled on a 2px grid",
+    );
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("button", { name: "Explain this view" }),
+    ).toBeFocused();
+    await expect(page.locator("#observation-evidence")).toHaveCount(0);
   }
-  const first = world.locator("[data-consumer]").first();
-  await first.focus();
-  await first.press("End");
-  await expect(world.locator("[data-consumer]").last()).toBeFocused();
-  await page.keyboard.press("Home");
-  await expect(first).toBeFocused();
-  await page.keyboard.press("ArrowDown");
-  await expect(world.locator("[data-consumer]").nth(1)).toBeFocused();
-  // Pointer exploration cannot change the contract or recompute a different example.
-  await first.hover();
-  await expect(world).toHaveAttribute("data-required", "true");
-  await world.getByRole("button", { name: "How do you know?" }).click();
-  await expect(page.locator("#impact-note")).toContainText(
-    "fictional demo inventory",
-  );
-  await expect(page.locator("#impact-note a")).toHaveAttribute(
-    "href",
-    /blob\/[a-f\d]{40}\/script.js#L633/,
-  );
-  await page.keyboard.press("Escape");
-  await expect(
-    world.getByRole("button", { name: "How do you know?" }),
-  ).toBeFocused();
-  await toggle().click();
-  await expect(world.locator('[data-status="review"]')).toHaveCount(0);
-  await expect(world.locator('[data-status="unflagged"]')).toHaveCount(4);
-  await page.waitForTimeout(480);
+  await slider.focus();
+  await slider.press("End");
+  await expect(world).toHaveAttribute("data-position", String(band.max));
+  await expect(world).toHaveAttribute("data-matches", "R");
+  await slider.press("Home");
+  await slider.press("ArrowDown");
+  await expect(world).toHaveAttribute("data-position", String(band.min + 8));
+  await setView(112);
+  await page.waitForTimeout(280);
+  await expect(world).toHaveAttribute("data-previewing", "false");
   assert.equal(
     await world.evaluate((el) =>
       el
@@ -213,7 +210,42 @@ async function inspectChange() {
         .some((a) => a.playState === "running"),
     ),
     false,
-    "Motion finishes and remains idle",
+    "No perpetual motion remains after interaction",
+  );
+}
+
+async function verifySvgGeometry() {
+  const samples = [];
+  for (const id of glyphIds) {
+    const mask = rasterize(id),
+      columns = observationField.width / cellSize;
+    for (const y of [37, 75, 113, 175, 211, 241, 281, 307, 351, 401]) {
+      for (const x of [91, 115, 131, 167, 223, 291, 331, 363])
+        samples.push({
+          id,
+          x,
+          y,
+          expected:
+            !!mask[
+              Math.floor(y / cellSize) * columns + Math.floor(x / cellSize)
+            ],
+        });
+    }
+  }
+  const mismatches = await page.evaluate(
+    (samples) =>
+      samples.filter(
+        ({ id, x, y, expected }) =>
+          document
+            .querySelector('[data-glyph="' + id + '"] path')
+            .isPointInFill(new DOMPoint(x, y)) !== expected,
+      ),
+    samples,
+  );
+  assert.deepEqual(
+    mismatches,
+    [],
+    "Native SVG fill agrees with the evidence masks",
   );
 }
 
@@ -266,23 +298,12 @@ try {
   await expect(
     page.locator(".featured-projects, .home-writing, .project-explorer"),
   ).toHaveCount(0);
-  await expect(page.locator("main a[href^='/projects']").first()).toBeVisible();
+  await expect(page.locator("main a[href^='/projects']")).toHaveCount(0);
   await expect(page.locator("a[href='/about']")).toHaveCount(0);
   const introduction = page.getByTestId("home-introduction");
-  await expect(
-    introduction.getByRole("link", {
-      name: "local model routing",
-      exact: true,
-    }),
-  ).toHaveAttribute("href", "/projects#llm-router");
-  await expect(
-    introduction.getByRole("link", {
-      name: "MCP contract checks",
-      exact: true,
-    }),
-  ).toHaveAttribute("href", "/projects#mcp-impact");
+  await expect(introduction.getByRole("link")).toHaveCount(0);
   await expect(introduction).not.toContainText(
-    /open to work|DevRel|AI Engineer/i,
+    /RouterFlow|MCP Impact|Narrative Gap|open to work|DevRel|AI Engineer/i,
   );
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   const initialHTML = await (await context.request.get(baseURL)).text();
@@ -292,7 +313,7 @@ try {
     "Dark is present in server-rendered HTML before JavaScript",
   );
   await expect(introduction).toBeInViewport({ ratio: 1 });
-  await expect(page.getByTestId("smallest-change")).toBeInViewport({
+  await expect(page.getByTestId("unseen-part")).toBeInViewport({
     ratio: 1,
   });
   const legacyAbout = await context.request.get(baseURL + "/about", {
@@ -310,14 +331,24 @@ try {
   assert.equal(
     await page.locator("canvas").count(),
     0,
-    "The homepage uses local HTML surfaces",
+    "The homepage draws its custom letterforms with SVG",
   );
+  await expect(page.getByTestId("unseen-part")).toHaveAttribute(
+    "data-previewing",
+    "false",
+    { timeout: 6000 },
+  );
+  await expect(page.getByTestId("unseen-part")).toHaveAttribute(
+    "data-position",
+    "112",
+  );
+  await verifySvgGeometry();
   await capture({ path: ".qa/home-desktop.png", fullPage: true });
   console.log("Desktop screenshot saved");
   if (process.env.VISUAL_ONLY === "1") process.exitCode = 0;
   else {
     await assertLayout("Home desktop / dark");
-    await inspectChange();
+    await inspectObservation();
     await page
       .getByRole("button", { name: "Toggle light and dark theme" })
       .first()
@@ -327,7 +358,7 @@ try {
     );
     await capture({ path: ".qa/home-light.png", fullPage: true });
     await assertLayout("Home desktop / light");
-    await inspectChange();
+    await inspectObservation();
     await page
       .getByRole("navigation", { name: "Main navigation", exact: true })
       .getByRole("link", { name: "Projects", exact: true })
@@ -432,7 +463,7 @@ try {
     ]) {
       await page.setViewportSize(viewport);
       await visit("/");
-      await inspectChange();
+      await inspectObservation();
       assert.equal(
         await page.evaluate(
           () => document.documentElement.scrollHeight > innerHeight + 1,
@@ -449,9 +480,9 @@ try {
       if (route === "/") {
         await expect(introduction).toBeInViewport({ ratio: 1 });
         await expect(
-          page.getByRole("button", { name: "Make required", exact: true }),
+          page.getByRole("slider", { name: "Observation band" }),
         ).toBeInViewport({ ratio: 1 });
-        await expect(page.getByTestId("smallest-change")).toBeInViewport({
+        await expect(page.getByTestId("unseen-part")).toBeInViewport({
           ratio: 0.25,
         });
       }
@@ -471,16 +502,16 @@ try {
         .click();
     }
     await visit("/");
-    await inspectChange();
+    await inspectObservation();
     for (const width of [1024, 820, 760, 360, 320]) {
       await page.setViewportSize({ width, height: 852 });
-      await inspectChange();
+      await inspectObservation();
       assert.equal(
         await page.evaluate(
           () => document.documentElement.scrollWidth > innerWidth + 1,
         ),
         false,
-        "Smallest Change responsive width " + width,
+        "Unseen Part responsive width " + width,
       );
     }
     await page.setViewportSize({ width: 393, height: 852 });
@@ -507,7 +538,7 @@ try {
     await expect(page.getByRole("dialog")).not.toBeVisible();
     await page.setViewportSize({ width: 320, height: 568 });
     await assertLayout("Small phone");
-    await inspectChange();
+    await inspectObservation();
     await inspectStudies();
     await visit("/projects#context-relay");
     await expect(page.locator("#context-relay-details")).toBeVisible();
@@ -529,22 +560,23 @@ try {
       .press("Escape");
     await visit("/");
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await inspectChange();
-    await page
-      .getByRole("button", { name: "Make required", exact: true })
-      .click();
+    await inspectObservation();
+    await setView(350);
     assert.equal(
       await page
-        .getByTestId("smallest-change")
+        .getByTestId("unseen-part")
         .evaluate((el) =>
           el
             .getAnimations({ subtree: true })
             .some((a) => a.playState === "running"),
         ),
       false,
-      "Reduced motion updates immediately without playback",
+      "Reduced-motion views update immediately",
     );
-    await expect(page.locator('[data-status="review"]')).toHaveCount(3);
+    await expect(page.getByTestId("unseen-part")).toHaveAttribute(
+      "data-matches",
+      "R",
+    );
     await visit("/projects#mcp-impact");
     await painted();
     const still = await page

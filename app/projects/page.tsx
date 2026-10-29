@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { ProjectCollection } from "../components/project-collection";
+import { ProjectBook } from "../components/project-book";
 
 export const metadata: Metadata = { title: "Projects" };
 
 export default function ProjectsPage() {
   return (
     <main id="main" className="page-main">
-      <header className="page-intro">
-        <h1>
+      <header className="page-intro projects-intro">
+        <div><p className="page-kicker">Code & experiments</p><h1>
           Projects<span className="name-period">.</span>
-        </h1>
+        </h1></div>
         <p className="intro-deck">
-          Local apps, developer tools, and a few experiments.
+          Local models, developer tools, and a few useful experiments. Here&apos;s the work, with the code behind it.
         </p>
       </header>
-      <ProjectCollection />
+      <ProjectBook />
     </main>
   );
 }

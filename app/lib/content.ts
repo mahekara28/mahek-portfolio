@@ -3,8 +3,6 @@ export const links = {
   x: "https://x.com/mahekara28",
   linkedin: "https://www.linkedin.com/in/mahek-ara/",
   email: "mailto:mahekarabangi28@gmail.com",
-  resume:
-    "https://drive.google.com/file/d/1ieDdXUTnlAKEhHyRuVNN0C0Y5Sn8vDR3/view?usp=sharing",
 };
 
 export const reviewedOn = "2026-10-24";
@@ -37,6 +35,9 @@ export type Project = {
   focus: Exclude<Focus, "all">[];
   status: string;
   description: string;
+  question: string;
+  steps: [string, string, string];
+  scope: string;
   approach: string;
   boundary: string;
   stack: string[];
@@ -55,6 +56,9 @@ export const projects: Project[] = [
     status: "Local prototype",
     description:
       "Keyword-based routing between two local Ollama models, with a reason for each choice.",
+    question: "Does this request need the bigger model?",
+    steps: ["Read the request", "Match routing keywords", "Call a local model"],
+    scope: "Rule-based routing; quality-based escalation is not implemented.",
     approach:
       "Classification lives in router.py; inference lives in llm.py. Three route labels map to two local models: Qwen 2.5 1.5B for small requests and Llama 3.2 3B for both medium and large routes.",
     boundary:
@@ -86,6 +90,9 @@ export const projects: Project[] = [
     status: "Working prototype",
     description:
       "GitHub activity brought together to review docs and developer onboarding.",
+    question: "What can repo activity tell us about onboarding?",
+    steps: ["Fetch GitHub activity", "Apply signal rules", "Review a saved brief"],
+    scope: "Findings are heuristic; full MCP integration is not implemented.",
     approach:
       "FastAPI fetches repository metadata, issues, pull requests and contributors. Next.js displays the analysis, and SQLite saves the workspace. Rules and templates generate the findings and briefs.",
     boundary:
@@ -117,6 +124,9 @@ export const projects: Project[] = [
     status: "Local tool",
     description:
       "A contract-change checker that finds references across prompts, agents and workflows.",
+    question: "What might a tool-contract change affect?",
+    steps: ["Compare two revisions", "Find contract references", "Trace possible impact"],
+    scope: "References suggest possible impact; they do not prove a runtime failure.",
     approach:
       "It compares a pull request or two refs, parses supported JSON and YAML-like contracts, and searches candidate files for tool and field names. The report links each possible dependency to a source path and exports as JSON.",
     boundary:
@@ -148,6 +158,9 @@ export const projects: Project[] = [
     status: "Offline simulation",
     description:
       "An offline lab with 100 prompt-injection scenarios and simulated outcomes.",
+    question: "How can I explore different prompt-injection scenarios?",
+    steps: ["Choose an attack case", "Run the simulator", "Compare the outcomes"],
+    scope: "Simulated outcomes, not attacks against a live model or security benchmarks.",
     approach:
       "The simulator combines attack keywords, categories, a deterministic text signature and configured defense weights to mark cases as blocked or exploited. The API returns each result and a category summary.",
     boundary:
@@ -175,6 +188,9 @@ export const projects: Project[] = [
     status: "Local application",
     description:
       "Compare training, hiring and contracting against a project's time, budget and skills.",
+    question: "Train, hire or contract for the next project?",
+    steps: ["Set time and budget", "Check people and skills", "Compare the plans"],
+    scope: "A single-user planning tool using fictional people and example costs.",
     approach:
       "A separate JavaScript engine assigns scarce roles first using a greedy heuristic. Each plan breaks down costs and blockers. Saved snapshots keep the assumptions behind an exported decision brief.",
     boundary:
@@ -211,6 +227,9 @@ export const projects: Project[] = [
     status: "Public alpha",
     description:
       "Python tooling for current instructions, guarded tool calls and application-owned result checks.",
+    question: "Did the tool actually do what was asked?",
+    steps: ["Keep current instructions", "Check the tool call", "Verify the result"],
+    scope: "A public alpha; checks cover registered tools and configured fields only.",
     approach:
       "Current preferences live separately from chat history. Declared tool arguments are checked against them, then an application-owned verifier checks the result. The release-desk example reads the saved file bytes; a successful callback isn't enough.",
     boundary:
@@ -242,6 +261,9 @@ export const projects: Project[] = [
     status: "Local prototype",
     description:
       "An activity planner using your availability, timing rules and a local Llama model.",
+    question: "When could this fit into my day?",
+    steps: ["Describe an activity", "Apply timing rules", "Ask a local model"],
+    scope: "Suggests a plan; it does not book time or check a live calendar.",
     approach:
       "Keyword rules suggest a time window and duration. Ollama runs Llama 3.2 3B locally, with a prompt asking for four short lines: time, duration, reasoning and action.",
     boundary:
@@ -269,6 +291,9 @@ export const projects: Project[] = [
     status: "Local-first prototype",
     description:
       "CSV catalog reviews, suggested edits and approvals, saved locally in the browser.",
+    question: "Which catalog entries need attention?",
+    steps: ["Import a CSV", "Check product details", "Review suggested edits"],
+    scope: "Rule-based suggestions, with optional Supabase storage requiring setup.",
     approach:
       "TypeScript rules score title length, tag coverage, images and stock movement after CSV import. An optional Supabase adapter stores workspace snapshots, with authentication and row-level policies.",
     boundary:
@@ -299,6 +324,9 @@ export const projects: Project[] = [
     focus: ["ai"],
     status: "Legacy API demo",
     description: "A small Streamlit Q&A app using an older Gemini API.",
+    question: "What does a minimal model-backed app need?",
+    steps: ["Read a question", "Call the Gemini API", "Display the response"],
+    scope: "An early API experiment; the SDK and model name need updating.",
     approach:
       "Load a Google API key from the environment, call the configured model and render its text in Streamlit.",
     boundary:

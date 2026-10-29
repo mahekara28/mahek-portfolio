@@ -1,6 +1,6 @@
 # Mahek Ara - portfolio
 
-A personal portfolio with an About Me homepage and interactive technical sketch, a separate nine-project index, and writing. Project descriptions are backed by public source code.
+A personal portfolio with an About Me homepage and automatic technical sketch, a separate nine-project index, and writing. Project descriptions are backed by public source code.
 
 ## Run locally
 
@@ -13,30 +13,28 @@ The application uses Next.js App Router, React, TypeScript, Tailwind CSS and the
 
 ## Design
 
-The homepage pairs a short personal introduction with **The Smallest Change**: four joined, notched surfaces and one editable requirement. Making an optional MCP input required opens only surfaces whose demo inventory references the changed tool. The unrelated eval stays still. There is no timeline, automatic playback, neural-network graphic or project gallery.
+The homepage pairs a personal introduction with a small evidence experiment: an AI says “done”, a tool reports success, but only inspecting the returned file establishes whether it matches the request. The three stages unfold automatically when the sketch comes into view. The example returns JSON where CSV was requested, and a local check of the contents identifies the mismatch. No dragging, clicking or selecting is required. No model is running, and the narrow checks do not prove complete correctness.
 
-The example is grounded in a pinned revision of MCP Impact's fictional demo. The comparison runs locally and derives its three potential impacts from exact tool references. Selecting a surface reveals the evidence and demo path. A separate explanation identifies what the check cannot prove: no consumers are executed, and no runtime failures are confirmed.
-
-An asymmetric silhouette, off-centre seam, stone surfaces and ochre revealed edges replace the previous woven scene. Motion is a bounded response to the visitor's change, not a repeating effect. Reduced motion gives an immediate static change. The homepage uses a compact laptop composition and a shallower stacked phone layout. Expanded evidence can scroll naturally. The original project sketches remain on the Projects page.
+The typographic visual changes from solid to outlined as a claim is inspected. Motion runs for under four seconds and settles on the result. Playback waits while offscreen or in a hidden tab; reduced motion shows the final state immediately. Both themes use solid, readable colors. There are no graphics dependencies or external requests. See [the evidence-study notes](docs/evidence-study.md) for the interaction and its limits.
 
 ## Content and routes
 
-- `app/lib/content.ts`: nine projects, focus areas, implementation limits, reviewed revisions, evidence links, profiles, resume and article metadata.
+- `app/lib/content.ts`: nine projects, their questions and steps, focus areas, implementation limits, reviewed revisions, evidence links, profiles and article metadata.
 - `app/lib/github-snapshot.json`: validated public GitHub metadata, refreshed independently of descriptions.
-- `app/lib/trace-studies.ts`: conceptual relationships, endpoint labels and shared drawing geometry.
-- `app/lib/smallest-change.ts`: pinned demo inventory, contract and narrow optional-to-required comparison.
-- `app/components/smallest-change.tsx` and its CSS module: the homepage interaction and local evidence disclosure.
-- `/`: the complete essential About Me introduction and an interactive contract-change example. Projects and writing are available through shared navigation.
-- `/projects`: a compact filterable index with implementation details, honest limits, source evidence and a real repository screenshot. Filters support shareable `?focus=ai`, `?focus=developer` and `?focus=operations` URLs; project anchors open the relevant notes.
+- `app/lib/evidence-study.ts`: local fixtures and content checks.
+- `app/components/evidence-field.tsx`: automatic playback, visual states and a short inline explanation.
+- `app/components/project-book.tsx`: compact project grid, direct code links and native detail dialogs.
+- `/`: the essential About Me introduction and an automatic evidence study. No project references in the introduction.
+- `/projects`: a filterable compact grid. Read notes opens the approach, implementation limits and pinned source links in a keyboard-accessible dialog. Filters support shareable `?focus=ai`, `?focus=developer` and `?focus=operations` URLs; project anchors open the relevant dialog. The real repository screenshot is preserved.
 - `/blog`: the existing article plus selected repository guides and validation writing.
 - `/blog/llm-routing`: full article, working contents links, routing diagrams and code copying.
 - `/about`: a permanent redirect to `/` for existing bookmarks; there is no separate About page or navigation entry.
 
-See [The Smallest Change notes](docs/smallest-change.md) for the current homepage. [The introduction notes](docs/introduction-world.md) record the retired five-stage scene. [The graph refinement notes](docs/graph-refinement.md) and [earlier refinement notes](docs/portfolio-refinement.md) document previous passes.
+The sentence study, decision planes, PBR, graph and earlier refinement notes document retired design passes. Their old components are retained as source history and are not imported by active routes.
 
 Every fresh document starts in dark mode, including when an older light preference exists in local storage or the OS uses light mode. The server HTML and next-themes startup script agree on dark. The secondary theme switch works throughout client-side navigation; a reload or fresh visit intentionally resets it to dark. Navigation is shared across all pages; the mobile drawer uses a native modal dialog with focus containment and Escape dismissal.
 
-The resume URL is preserved from the original homepage. Contact uses the email on the public GitHub profile. GitHub, LinkedIn and the user-supplied personal X profile are linked in shared navigation and footer areas.
+Résumé links have been removed at the owner's request. Contact uses the email on the public GitHub profile. GitHub, LinkedIn and the user-supplied personal X profile remain available on the homepage and in the shared navigation/footer.
 
 ## Source review and metadata
 
@@ -68,4 +66,4 @@ npx playwright install chromium
 npm run verify
 ```
 
-Use Node.js 24 for the checks. Set `BASE_URL` for a different port; optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Unit checks cover contract isolation, data-derived impact, unchanged consumers, reversible updates, unknown execution results, preserved project evidence and snapshot handling. Browser checks cover selective motion, evidence disclosures, keyboard controls, laptop fit, mobile widths, no external requests, existing routes and features, dark-first loads, theme changes across navigation, reduced motion and WCAG A/AA rules. Screenshots and results go to the ignored `.qa/` directory.
+Use Node.js 24 for the checks. Set `BASE_URL` for a different port; optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Unit checks cover artifact validation, unverified tool receipts, project evidence and snapshot handling. Browser checks exercise automatic playback, offscreen suspension and the absence of manual controls, project dialogs and history, source links, article copying, laptop fit, mobile widths, dark-first loads, themes, reduced motion, keyboard navigation, removed résumé links and WCAG A/AA rules. Screenshots and results go to the ignored `.qa/` directory.

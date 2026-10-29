@@ -1,5 +1,8 @@
 # The Smallest Change
 
+Historical notes for the retired homepage. The current implementation is
+documented in [The Unseen Part](unseen-part.md).
+
 The homepage is the About Me page. A short introduction sits beside four joined,
 notched surfaces. One explicit contract edit opens only the affected surfaces.
 There is no automatic playback, orbit, graph, canvas, render loop or model call.
