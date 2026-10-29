@@ -63,11 +63,14 @@ export function SiteHeader() {
       </a>
       <header className="site-header">
         <Link href="/" className="wordmark" aria-label="Mahek Ara, home">
-          <span className="trace-mark" aria-hidden="true">
-            <i />
-            <i />
-            <i />
-          </span>
+          <svg
+            className="seam-mark"
+            viewBox="0 0 30 30"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <path d="M4 3h6l2 2 2-2h10v5H4zM1 10h9l2 2 2-2h15v5H1zM7 17h3l2 2 2-2h10v5H7zM3 24h7l2 2 2-2h13v5H3z" />
+          </svg>
           <span>Mahek Ara</span>
         </Link>
         <nav className="desktop-nav" aria-label="Main navigation">

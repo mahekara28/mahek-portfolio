@@ -13,28 +13,26 @@ The application uses Next.js App Router, React, TypeScript, Tailwind CSS and the
 
 ## Design
 
-The homepage pairs a short personal introduction with an interactive thread. The introduction links directly to local model routing, MCP contract changes and developer questions in GitHub issues. The scene follows a question through context, a tool choice, a result and feedback. It opens with the developer-report example. No role targets, project cards or gallery are displayed on the homepage.
+The homepage pairs a short personal introduction with **The Smallest Change**: four joined, notched surfaces and one editable requirement. Making an optional MCP input required opens only surfaces whose demo inventory references the changed tool. The unrelated eval stays still. There is no timeline, automatic playback, neural-network graphic or project gallery.
 
-On laptops the introduction, scene and compact contact footer fit within the first viewport. Phones use a stacked composition and a dedicated vertical drawing. Source and tool labels appear as they become relevant. A concise result stays visible; the native “Look inside” disclosure reveals the implementation explanation and sample output without crowding the initial view.
+The example is grounded in a pinned revision of MCP Impact's fictional demo. The comparison runs locally and derives its three potential impacts from exact tool references. Selecting a surface reveals the evidence and demo path. A separate explanation identifies what the check cannot prove: no consumers are executed, and no runtime failures are confirmed.
 
-The woven paths and folded apertures retain the limestone and ink themes. Teal identifies the selected path; a warm clay loop carries feedback back into context. The two local examples read a sample setup guide or count fictional developer reports. A Windows-specific correction changes the actual lookup or filtered count. The interface clearly identifies sample data and the absence of AI model or external service calls.
-
-An initial sequence plays once when the field is visible and finishes in roughly four seconds. Switching examples starts the new sequence immediately. Pause, replay, step through or inspect any stage. Brighter short trails show the chosen route; context signals converge and the selected aperture opens. Motion stops after one pass; background tabs and scrolling out of view pause it. Native buttons support touch and keyboard navigation. Reduced motion uses manual advancement. Mobile has a dedicated vertical composition. There are no new dependencies, remote assets or perpetual effects. The original six project sketches remain in expanded project notes.
+An asymmetric silhouette, off-centre seam, stone surfaces and ochre revealed edges replace the previous woven scene. Motion is a bounded response to the visitor's change, not a repeating effect. Reduced motion gives an immediate static change. The homepage uses a compact laptop composition and a shallower stacked phone layout. Expanded evidence can scroll naturally. The original project sketches remain on the Projects page.
 
 ## Content and routes
 
 - `app/lib/content.ts`: nine projects, focus areas, implementation limits, reviewed revisions, evidence links, profiles, resume and article metadata.
 - `app/lib/github-snapshot.json`: validated public GitHub metadata, refreshed independently of descriptions.
 - `app/lib/trace-studies.ts`: conceptual relationships, endpoint labels and shared drawing geometry.
-- `app/lib/decision-sketch.ts`: sample data, local tools, playback state, stage explanations and desktop/mobile path geometry.
-- `app/components/decision-world.tsx` and its CSS module: the homepage's interactive scene.
-- `/`: the complete essential About Me introduction and a conceptual decision sketch. Projects and writing are available through shared navigation.
+- `app/lib/smallest-change.ts`: pinned demo inventory, contract and narrow optional-to-required comparison.
+- `app/components/smallest-change.tsx` and its CSS module: the homepage interaction and local evidence disclosure.
+- `/`: the complete essential About Me introduction and an interactive contract-change example. Projects and writing are available through shared navigation.
 - `/projects`: a compact filterable index with implementation details, honest limits, source evidence and a real repository screenshot. Filters support shareable `?focus=ai`, `?focus=developer` and `?focus=operations` URLs; project anchors open the relevant notes.
 - `/blog`: the existing article plus selected repository guides and validation writing.
 - `/blog/llm-routing`: full article, working contents links, routing diagrams and code copying.
 - `/about`: a permanent redirect to `/` for existing bookmarks; there is no separate About page or navigation entry.
 
-See [the introduction notes](docs/introduction-world.md) for the current homepage. [The graph refinement notes](docs/graph-refinement.md) and [earlier refinement notes](docs/portfolio-refinement.md) document previous passes.
+See [The Smallest Change notes](docs/smallest-change.md) for the current homepage. [The introduction notes](docs/introduction-world.md) record the retired five-stage scene. [The graph refinement notes](docs/graph-refinement.md) and [earlier refinement notes](docs/portfolio-refinement.md) document previous passes.
 
 Every fresh document starts in dark mode, including when an older light preference exists in local storage or the OS uses light mode. The server HTML and next-themes startup script agree on dark. The secondary theme switch works throughout client-side navigation; a reload or fresh visit intentionally resets it to dark. Navigation is shared across all pages; the mobile drawer uses a native modal dialog with focus containment and Escape dismissal.
 
@@ -70,4 +68,4 @@ npx playwright install chromium
 npm run verify
 ```
 
-Use Node.js 24 for the checks, which also test the TypeScript geometry directly. Set `BASE_URL` for a different port. Optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Tests cover decision invariants, example limitations, preserved project evidence, snapshot validation, caching and network failure handling. Browser checks cover both examples and their feedback, the detail disclosure, keyboard controls, bounded animation, laptop viewport fit, mobile label collisions, no external requests, all routes and existing project/navigation features, dark-first loads with an old saved light preference, manual theme changes across client navigation, reduced motion and WCAG A/AA rules. Screenshots and results are written to the ignored `.qa/` directory.
+Use Node.js 24 for the checks. Set `BASE_URL` for a different port; optionally set `PLAYWRIGHT_EXECUTABLE_PATH` to use an installed browser. Unit checks cover contract isolation, data-derived impact, unchanged consumers, reversible updates, unknown execution results, preserved project evidence and snapshot handling. Browser checks cover selective motion, evidence disclosures, keyboard controls, laptop fit, mobile widths, no external requests, existing routes and features, dark-first loads, theme changes across navigation, reduced motion and WCAG A/AA rules. Screenshots and results go to the ignored `.qa/` directory.

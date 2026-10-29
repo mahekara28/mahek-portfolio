@@ -10,12 +10,7 @@ import {
   STEPS,
 } from "../app/lib/trace-studies.ts";
 import { projects, links } from "../app/lib/content.ts";
-import {
-  examples,
-  stages,
-  runExample,
-  describeStage,
-} from "../app/lib/decision-sketch.ts";
+import { consumers } from "../app/lib/smallest-change.ts";
 
 const shapes = new Set();
 assert.equal(traceStudies.length, 6);
@@ -127,95 +122,98 @@ async function painted() {
   });
 }
 
-async function inspectWorld() {
-  const world = page.getByTestId("decision-world");
-  const section = page.locator("section[data-example]");
-  await expect(world.locator("svg:visible")).toHaveCount(1);
-  for (const example of examples) {
-    await page
-      .getByRole("button", { name: example.label, exact: true })
-      .click();
-    for (let step = 0; step < stages.length; step++) {
-      await page
-        .getByRole("button", {
-          name: `Explore ${stages[step].label}`,
-          exact: true,
-        })
-        .click();
-      await expect(section).toHaveAttribute("data-step", String(step));
-      await expect(page.locator("#decision-insight h3")).toHaveText(
-        describeStage(step, example.id, false).title,
-      );
-      if (step === 3) {
-        await expect(page.getByTestId("story-evidence")).toContainText(
-          runExample(example.id).result,
-        );
-        const tool = runExample(example.id).tool;
-        await expect(
-          world.locator(`svg:visible [data-edge="${tool}"]`),
-        ).toHaveAttribute("data-active", "true");
-        await expect(
-          world.locator(
-            `svg:visible [data-edge="${tool === "lookup" ? "count" : "lookup"}"]`,
-          ),
-        ).toHaveAttribute("data-active", "false");
-      }
-    }
-    await page
-      .getByRole("button", { name: `Add: “${example.feedback}”`, exact: true })
-      .click();
-    await expect(section).toHaveAttribute("data-revised", "true");
-    await expect(section).toHaveAttribute("data-step", "1");
-    await page
-      .getByRole("button", { name: "Explore Action", exact: true })
-      .click();
-    await expect(page.getByTestId("story-evidence")).toContainText(
-      runExample(example.id, true).result,
-    );
-    const disclosure = page.getByTestId("story-evidence").locator("details");
-    await expect(disclosure).not.toHaveAttribute("open", "");
-    await disclosure.locator("summary").click();
-    await expect(disclosure.locator("pre")).toBeVisible();
-    await expect(disclosure.locator("pre")).toHaveText(
-      runExample(example.id, true).detail,
-    );
-    await disclosure.locator("summary").click();
-    await expect(disclosure.locator("pre")).not.toBeVisible();
-    await expect(
-      world.locator('svg:visible [data-edge="return"]'),
-    ).toHaveAttribute("data-active", "true");
-  }
-  const layout = await world.evaluate((field) => {
-    const bounds = field.getBoundingClientRect();
-    const labels = [
-      ...field.querySelectorAll("[data-stage], [data-tool], [data-source]"),
-    ].map((el) => ({ text: el.textContent, r: el.getBoundingClientRect() }));
-    return {
-      outside: labels
-        .filter(
-          ({ r }) =>
-            r.left < bounds.left - 1 ||
-            r.right > bounds.right + 1 ||
-            r.top < bounds.top - 1 ||
-            r.bottom > bounds.bottom + 1,
-        )
-        .map((x) => x.text),
-      collisions: labels.flatMap(({ r: a, text }, i) =>
-        labels
-          .slice(i + 1)
-          .filter(
-            ({ r: b }) =>
-              Math.min(a.right, b.right) - Math.max(a.left, b.left) > 2 &&
-              Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top) > 2,
-          )
-          .map((b) => [text, b.text]),
-      ),
-    };
-  });
+async function inspectChange() {
+  const world = page.getByTestId("smallest-change");
+  const toggle = () =>
+    world.getByRole("button", { name: /Make required|Make optional/ });
+  if ((await world.getAttribute("data-required")) === "true")
+    await toggle().click();
+  const close = world.getByRole("button", { name: "Close explanation" });
+  if (await close.isVisible()) await close.click();
+  const stationary = world.locator('[data-consumer="eval-03"] > span').last();
+  const material = () =>
+    stationary.evaluate((el) => {
+      const face = el.getBoundingClientRect(),
+        sheet = el.parentElement.getBoundingClientRect();
+      const css = getComputedStyle(el);
+      return {
+        x: face.x - sheet.x,
+        y: face.y - sheet.y,
+        w: face.width,
+        h: face.height,
+        transform: css.transform,
+        background: css.background,
+        text: el.textContent,
+      };
+    });
+  const before = await material();
+  await toggle().click();
+  await expect(world.locator('[data-status="review"]')).toHaveCount(3);
+  await expect(world.locator('[data-status="unflagged"]')).toHaveCount(1);
+  await expect(page.locator("#impact-result")).toContainText(
+    "3 places to check.",
+  );
+  await expect(page.locator("#impact-result")).toContainText(
+    "No consumers were executed.",
+  );
+  await page.waitForTimeout(480);
   assert.deepEqual(
-    layout,
-    { outside: [], collisions: [] },
-    "Stage labels, sources and hit targets remain distinct and contained",
+    await material(),
+    before,
+    "Unflagged surface retains geometry, material and text",
+  );
+  for (const consumer of consumers) {
+    const sheet = world.locator('[data-consumer="' + consumer.id + '"]');
+    await sheet.click();
+    await expect(sheet).toHaveAttribute("aria-expanded", "true");
+    await expect(page.locator("#impact-note")).toContainText(
+      consumer.sourcePath,
+    );
+    await expect(page.locator("#impact-note")).toContainText("Demo path");
+    await expect(page.locator("#impact-note")).toContainText(
+      consumer.id === "eval-03"
+        ? "This one stays still."
+        : "A reference, not a confirmed failure.",
+    );
+    await sheet.press("Escape");
+    await expect(sheet).toBeFocused();
+    await expect(sheet).toHaveAttribute("aria-expanded", "false");
+  }
+  const first = world.locator("[data-consumer]").first();
+  await first.focus();
+  await first.press("End");
+  await expect(world.locator("[data-consumer]").last()).toBeFocused();
+  await page.keyboard.press("Home");
+  await expect(first).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(world.locator("[data-consumer]").nth(1)).toBeFocused();
+  // Pointer exploration cannot change the contract or recompute a different example.
+  await first.hover();
+  await expect(world).toHaveAttribute("data-required", "true");
+  await world.getByRole("button", { name: "How do you know?" }).click();
+  await expect(page.locator("#impact-note")).toContainText(
+    "fictional demo inventory",
+  );
+  await expect(page.locator("#impact-note a")).toHaveAttribute(
+    "href",
+    /blob\/[a-f\d]{40}\/script.js#L633/,
+  );
+  await page.keyboard.press("Escape");
+  await expect(
+    world.getByRole("button", { name: "How do you know?" }),
+  ).toBeFocused();
+  await toggle().click();
+  await expect(world.locator('[data-status="review"]')).toHaveCount(0);
+  await expect(world.locator('[data-status="unflagged"]')).toHaveCount(4);
+  await page.waitForTimeout(480);
+  assert.equal(
+    await world.evaluate((el) =>
+      el
+        .getAnimations({ subtree: true })
+        .some((a) => a.playState === "running"),
+    ),
+    false,
+    "Motion finishes and remains idle",
   );
 }
 
@@ -279,7 +277,7 @@ try {
   ).toHaveAttribute("href", "/projects#llm-router");
   await expect(
     introduction.getByRole("link", {
-      name: "MCP contract changes",
+      name: "MCP contract checks",
       exact: true,
     }),
   ).toHaveAttribute("href", "/projects#mcp-impact");
@@ -294,7 +292,9 @@ try {
     "Dark is present in server-rendered HTML before JavaScript",
   );
   await expect(introduction).toBeInViewport({ ratio: 1 });
-  await expect(page.getByTestId("decision-world")).toBeInViewport({ ratio: 1 });
+  await expect(page.getByTestId("smallest-change")).toBeInViewport({
+    ratio: 1,
+  });
   const legacyAbout = await context.request.get(baseURL + "/about", {
     maxRedirects: 0,
   });
@@ -307,123 +307,17 @@ try {
   await page.goto(baseURL + "/about", { waitUntil: "networkidle" });
   await expect(page).toHaveURL(baseURL + "/");
   await expect(introduction).toBeVisible();
-  await expect(
-    page.getByRole("group", { name: "Choose an example" }).getByRole("button"),
-  ).toHaveCount(2);
   assert.equal(
     await page.locator("canvas").count(),
     0,
-    "The homepage uses a local SVG world",
+    "The homepage uses local HTML surfaces",
   );
   await capture({ path: ".qa/home-desktop.png", fullPage: true });
   console.log("Desktop screenshot saved");
   if (process.env.VISUAL_ONLY === "1") process.exitCode = 0;
   else {
     await assertLayout("Home desktop / dark");
-    await inspectWorld();
-    await page
-      .getByRole("button", { name: "Find a pattern", exact: true })
-      .press("Home");
-    await expect(
-      page.getByRole("button", { name: "Run a project", exact: true }),
-    ).toHaveAttribute("aria-pressed", "true");
-    await page
-      .getByRole("button", { name: "Run a project", exact: true })
-      .press("ArrowRight");
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-example",
-      "patterns",
-    );
-    await page
-      .getByRole("button", { name: "Explore Input", exact: true })
-      .focus();
-    await page
-      .getByRole("button", { name: "Explore Input", exact: true })
-      .press("End");
-    await expect(
-      page.getByRole("button", { name: "Explore Feedback", exact: true }),
-    ).toBeFocused();
-    await expect(page.getByRole("tooltip")).toBeVisible();
-    await page.keyboard.press("Escape");
-    await expect(page.getByRole("tooltip")).not.toBeVisible();
-
-    await page
-      .getByRole("button", { name: "Run a project", exact: true })
-      .click();
-    // Choosing another example starts its short sequence immediately.
-    await expect(
-      page.getByRole("button", { name: "Pause", exact: true }),
-    ).toBeVisible();
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-step",
-      "1",
-      { timeout: 5000 },
-    );
-    await expect
-      .poll(() =>
-        page
-          .getByTestId("decision-world")
-          .evaluate((el) =>
-            el
-              .getAnimations({ subtree: true })
-              .some((a) => a.playState === "running"),
-          ),
-      )
-      .toBe(true);
-    await page.getByRole("button", { name: "Pause", exact: true }).click();
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-playing",
-      "false",
-    );
-    const pausedStep = await page
-      .locator("section[data-example]")
-      .getAttribute("data-step");
-    await page.waitForTimeout(2700);
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-step",
-      pausedStep,
-    );
-    assert.equal(
-      await page
-        .getByTestId("decision-world")
-        .evaluate((el) =>
-          el
-            .getAnimations({ subtree: true })
-            .some((a) => a.playState === "running"),
-        ),
-      false,
-    );
-    await page.getByRole("button", { name: "Continue", exact: true }).click();
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-step",
-      "4",
-      { timeout: 12000 },
-    );
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-playing",
-      "false",
-    );
-    await expect
-      .poll(
-        () =>
-          page
-            .getByTestId("decision-world")
-            .evaluate((el) =>
-              el
-                .getAnimations({ subtree: true })
-                .some((a) => a.playState === "running"),
-            ),
-        { timeout: 2500 },
-      )
-      .toBe(false);
-    await page
-      .getByRole("button", { name: "Replay example", exact: true })
-      .click();
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-step",
-      "0",
-    );
-    await page.getByRole("button", { name: "Pause", exact: true }).click();
+    await inspectChange();
     await page
       .getByRole("button", { name: "Toggle light and dark theme" })
       .first()
@@ -433,7 +327,7 @@ try {
     );
     await capture({ path: ".qa/home-light.png", fullPage: true });
     await assertLayout("Home desktop / light");
-    await inspectWorld();
+    await inspectChange();
     await page
       .getByRole("navigation", { name: "Main navigation", exact: true })
       .getByRole("link", { name: "Projects", exact: true })
@@ -538,7 +432,7 @@ try {
     ]) {
       await page.setViewportSize(viewport);
       await visit("/");
-      await inspectWorld();
+      await inspectChange();
       assert.equal(
         await page.evaluate(
           () => document.documentElement.scrollHeight > innerHeight + 1,
@@ -555,9 +449,9 @@ try {
       if (route === "/") {
         await expect(introduction).toBeInViewport({ ratio: 1 });
         await expect(
-          page.getByRole("group", { name: "Choose an example" }),
+          page.getByRole("button", { name: "Make required", exact: true }),
         ).toBeInViewport({ ratio: 1 });
-        await expect(page.getByTestId("decision-world")).toBeInViewport({
+        await expect(page.getByTestId("smallest-change")).toBeInViewport({
           ratio: 0.25,
         });
       }
@@ -577,16 +471,16 @@ try {
         .click();
     }
     await visit("/");
-    await inspectWorld();
+    await inspectChange();
     for (const width of [1024, 820, 760, 360, 320]) {
       await page.setViewportSize({ width, height: 852 });
-      await inspectWorld();
+      await inspectChange();
       assert.equal(
         await page.evaluate(
           () => document.documentElement.scrollWidth > innerWidth + 1,
         ),
         false,
-        "Decision world responsive width " + width,
+        "Smallest Change responsive width " + width,
       );
     }
     await page.setViewportSize({ width: 393, height: 852 });
@@ -613,7 +507,7 @@ try {
     await expect(page.getByRole("dialog")).not.toBeVisible();
     await page.setViewportSize({ width: 320, height: 568 });
     await assertLayout("Small phone");
-    await inspectWorld();
+    await inspectChange();
     await inspectStudies();
     await visit("/projects#context-relay");
     await expect(page.locator("#context-relay-details")).toBeVisible();
@@ -635,45 +529,22 @@ try {
       .press("Escape");
     await visit("/");
     await page.emulateMedia({ reducedMotion: "reduce" });
+    await inspectChange();
     await page
-      .getByRole("button", { name: "Run a project", exact: true })
+      .getByRole("button", { name: "Make required", exact: true })
       .click();
-    for (let step = 1; step <= 4; step++) {
-      await page
-        .getByRole("button", { name: "Next stage", exact: true })
-        .click();
-      await expect(page.locator("section[data-example]")).toHaveAttribute(
-        "data-step",
-        String(step),
-      );
-    }
-    await page
-      .getByRole("button", { name: "Add: “I'm on Windows.”", exact: true })
-      .click();
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-step",
-      "1",
-    );
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-playing",
-      "false",
-    );
-    await page.waitForTimeout(2600);
-    await expect(page.locator("section[data-example]")).toHaveAttribute(
-      "data-step",
-      "1",
-    );
     assert.equal(
       await page
-        .getByTestId("decision-world")
+        .getByTestId("smallest-change")
         .evaluate((el) =>
           el
             .getAnimations({ subtree: true })
             .some((a) => a.playState === "running"),
         ),
       false,
-      "Reduced-motion sequence advances only on request",
+      "Reduced motion updates immediately without playback",
     );
+    await expect(page.locator('[data-status="review"]')).toHaveCount(3);
     await visit("/projects#mcp-impact");
     await painted();
     const still = await page
