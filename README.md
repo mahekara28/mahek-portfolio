@@ -2,7 +2,7 @@
 
 [Visit the portfolio](https://mahekara.vercel.app/)
 
-A beach desktop with soft white-and-blush windows, a real portrait and a handwritten name. About, Writing, Projects and Contact are ordinary pages behind four distinct desktop icons. The introduction has no project feed.
+A graphite desktop for a builder, with movable app icons, draggable windows, a real portrait and a handwritten name. About, Writing, Projects and Contact open ordinary pages; Resume opens Mahek’s existing PDF on Google Drive. The introduction has no project feed.
 
 ## Run locally
 
@@ -13,13 +13,13 @@ npm ci
 npm run dev
 ```
 
-Next.js App Router, React and TypeScript. The interface and headings use self-hosted Nunito; Mahek’s handwritten name uses Allura. Fonts, icons and the portrait are served locally. No analytics, external font requests or social API calls are needed to render the site.
+Next.js App Router, React and TypeScript. The interface uses self-hosted Nunito and headings use Hanken Grotesk; Mahek’s handwritten name uses Allura. Fonts, icons and the portrait are served locally. No analytics, external font requests or social API calls are needed to render the site.
 
 ## Routes and content
 
 | Route | Contents |
 | --- | --- |
-| `/` | Portrait collage and introduction |
+| `/` | Builder introduction and portrait |
 | `/blog` | Five short technical notes and the original routing essay |
 | `/blog/[slug]` | Complete, statically generated articles with source links |
 | `/blog/llm-routing` | Original article, diagrams, contents links and code copying |
@@ -28,9 +28,11 @@ Next.js App Router, React and TypeScript. The interface and headings use self-ho
 | `/desktop` | Closed-window view; folders remain available |
 | `/about` | Permanent redirect to the introduction |
 
-The shared layout is `app/components/site-shell.tsx`. The desktop and its folders stay in place while the window content scrolls. The square title-bar button maximizes the window to the browser viewport; Restore or Escape returns it to its floating size. Closing the window returns focus to its folder. Escape closes an already restored window. New pages start at the top, while Back/Forward restores their reading positions. Folder navigation and reading work without JavaScript; window resizing and clipboard actions are enhancements.
+The shared layout is `app/components/site-shell.tsx`. Red closes the window, yellow minimizes it, and green maximizes or restores it. Minimizing keeps the content and reading position; the footer or the app icon reopens the window. Closing shows Mahek’s handwritten name on the desktop and returns focus to the app. Escape restores a maximized window, then closes a floating one.
 
-The site has one light appearance: the supplied beach photograph, white windows, blush title bars and a translucent menu bar. The wallpaper is optimized locally and served responsively through Next.js Image. Original SVG icons depict a profile card, notebook, project folder and envelope, with visible text labels. Mobile keeps them in a stationary horizontal row, with scrolling inside the window. Reduced motion disables transitions. Projects remain outside the home introduction; earlier project anchors still reveal the relevant archive entry. Old `?focus=` links resolve to the complete project page, with their anchor preserved.
+Drag a title bar or any of the five app icons to arrange the desktop. Movement is bounded to the workspace. With the title focused, arrow keys move the window; Alt + arrow keys move focused app icons. Shift makes smaller moves. Reset layout restores the defaults. Positions survive page navigation; resizing the viewport resets them to keep all controls reachable. Only the window’s content scrolls. New pages start at the top, while Back/Forward restores reading positions. Ordinary links and reading work without JavaScript.
+
+The site uses a single warm charcoal appearance with soft ivory actions, muted lavender details and a fine static texture inspired by ZenML’s editorial treatment. Icons, fonts and the portrait are local assets. Compact GitHub, LinkedIn and X links live in the menu bar. Mobile has a five-app row and internal window scrolling. Reduced motion disables transitions. Projects stay outside the home introduction; older project anchors still reveal the relevant archive entry.
 
 - `app/lib/writing.ts`: five articles, source references and reading-time calculation.
 - `app/lib/content.ts`: project descriptions, scope, pinned evidence and contact links.
@@ -50,7 +52,7 @@ npx playwright install chromium
 npm run verify
 ```
 
-Set `BASE_URL` if the server uses another port. `PLAYWRIGHT_EXECUTABLE_PATH` can select an installed browser. Browser checks cover desktop, 320px and short landscape layouts, the light appearance with a dark system preference, local wallpaper loading, internal scrolling, maximize/restore, keyboard navigation, close/reopen focus, reading-position history, project anchors, all articles, clipboard actions, the real portrait, no-JavaScript reading, 404s and WCAG A/AA rules. Reports and screenshots are written to the ignored `.qa/` folder.
+Set `BASE_URL` if the server uses another port. `PLAYWRIGHT_EXECUTABLE_PATH` can select an installed browser. Browser checks cover desktop, 320px and short landscape layouts, the dark appearance with a light system preference, dragging and keyboard placement, drag-versus-click behavior, layout reset, minimize/restore, internal scrolling, maximize/restore, keyboard navigation, close/reopen focus, reading-position history, project anchors, all articles, clipboard actions, the real portrait, no-JavaScript reading, 404s and WCAG A/AA rules. Reports and screenshots are written to the ignored `.qa/` folder.
 
 The existing Vercel integration deploys `main`. Branch pushes create previews. No new hosting account or deployment credentials are required.
 

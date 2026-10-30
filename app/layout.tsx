@@ -10,12 +10,13 @@ const text = localFont({
   ],
   variable: "--font-text", display: "swap",
 });
+const heading = localFont({ src: "../public/fonts/hanken.ttf", variable: "--font-heading", display: "swap" });
 const signature = localFont({ src: "../public/fonts/allura-normal-400.ttf", variable: "--font-signature", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mahekara.vercel.app"),
   title: {
-    default: "Mahek Ara — a little corner of the internet",
+    default: "Mahek Ara — AI tools & developer workflows",
     template: "%s | Mahek Ara",
   },
   description:
@@ -34,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light" className={`${text.variable} ${signature.variable}`}>
+    <html lang="en" data-theme="dark" className={`${text.variable} ${signature.variable} ${heading.variable}`}>
       <body>
         <DesktopShell>{children}</DesktopShell>
       </body>
