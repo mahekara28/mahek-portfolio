@@ -1,26 +1,22 @@
-import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
-import { EvidenceField } from "./components/evidence-field";
-import { links } from "./lib/content";
+import portrait from "../public/images/mahek-ara.jpg";
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <main id="main" className="home-main">
-      <header className="home-introduction" data-testid="home-introduction">
-        <p className="greeting">Hi, I&apos;m</p>
-        <h1>Mahek Ara.</h1>
-        <p className="home-lead">Curious about how intelligent systems work, and how people make sense of them.</p>
-        <p>AI, LLMs and developer tools keep pulling me in. I like taking an idea apart, trying it in code, and finding out where it stops behaving the way I expected.</p>
-        <p>I&apos;m just as interested in the people around the technology: good docs, useful conversations, and communities where it&apos;s easy to ask questions and share what you learn.</p>
-        <div className="intro-pages">
-          <Link href="/projects">See my projects <ArrowUpRight size={15} aria-hidden="true" /></Link>
-          <Link href="/blog">Read my notes <ArrowUpRight size={15} aria-hidden="true" /></Link>
+    <main id="main" className="md-about" tabIndex={-1}>
+      <p className="md-welcome">Hello, lovely to meet you.</p>
+      <div className="md-portrait-composition">
+        <div className="md-underpaper" aria-hidden="true" />
+        <div className="md-photo-print">
+          <Image src={portrait} alt="Mahek Ara, with a small pink flower in her hair" sizes="220px" preload />
         </div>
-        <div className="intro-social">
-          {([['GitHub', links.github], ['LinkedIn', links.linkedin], ['X', links.x]] as const).map(([name, href]) => <a key={name} href={href} target="_blank" rel="noreferrer">{name}<ArrowUpRight size={12} aria-hidden="true" /></a>)}
-        </div>
-      </header>
-      <EvidenceField />
+        <div className="md-tape" aria-hidden="true" />
+      </div>
+      <h1 className="md-signature">Mahek Ara</h1>
+      <p className="md-description">Figuring things out by building them.</p>
+      <p className="md-bio">I build AI tools, untangle workflows, and write about what I learn along the way.</p>
+      <Link className="md-about-contact" href="/contact">Say hello</Link>
     </main>
   );
 }

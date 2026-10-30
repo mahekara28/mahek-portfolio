@@ -1,63 +1,27 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
-import {
-  projects,
-  repositoryNotes,
-  routingPost,
-  sourceUrl,
-} from "../lib/content";
+import { routingPost } from "../lib/content";
+import { notes, readingTime } from "../lib/writing";
 
-export const metadata: Metadata = { title: "Writing" };
+export const metadata: Metadata = { title: "Writing", description: "Notes on context, AI inference, decision systems and verifying the things we build." };
 
 export default function BlogPage() {
   return (
-    <main id="main" className="page-main writing-main">
-      <header className="page-intro">
-        <div><p className="page-kicker">Notes worth keeping</p><h1>
-          Writing<span className="name-period">.</span>
-        </h1></div>
-        <p className="intro-deck">
-          Some things need more than a quick explanation. This is where I give them a little room.
-        </p>
-      </header>
-      <article className="writing-feature">
-        <div className="writing-meta mono">
-          <span className="writing-number" aria-label="Article 1">01</span>
-          <span>{routingPost.date}</span>
-          <span>{routingPost.readTime}</span>
-        </div>
-        <Link href={routingPost.href} className="writing-link">
-          <h2>{routingPost.title}</h2>
-          <p>{routingPost.description}</p>
-          <span className="text-link">
-            Read the note <ArrowUpRight size={17} aria-hidden="true" />
-          </span>
-        </Link>
-      </article>
-      <section
-        className="repository-writing"
-        aria-labelledby="repository-writing-title"
-      >
-        <header><h2 id="repository-writing-title">Alongside the code</h2><p>Setup guides, decisions, and notes on what the tests actually cover.</p></header>
-        <div>
-          {repositoryNotes.map((note) => {
-            const project = projects.find((item) => item.id === note.project)!;
-            return (
-              <a
-                className="repository-note"
-                key={note.title}
-                href={sourceUrl(project, note.path)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <span className="mono">{note.kind}</span>
-                <h3>{note.title}</h3>
-                <ArrowUpRight size={18} aria-hidden="true" />
-              </a>
-            );
-          })}
-        </div>
+    <main id="main" className="md-paper-view" tabIndex={-1}>
+      <p className="md-eyebrow">From the notebook</p>
+      <h1>Things worth figuring out.</h1>
+      <p className="md-intro">Notes on the systems I build, the choices behind them, and the questions that stay with me.</p>
+      <div className="md-posts">
+        {notes.map((note, index) => (
+          <Link className="md-post" href={`/blog/${note.slug}`} key={note.slug}>
+            <small aria-hidden="true">{String(index + 1).padStart(2, "0")}</small>
+            <span><strong>{note.title}</strong><span>{note.topic} · {readingTime(note)}</span></span>
+          </Link>
+        ))}
+      </div>
+      <section className="md-earlier" aria-labelledby="earlier-notes">
+        <h2 id="earlier-notes">An earlier note</h2>
+        <Link className="text-link" href={routingPost.href}>{routingPost.title}</Link>
       </section>
     </main>
   );

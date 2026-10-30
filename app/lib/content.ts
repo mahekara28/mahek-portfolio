@@ -224,33 +224,24 @@ export const projects: Project[] = [
     title: "Context Relay",
     category: "Agent tooling",
     focus: ["ai", "developer"],
-    status: "Public alpha",
+    status: "Public npm beta",
     description:
-      "Python tooling for current instructions, guarded tool calls and application-owned result checks.",
-    question: "Did the tool actually do what was asked?",
-    steps: ["Keep current instructions", "Check the tool call", "Verify the result"],
-    scope: "A public alpha; checks cover registered tools and configured fields only.",
+      "A local CLI, interface and MCP server for reviewed context handoffs between supported coding agents.",
+    question: "What should a fresh coding session inherit?",
+    steps: ["Capture selected history", "Review a cited checkpoint", "Offer a checked handoff"],
+    scope: "Public beta with four capture adapters; live model-quality evaluation remains pending.",
     approach:
-      "Current preferences live separately from chat history. Declared tool arguments are checked against them, then an application-owned verifier checks the result. The release-desk example reads the saved file bytes; a successful callback isn't enough.",
+      "Native adapters import selected history. Reviewed checkpoints keep instructions, acceptance criteria and open work with source citations. SQLite stores local state; MCP exposes packet inspection and addressed handoff acceptance. Optional Nebius drafts return to the editor for review.",
     boundary:
-      "It's a public alpha. The parser doesn't catch many phrasings, and checks only cover configured fields and registered tools. State is stored in local SQLite. The published evaluation includes no organisational pilot or hosted-provider acceptance run, so it isn't a reliability guarantee.",
-    stack: ["Python", "SQLite", "Tool contracts", "Outcome checks"],
+      "Supported formats and harness versions have limits. A handoff receipt acknowledges the packet, not completion of the task. Live model-quality evaluation remains pending. Relay does not edit native conversation databases.",
+    stack: ["TypeScript", "Node.js", "SQLite", "MCP"],
     repo: "context-relay",
     github: "https://github.com/mahekara28/context-relay",
-    revision: "139d3c44df7882750db59c1ed87a6a45da7bfb53",
+    revision: "4e52ada45c471f17a94b16b2d81ed6636495f0f7",
     evidence: [
-      {
-        label: "Action harness",
-        path: "src/context_relay/actions.py",
-      },
-      {
-        label: "File-readback example",
-        path: "examples/verified_release_desk.py",
-      },
-      {
-        label: "Validation & limits",
-        path: "docs/VALIDATION.md",
-      },
+      { label: "MCP handoff tools", path: "packages/relay/src/mcp.ts" },
+      { label: "Local store and packets", path: "packages/relay/src/store.ts" },
+      { label: "Connections and limits", path: "docs/HARNESS_CONNECTIONS.md" },
     ],
   },
   {
