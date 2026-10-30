@@ -4,22 +4,14 @@ import "./globals.css";
 import { ThemeProvider } from "./theme-provider";
 import { DesktopShell } from "./components/site-shell";
 
-const body = localFont({
+const text = localFont({
   src: [
-    { path: "../public/fonts/dmsans-normal-400.ttf", weight: "400" },
-    { path: "../public/fonts/dmsans-normal-500.ttf", weight: "500" },
-    { path: "../public/fonts/dmsans-normal-600.ttf", weight: "600" },
+    { path: "../public/fonts/nunito-latin-normal.woff2", weight: "400 800", style: "normal" },
+    { path: "../public/fonts/nunito-latin-italic.woff2", weight: "400 800", style: "italic" },
   ],
-  variable: "--font-body", display: "swap",
+  variable: "--font-text", display: "swap",
 });
 const signature = localFont({ src: "../public/fonts/allura-normal-400.ttf", variable: "--font-signature", display: "swap" });
-const editorial = localFont({
-  src: [
-    { path: "../public/fonts/playfairdisplay-normal-400.ttf", weight: "400", style: "normal" },
-    { path: "../public/fonts/playfairdisplay-italic-400.ttf", weight: "400", style: "italic" },
-  ],
-  variable: "--font-editorial", display: "swap",
-});
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://mahekara.vercel.app"),
@@ -43,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="dark" className={`${body.variable} ${signature.variable} ${editorial.variable}`} suppressHydrationWarning>
+    <html lang="en" data-theme="dark" className={`${text.variable} ${signature.variable}`} suppressHydrationWarning>
       <body>
         <ThemeProvider>
           <DesktopShell>{children}</DesktopShell>

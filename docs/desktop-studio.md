@@ -9,7 +9,7 @@ References: [PostHog](https://posthog.com/) for the desktop metaphor; [April Lei
 ## Assets
 
 - `public/images/mahek-ara.jpg`: Mahek’s X avatar, supplied for use by the owner through https://x.com/mahekara28/photo. Source image: https://pbs.twimg.com/profile_images/2096128423227981824/mWcidAQx.jpg. Downloaded October 30, 2026. The photo is unchanged; the paper and tape are CSS.
-- Allura (signature), DM Sans (interface), Playfair Display (headings): Google Fonts distributions, self-hosted under `public/fonts`. Each family’s SIL Open Font License is included. No Google requests at build or runtime.
+- Allura (signature) and Nunito (interface, headings): self-hosted under `public/fonts` with each family’s SIL Open Font License. Nunito uses the Latin variable WOFF2 distribution from Google Fonts. No font service requests are made at build or runtime. PostHog uses RoundHog, but its [brand license](https://github.com/PostHog/brand/blob/main/LICENSE) prohibits use in another project, so this site uses the open-license rounded alternative.
 - Existing Plex Mono remains for code. Its existing license is retained.
 - Lucide provides the four folder icons, theme controls and close icon under the installed package’s ISC license.
 

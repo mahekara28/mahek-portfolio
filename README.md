@@ -13,7 +13,7 @@ npm ci
 npm run dev
 ```
 
-Next.js App Router, React and TypeScript. Fonts, icons and the portrait are served locally. No analytics, external font requests or social API calls are needed to render the site.
+Next.js App Router, React and TypeScript. The interface and headings use self-hosted Nunito; Mahek’s handwritten name uses Allura. Fonts, icons and the portrait are served locally. No analytics, external font requests or social API calls are needed to render the site.
 
 ## Routes and content
 
