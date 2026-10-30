@@ -8,8 +8,8 @@ import { notes } from "../app/lib/writing.ts";
 const baseURL = process.env.BASE_URL || "http://127.0.0.1:3000";
 await mkdir(".qa", { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}) });
-const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: "dark" });
-await context.addInitScript(() => localStorage.setItem("theme", "dark"));
+const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: "light" });
+await context.addInitScript(() => localStorage.setItem("theme", "light"));
 await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: baseURL });
 const page = await context.newPage();
 page.setDefaultTimeout(15000);
@@ -24,11 +24,12 @@ async function visit(route) {
   assert.equal(response.status(), 200, route);
   await expect(page.locator("h1")).toHaveCount(1);
   await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 }
 async function layout(label) {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, label + ": horizontal overflow");
   assert.equal(await page.evaluate(() => document.documentElement.scrollHeight > innerHeight + 1), false, label + ": desktop must fit viewport");
+  for (const content of await page.locator(".md-window-content:visible").all()) assert(await content.evaluate(el => el.scrollWidth <= el.clientWidth + 1), label + ": window content fits horizontally");
   const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   report.push({ label, violations: axe.violations.map(({ id, impact, nodes }) => ({ id, impact, elements: nodes.map(node => ({ target: node.target, summary: node.failureSummary })) })) });
   console.log(label + ": " + axe.violations.length + " accessibility issues");
@@ -38,16 +39,74 @@ try {
   await expect(page.locator("h1")).toHaveText("Mahek Ara");
   for (const project of projects) assert(!(await page.locator("main").innerText()).includes(project.title), "Projects stay in their folder");
   assert(await page.getByRole("img", { name: /Mahek Ara/ }).evaluate(image => image.complete && image.naturalWidth > 0), "Portrait loads");
-  assert(await page.locator(".md-wallpaper").evaluate(image => image.complete && image.naturalWidth > 0), "Wallpaper loads locally");
-  await layout("home / desktop / beach");
+  await expect(page.locator(".md-app-icon")).toHaveCount(5);
+  await expect(folders().getByRole("link", { name: "Resume", exact: true })).toHaveAttribute("href", links.resume);
+  await expect(page.getByRole("navigation", { name: "Social profiles" }).getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", links.linkedin);
+  await layout("home / desktop / graphite");
   await page.screenshot({ path: ".qa/desktop-home.png", fullPage: true });
+  // Pointer gestures rearrange items without navigating; explicit activation still opens them.
+  async function drag(locator, dx, dy) {
+    const box = await locator.boundingBox();
+    assert(box, "Drag target exists");
+    const start = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    await page.mouse.move(start.x, start.y);
+    await page.mouse.down();
+    await page.mouse.move(start.x + dx, start.y + dy, { steps: 10 });
+    await page.mouse.up();
+  }
+  const frame = page.locator(".md-window");
+  const initialWindow = await frame.boundingBox();
+  await drag(page.getByRole("button", { name: "Move window", exact: true }), 100, 40);
+  const movedWindow = await frame.boundingBox();
+  assert(movedWindow.x > initialWindow.x + 50 && movedWindow.y > initialWindow.y + 20, "Title bar moves the window");
+  await page.getByRole("button", { name: "Maximize window", exact: true }).click();
+  await page.getByRole("button", { name: "Restore window", exact: true }).click();
+  assert.deepEqual(await frame.boundingBox(), movedWindow, "Restore remembers the dragged location");
+  for (const name of ["About me", "Writing", "Projects", "Contact", "Resume"]) {
+    const shortcut = folders().getByRole("link", { name, exact: true });
+    const before = await shortcut.boundingBox();
+    await drag(shortcut, 45, 3);
+    const after = await shortcut.boundingBox();
+    assert(after.x > before.x + 30, name + " moves independently");
+    await expect(page).toHaveURL(baseURL + "/");
+    assert.equal(context.pages().length, 1, "Dragging the resume cannot open an external tab");
+  }
+  // A single large pointer move must be captured even after it leaves a small icon.
+  const resume = folders().getByRole("link", { name: "Resume", exact: true });
+  const resumeStart = await resume.boundingBox();
+  await page.mouse.move(resumeStart.x + 30, resumeStart.y + 25);
+  await page.mouse.down();
+  await page.mouse.move(resumeStart.x + 150, resumeStart.y - 35);
+  await page.mouse.up();
+  assert((await resume.boundingBox()).x > resumeStart.x + 80, "Fast drag retains the target");
+  assert.equal(context.pages().length, 1, "Fast resume drag does not open a tab");
+  const writing = folders().getByRole("link", { name: "Writing", exact: true });
+  const movedShortcut = await writing.boundingBox();
+  await writing.focus();
+  await page.keyboard.press("Alt+ArrowRight");
+  assert((await writing.boundingBox()).x > movedShortcut.x, "Keyboard can arrange icons");
+  await page.getByRole("button", { name: "Move window", exact: true }).focus();
+  await page.keyboard.press("ArrowLeft");
+  assert((await frame.boundingBox()).x < movedWindow.x, "Keyboard can move windows");
+  await page.getByRole("button", { name: "Reset layout", exact: true }).click();
+  assert.deepEqual(await frame.boundingBox(), initialWindow, "Reset returns the default window position");
   await folders().getByRole("link", { name: "Writing", exact: true }).click();
   await expect(page).toHaveURL(baseURL + "/blog");
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await expect(page.locator(".md-post")).toHaveCount(5);
   await page.locator(".md-post").first().click();
   await expect(page).toHaveURL(baseURL + "/blog/context-relay");
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toHaveAttribute("aria-current", "page");
+  const reading = page.locator(".md-window-content");
+  await reading.evaluate(el => { el.scrollTop = 400; });
+  await page.getByRole("button", { name: "Minimize window", exact: true }).click();
+  await expect(frame).toBeHidden();
+  await expect(page.locator("#desktop-main h1")).toHaveText("Mahek Ara");
+  await expect(folders().getByRole("link", { name: "Writing", exact: true })).toBeFocused();
+  await page.getByRole("button", { name: "Open Writing", exact: true }).click();
+  await expect(frame).toBeVisible();
+  await expect.poll(() => reading.evaluate(el => el.scrollTop)).toBe(400);
+  await reading.evaluate(el => { el.scrollTop = 0; });
   await page.getByRole("button", { name: "Copy article link" }).click();
   assert.equal(await page.evaluate(() => navigator.clipboard.readText()), baseURL + "/blog/context-relay");
   await page.goBack(); await expect(page).toHaveURL(baseURL + "/blog");
@@ -56,7 +115,8 @@ try {
   await expect(page).toHaveURL(baseURL + "/desktop");
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toBeFocused();
   await expect(page.locator(".md-window")).toHaveCount(0);
-  await layout("closed desktop / beach");
+  await expect(page.locator("h1")).toHaveText("Mahek Ara");
+  await layout("closed desktop / graphite");
   await page.keyboard.press("Enter"); await expect(page).toHaveURL(baseURL + "/blog");
   await page.getByRole("link", { name: "Close window", exact: true }).click();
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toBeFocused();
@@ -89,7 +149,7 @@ try {
     await page.setViewportSize({ width, height: width === 320 ? 760 : 900 });
     for (const route of routes) {
       await visit(route);
-      await layout(route + " / " + width + " / beach");
+      await layout(route + " / " + width + " / graphite");
       if (width === 320 && route === "/") await page.screenshot({ path: ".qa/mobile-home.png", fullPage: true });
     }
   }
@@ -156,6 +216,26 @@ try {
     await page.keyboard.press("Enter");
     await expect(page.locator(".md-window")).toHaveAttribute("data-maximized", "false");
   }
+  // Real touch events cover pointer capture and cancellation, not just synthetic callbacks.
+  const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
+  const touchPage = await touchContext.newPage();
+  await touchPage.goto(baseURL + "/", { waitUntil: "networkidle" });
+  const touchIcon = touchPage.locator('[data-open="resume"]');
+  const touchStart = await touchIcon.boundingBox();
+  const touchClient = await touchContext.newCDPSession(touchPage);
+  const finger = { x: touchStart.x + touchStart.width / 2, y: touchStart.y + 20 };
+  await touchClient.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [finger] });
+  await touchClient.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: finger.x - 80, y: finger.y + 10 }] });
+  await touchClient.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  await expect.poll(async () => (await touchIcon.boundingBox()).x).toBeLessThan(touchStart.x - 50);
+  assert.equal(touchContext.pages().length, 1, "Touch drag does not open resume");
+  await expect(touchPage).toHaveURL(baseURL + "/");
+  // A narrow viewport gets an accessible default arrangement rather than stranded controls.
+  await touchPage.setViewportSize({ width: 320, height: 760 });
+  await expect.poll(() => touchIcon.evaluate(el => el.style.transform)).toBe("");
+  const touchBounds = await touchIcon.boundingBox();
+  assert(touchBounds.x >= 0 && touchBounds.x + touchBounds.width <= 320);
+  await touchContext.close();
   await page.setViewportSize({ width: 320, height: 760 });
   await page.emulateMedia({ reducedMotion: "reduce" });
   await visit("/");
@@ -180,5 +260,5 @@ try {
   assert.deepEqual(remoteRequests, [], "No third-party services needed to render");
   await writeFile(".qa/interface-report.json", JSON.stringify({ report, errors, remoteRequests }, null, 2));
   assert.equal(report.flatMap(item => item.violations).length, 0, "Accessibility issues: see .qa/interface-report.json");
-  console.log("Desktop navigation, history, article links, portrait, responsive layout, fixed light appearance, keyboard, no-JS reading and accessibility checks passed.");
+  console.log("Desktop navigation, history, article links, portrait, responsive layout, fixed dark appearance, keyboard, no-JS reading and accessibility checks passed.");
 } finally { await writeFile(".qa/interface-report.json", JSON.stringify({ report, errors, remoteRequests }, null, 2)); await browser.close(); }
