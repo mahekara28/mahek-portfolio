@@ -93,7 +93,7 @@ try {
   await folders().getByRole("link", { name: "Writing", exact: true }).click();
   await expect(page).toHaveURL(baseURL + "/blog");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await expect(page.locator(".md-post")).toHaveCount(5);
+  await expect(page.locator(".md-post")).toHaveCount(1);
   await page.locator(".md-post").first().click();
   await expect(page).toHaveURL(baseURL + "/blog/context-relay");
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toHaveAttribute("aria-current", "page");
@@ -130,18 +130,37 @@ try {
   await visit("/projects?focus=ai#llm-router");
   await expect(page.locator(".md-archive")).toHaveAttribute("open", "");
   await expect(page.locator("#llm-router")).toBeInViewport();
-  await visit("/blog/llm-routing");
+  await visit("/blog/context-relay");
   await page.getByRole("button", { name: "Copy code", exact: true }).first().click();
-  assert((await page.evaluate(() => navigator.clipboard.readText())).includes('complexity == "low"'));
-  await page.locator(".essay-toc a[href='#routing-cost']").click();
-  await expect(page.locator("#routing-cost")).toBeInViewport();
+  assert((await page.evaluate(() => navigator.clipboard.readText())).includes('retention-days'));
+  const contents = page.getByRole("navigation", { name: "On this page" });
+  await contents.locator('a[href="#packet"]').click();
+  await expect(page.locator("#packet h2")).toBeInViewport();
+  await expect(contents.locator('a[href="#packet"]')).toHaveAttribute("aria-current", "location");
+  await page.locator("#handoff").scrollIntoViewIfNeeded();
+  await expect(contents.locator('a[href="#handoff"]')).toHaveAttribute("aria-current", "location");
+  assert.equal(await page.evaluate(() => scrollY), 0, "Contents navigation scrolls the window, not the desktop");
+  const railTop = (await page.locator(".md-article-toc").boundingBox()).y;
+  await contents.locator('a[href="#model-proposals"]').click();
+  await expect(contents.locator('a[href="#model-proposals"]')).toHaveAttribute("aria-current", "location");
+  assert(Math.abs((await page.locator(".md-article-toc").boundingBox()).y - railTop) < 2, "Contents rail stays fixed while sections scroll");
+  const demo = page.getByRole("button", { name: "Play recorded demo", exact: true });
+  await expect(page.locator("#relay-recording")).toHaveAttribute("src", /threads\.png$/);
+  await demo.click();
+  await expect(page.locator("#relay-recording")).toHaveAttribute("src", /workflow\.gif$/);
+  await page.getByRole("button", { name: "Stop demo", exact: true }).click();
+  await expect(page.locator("#relay-recording")).toHaveAttribute("src", /threads\.png$/);
   for (const note of notes) {
     await visit("/blog/" + note.slug);
     await expect(page.locator("h1")).toHaveText(note.title);
-    assert((await page.locator("article").innerText()).split(/\s+/).length > 550, "Technical article includes enough explanation to support its diagram");
-    await expect(page.locator(".md-architecture svg[role=img]")).toHaveCount(1);
-    assert((await page.locator(".md-architecture svg title").textContent()).length > 20, "Diagram has a descriptive title");
-    assert((await page.locator(".md-architecture svg desc").textContent()).length > 80, "Diagram has a text equivalent");
+    assert((await page.locator("article").innerText()).split(/\s+/).length > 1200, "Deep dive includes the complete implementation path");
+    await expect(page.locator(".md-architecture svg[role=img]")).toHaveCount(2);
+    for (const svg of await page.locator(".md-architecture svg").all()) {
+      assert((await svg.locator("title").textContent()).length > 20, "Diagram has a descriptive title");
+      assert((await svg.locator("desc").textContent()).length > 80, "Diagram has a text equivalent");
+    }
+    await expect(page.locator(".md-readme-architecture img")).toBeVisible();
+    await expect(page.locator(".md-article-meta")).toContainText(/[6-8] min read/);
     await expect(page.locator(".md-sources a")).toHaveCount(note.sources.length);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mahekara.vercel.app/blog/" + note.slug);
   }
@@ -149,7 +168,14 @@ try {
   await expect(page.locator(".md-email")).toHaveAttribute("href", links.email);
   await expect(page.locator(".md-contact-links a")).toHaveCount(3);
   await visit("/about"); await expect(page).toHaveURL(baseURL + "/");
-  const routes = ["/", "/blog", "/projects", "/contact", "/blog/context-relay", "/blog/llm-routing"];
+  await visit("/blog/working-context"); await expect(page).toHaveURL(baseURL + "/blog/context-relay");
+  for (const retired of ["decision-assumptions", "inference-latency", "verify-the-result", "llm-routing"]) {
+    await visit("/blog/" + retired); await expect(page).toHaveURL(baseURL + "/blog");
+  }
+  await visit("/blog/context-relay#packet");
+  await expect(page.locator("#packet h2")).toBeInViewport();
+  await expect(contents.locator('a[href="#packet"]')).toHaveAttribute("aria-current", "location");
+  const routes = ["/", "/blog", "/projects", "/contact", "/blog/context-relay"];
   for (const width of [1440, 320]) {
     await page.setViewportSize({ width, height: width === 320 ? 760 : 900 });
     for (const route of routes) {
@@ -161,16 +187,17 @@ try {
   await page.setViewportSize({ width: 320, height: 760 });
   for (const note of notes) {
     await visit("/blog/" + note.slug);
-    const diagram = page.locator(".md-architecture-scroll");
-    assert(await diagram.evaluate(el => el.scrollWidth > el.clientWidth), note.slug + ": diagram can be inspected horizontally on mobile");
-    await diagram.focus();
-    await page.keyboard.press("ArrowRight");
-    await expect.poll(() => diagram.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
-    await layout(note.slug + " diagram / mobile");
+    for (const diagram of await page.locator(".md-architecture-scroll").all()) {
+      assert(await diagram.evaluate(el => el.scrollWidth > el.clientWidth), note.slug + ": diagram can be inspected horizontally on mobile");
+      await diagram.focus();
+      await page.keyboard.press("ArrowRight");
+      await expect.poll(() => diagram.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
+    }
+    await layout(note.slug + " diagrams / mobile");
   }
   for (const viewport of [{ width: 1440, height: 900 }, { width: 320, height: 760 }, { width: 844, height: 390 }]) {
     await page.setViewportSize(viewport);
-    await visit("/blog/llm-routing");
+    await visit("/blog/context-relay");
     const content = page.locator(".md-window-content");
     const frame = page.locator(".md-window");
     const sidebarBefore = await folders().boundingBox();
@@ -211,7 +238,7 @@ try {
     await expect(frame).toHaveAttribute("data-maximized", "false");
     assert.deepEqual(await frame.boundingBox(), frameBefore, "Restore returns the floating window size");
     await expect(page.getByRole("button", { name: "Maximize window", exact: true })).toBeFocused();
-    await expect(page).toHaveURL(baseURL + "/blog/llm-routing");
+    await expect(page).toHaveURL(baseURL + "/blog/context-relay");
     await content.evaluate(el => { el.scrollTop = 500; });
     await expect.poll(() => content.evaluate(el => el.scrollTop)).toBe(500);
     const readingPosition = await content.evaluate(el => el.scrollTop);
@@ -219,7 +246,7 @@ try {
     await expect(page.locator(".md-welcome")).toBeInViewport();
     await expect.poll(() => page.locator(".md-window-content").evaluate(el => el.scrollTop)).toBe(0);
     await page.goBack();
-    await expect(page).toHaveURL(baseURL + "/blog/llm-routing");
+    await expect(page).toHaveURL(baseURL + "/blog/context-relay");
     await expect.poll(() => content.evaluate(el => el.scrollTop)).toBe(readingPosition);
     await page.goForward();
     await expect(page).toHaveURL(baseURL + "/");

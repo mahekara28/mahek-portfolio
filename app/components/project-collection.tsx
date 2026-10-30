@@ -195,9 +195,9 @@ export function ProjectCollection() {
                       </>
                     )}
                   </p>
-                  {project.id === "llm-router" && (
-                    <Link className="text-link" href="/blog/llm-routing">
-                      My note on routing <ArrowRight size={16} />
+                  {project.id === "context-relay" && (
+                    <Link className="text-link" href="/blog/context-relay">
+                      Inside Context Relay <ArrowRight size={16} />
                     </Link>
                   )}
                 </div>

@@ -390,12 +390,3 @@ export const repositoryNotes = [
     path: "docs/VALIDATION.md",
   },
 ];
-
-export const routingPost = {
-  title: "Why I built an LLM router.",
-  href: "/blog/llm-routing",
-  description:
-    "Two local models, a few routing rules, and the questions that are still open.",
-  date: "August 2026",
-  readTime: "6 min read",
-};

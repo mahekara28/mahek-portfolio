@@ -54,32 +54,3 @@ export function CopyButton({
     </span>
   );
 }
-
-export function ReadingProgress() {
-  const bar = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    let frame = 0;
-    function update() {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        const article = document.getElementById("essay-body");
-        if (!article || !bar.current) return;
-        const bounds = article.getBoundingClientRect();
-        const progress = Math.min(
-          1,
-          Math.max(0, (window.innerHeight - bounds.top) / bounds.height),
-        );
-        bar.current.style.transform = `scaleX(${progress})`;
-      });
-    }
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-  return <div ref={bar} className="reading-progress" aria-hidden="true" />;
-}

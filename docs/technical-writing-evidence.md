@@ -1,13 +1,16 @@
-# Technical writing evidence notes
+# Context Relay article evidence
 
-Audience: AI engineering and studio operations readers evaluating Mahek's ability to explain a system she built or a measurement she would run. Each article moves from an execution path to a design boundary and a falsifiable check. Diagrams describe data flow or decision order, not decorative process steps.
+Audience: a technical reader evaluating the implementation of agent context handoffs. The article should explain the problem, follow state through capture/review/export/acceptance, and show exactly which claims the current software validates. Scope: npm beta 0.3.0-beta.1 at Context Relay revision `4e52ada45c471f17a94b16b2d81ed6636495f0f7`.
 
-| Article | Checkable claim represented in the diagram | Primary evidence | Boundary |
-| --- | --- | --- | --- |
-| Context Relay | Native capture and MCP are separate integration paths; checkpoint and packet mediate the handoff. | Context Relay `docs/HARNESS_CONNECTIONS.md`, `packages/relay/src/store.ts`, `packages/relay/src/mcp.ts` at `4e52ada` | Acknowledgement is not task completion; uncaptured native turns are not detected by stored-revision checks. |
-| Working context | A packet has required task fields, cited source references, and optional evidence constrained by a UTF-8 byte budget. | Context Relay `packages/relay/src/store.ts` and `packages/relay/src/model.ts` at `4e52ada` | Byte size is not model token count; a valid citation does not prove its interpretation. |
-| Staffing | Eligibility, greedy assignment and feasibility gates precede plan ranking. | Build, Buy or Borrow `engine.js`, `tests/engine.test.cjs` at `bd642ab` | The heuristic has no global optimality claim; portfolio input data are fictional. |
-| Inference | Transport, queue, prefill and decode can contribute to a client-visible response; KV caching reuses past attention state. | Hugging Face cache explanation and NVIDIA GenAI-Perf metric definitions | The timeline is a conceptual execution path, not measured latency for Mahek's projects. |
-| Verification | Receipt, artifact readback and task checks establish different levels of evidence. Relay validates acceptance at the handoff boundary. | Context Relay `packages/relay/src/store.ts` and `packages/relay/src/mcp.ts` at `4e52ada` | The CSV verifier is illustrative; no production audit record is claimed. |
+| Claim | Evidence at the pinned revision | Visual implication / boundary |
+| --- | --- | --- |
+| Native capture and MCP are separate integration paths. | README, `docs/HARNESS_CONNECTIONS.md`, MCP architecture specification | Reuse the README architecture with its original harness icons and local service boundary. MCP does not expose full host history. |
+| Checkpoints retain source references and explicit instruction resolutions. | `packages/relay/src/model.ts`, `store.ts` | Projection diagram shows selection and a path back to evidence. Citation validity does not establish interpretation quality. |
+| Required packet fields must fit; optional evidence can be skipped under the byte budget. | `store.ts`, `packet()` | Describe exact ordered admission behavior and omission count; bytes are not tokens. |
+| Offer and accept perform freshness checks. | `store.ts`, `offer()`, `accept()`, `freshness()` | Handoff diagram separates checks, offered state and acknowledgement. Uncaptured native turns and unselected files remain outside coverage. |
+| MCP is project/harness scoped. | `packages/relay/src/mcp.ts` | Receiver inspects and acknowledges; acceptance is not completed coding work. |
+| Optional model drafts return to review. | `docs/WORKSPACE.md`, Nebius implementation | Describe explicit consent and schema/citation checks; no semantic correctness claim. |
+| The README recording is an actual UI with synthetic data. | `docs/assets/workspace/README.md`, `scripts/npm/render-demo.mjs` | Playback is opt-in and stoppable. Caption states that no model call or task execution occurs. |
+| Continuation quality remains unmeasured. | `docs/releases/NPM_VERIFICATION.md` | Proposed transcript/summary/packet comparison is clearly an evaluation plan, not a benchmark result. |
 
-Evidence and evaluations are deliberately separate. The posts describe proposed experiments as proposals, not benchmark results, hiring savings, or verified cross-harness task success. If the linked implementations change, review the claims and diagrams against a new pinned revision before updating the posts.
+The earlier short articles are retired from the public writing list. Their URLs redirect to the expanded Context Relay article where content overlaps, or temporarily to Writing while the second article is chosen. The historical text remains in Git.
