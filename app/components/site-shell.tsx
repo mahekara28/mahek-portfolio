@@ -1,24 +1,25 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useSelectedLayoutSegment, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ContactRound, Copy, FolderClosed, Mail, Moon, NotebookPen, Square, Sun, X } from "lucide-react";
+import { Copy, Square, X } from "lucide-react";
 import { links } from "../lib/content";
-import { useTheme } from "../theme-provider";
 import { WindowContent } from "./window-content";
+import { DesktopIcon, type DesktopIconKind } from "./desktop-icon";
+import wallpaper from "../../public/images/beach-wallpaper.webp";
 
-const folders = [
-  { href: "/", label: "About me", kind: "about", Icon: ContactRound },
-  { href: "/blog", label: "Writing", kind: "writing", Icon: NotebookPen },
-  { href: "/projects", label: "Projects", kind: "projects", Icon: FolderClosed },
-  { href: "/contact", label: "Contact", kind: "contact", Icon: Mail },
+const folders: { href: string; label: string; kind: DesktopIconKind }[] = [
+  { href: "/", label: "About me", kind: "about" },
+  { href: "/blog", label: "Writing", kind: "writing" },
+  { href: "/projects", label: "Projects", kind: "projects" },
+  { href: "/contact", label: "Contact", kind: "contact" },
 ];
 
 export function DesktopShell({ children }: { children: ReactNode }) {
   const segment = useSelectedLayoutSegment();
   const router = useRouter();
-  const { isDark, toggleTheme } = useTheme();
   const returnTo = useRef<string | null>(null);
   const navigation = useRef<HTMLElement>(null);
   const maximizeControl = useRef<HTMLButtonElement>(null);
@@ -52,6 +53,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="desktop" data-maximized={maximized}>
+      <Image className="md-wallpaper" src={wallpaper} alt="" fill sizes="(max-aspect-ratio: 3/2) 150vh, 100vw" preload placeholder="blur" />
       <a className="skip-link" href="#main">Skip to content</a>
       <header className="md-menubar" inert={maximized}>
         <Link className="md-desktop-name" href="/" aria-label="Mahek’s introduction">
@@ -63,16 +65,13 @@ export function DesktopShell({ children }: { children: ReactNode }) {
             <a href={links.github} target="_blank" rel="noreferrer">GitHub</a>
             <a href={links.x} target="_blank" rel="noreferrer">X</a>
           </nav>
-          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={isDark ? "Use stone theme" : "Use garden theme"} title={isDark ? "Use stone theme" : "Use garden theme"}>
-            {isDark ? <Sun size={17} aria-hidden="true" /> : <Moon size={17} aria-hidden="true" />}
-          </button>
         </div>
       </header>
       <div className="md-workspace">
         <nav className="md-shortcuts" aria-label="Desktop folders" ref={navigation} inert={maximized}>
-          {folders.map(({ href, label, kind, Icon }) => (
+          {folders.map(({ href, label, kind }) => (
             <Link key={href} href={href} className="md-shortcut" data-open={kind} aria-current={!closed && current?.href === href ? "page" : undefined}>
-              <Icon aria-hidden="true" /><span>{label}</span>
+              <DesktopIcon kind={kind} /><span>{label}</span>
             </Link>
           ))}
         </nav>

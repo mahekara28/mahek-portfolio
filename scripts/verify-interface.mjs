@@ -8,8 +8,8 @@ import { notes } from "../app/lib/writing.ts";
 const baseURL = process.env.BASE_URL || "http://127.0.0.1:3000";
 await mkdir(".qa", { recursive: true });
 const browser = await chromium.launch({ headless: true, ...(process.env.PLAYWRIGHT_EXECUTABLE_PATH ? { executablePath: process.env.PLAYWRIGHT_EXECUTABLE_PATH } : {}) });
-const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: "light" });
-await context.addInitScript(() => localStorage.setItem("theme", "light"));
+const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, colorScheme: "dark" });
+await context.addInitScript(() => localStorage.setItem("theme", "dark"));
 await context.grantPermissions(["clipboard-read", "clipboard-write"], { origin: baseURL });
 const page = await context.newPage();
 page.setDefaultTimeout(15000);
@@ -24,7 +24,7 @@ async function visit(route) {
   assert.equal(response.status(), 200, route);
   await expect(page.locator("h1")).toHaveCount(1);
   await page.evaluate(() => document.fonts.ready);
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
 }
 async function layout(label) {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, label + ": horizontal overflow");
@@ -38,11 +38,9 @@ try {
   await expect(page.locator("h1")).toHaveText("Mahek Ara");
   for (const project of projects) assert(!(await page.locator("main").innerText()).includes(project.title), "Projects stay in their folder");
   assert(await page.getByRole("img", { name: /Mahek Ara/ }).evaluate(image => image.complete && image.naturalWidth > 0), "Portrait loads");
-  await layout("home / desktop / garden");
+  assert(await page.locator(".md-wallpaper").evaluate(image => image.complete && image.naturalWidth > 0), "Wallpaper loads locally");
+  await layout("home / desktop / beach");
   await page.screenshot({ path: ".qa/desktop-home.png", fullPage: true });
-  await page.getByRole("button", { name: "Use stone theme" }).click();
-  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
-  await layout("home / desktop / stone");
   await folders().getByRole("link", { name: "Writing", exact: true }).click();
   await expect(page).toHaveURL(baseURL + "/blog");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
@@ -58,7 +56,7 @@ try {
   await expect(page).toHaveURL(baseURL + "/desktop");
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toBeFocused();
   await expect(page.locator(".md-window")).toHaveCount(0);
-  await layout("closed desktop / stone");
+  await layout("closed desktop / beach");
   await page.keyboard.press("Enter"); await expect(page).toHaveURL(baseURL + "/blog");
   await page.getByRole("link", { name: "Close window", exact: true }).click();
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toBeFocused();
@@ -91,9 +89,7 @@ try {
     await page.setViewportSize({ width, height: width === 320 ? 760 : 900 });
     for (const route of routes) {
       await visit(route);
-      await layout(route + " / " + width + " / garden");
-      await page.getByRole("button", { name: "Use stone theme" }).click();
-      await layout(route + " / " + width + " / stone");
+      await layout(route + " / " + width + " / beach");
       if (width === 320 && route === "/") await page.screenshot({ path: ".qa/mobile-home.png", fullPage: true });
     }
   }
@@ -184,5 +180,5 @@ try {
   assert.deepEqual(remoteRequests, [], "No third-party services needed to render");
   await writeFile(".qa/interface-report.json", JSON.stringify({ report, errors, remoteRequests }, null, 2));
   assert.equal(report.flatMap(item => item.violations).length, 0, "Accessibility issues: see .qa/interface-report.json");
-  console.log("Desktop navigation, history, article links, portrait, responsive layout, themes, keyboard, no-JS reading and accessibility checks passed.");
+  console.log("Desktop navigation, history, article links, portrait, responsive layout, fixed light appearance, keyboard, no-JS reading and accessibility checks passed.");
 } finally { await writeFile(".qa/interface-report.json", JSON.stringify({ report, errors, remoteRequests }, null, 2)); await browser.close(); }
