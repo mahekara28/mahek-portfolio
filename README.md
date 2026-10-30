@@ -2,7 +2,7 @@
 
 [Visit the portfolio](https://mahekara.vercel.app/)
 
-A graphite desktop for a builder, with movable app icons, draggable windows, a real portrait and a handwritten name. About, Writing, Projects and Contact open ordinary pages; Resume opens Mahek’s existing PDF on Google Drive. The introduction has no project feed.
+A light sage desktop with movable app icons, draggable cream windows, a layered photo print and a handwritten name. About, Writing, Projects and Contact open ordinary pages; Resume opens Mahek’s existing PDF on Google Drive. The introduction has no project feed.
 
 ## Run locally
 
@@ -19,7 +19,7 @@ Next.js App Router, React and TypeScript. The interface uses self-hosted Nunito 
 
 | Route | Contents |
 | --- | --- |
-| `/` | Builder introduction and portrait |
+| `/` | Layered portrait, handwritten name and builder introduction |
 | `/blog` | Five short technical notes and the original routing essay |
 | `/blog/[slug]` | Complete, statically generated articles with source links |
 | `/blog/llm-routing` | Original article, diagrams, contents links and code copying |
@@ -32,7 +32,7 @@ The shared layout is `app/components/site-shell.tsx`. Red closes the window, yel
 
 Drag a title bar or any of the five app icons to arrange the desktop. Movement is bounded to the workspace. With the title focused, arrow keys move the window; Alt + arrow keys move focused app icons. Shift makes smaller moves. Reset layout restores the defaults. Positions survive page navigation; resizing the viewport resets them to keep all controls reachable. Only the window’s content scrolls. New pages start at the top, while Back/Forward restores reading positions. Ordinary links and reading work without JavaScript.
 
-The site uses a single warm charcoal appearance with soft ivory actions, muted lavender details and a fine static texture inspired by ZenML’s editorial treatment. Icons, fonts and the portrait are local assets. Compact GitHub, LinkedIn and X links live in the menu bar. Mobile has a five-app row and internal window scrolling. Reduced motion disables transitions. Projects stay outside the home introduction; older project anchors still reveal the relevant archive entry.
+The site uses a single light sage-and-cream appearance with green accents and a fine static texture. The centered portrait uses a tilted photo print, lined paper and translucent tape, following the owner’s screenshot. Icons, fonts and the portrait are local assets. Compact GitHub, LinkedIn and X links live in the menu bar. Mobile has a five-app row and internal window scrolling. Reduced motion disables transitions. Projects stay outside the home introduction; older project anchors still reveal the relevant archive entry.
 
 - `app/lib/writing.ts`: five articles, source references and reading-time calculation.
 - `app/lib/content.ts`: project descriptions, scope, pinned evidence and contact links.
@@ -52,7 +52,7 @@ npx playwright install chromium
 npm run verify
 ```
 
-Set `BASE_URL` if the server uses another port. `PLAYWRIGHT_EXECUTABLE_PATH` can select an installed browser. Browser checks cover desktop, 320px and short landscape layouts, the dark appearance with a light system preference, dragging and keyboard placement, drag-versus-click behavior, layout reset, minimize/restore, internal scrolling, maximize/restore, keyboard navigation, close/reopen focus, reading-position history, project anchors, all articles, clipboard actions, the real portrait, no-JavaScript reading, 404s and WCAG A/AA rules. Reports and screenshots are written to the ignored `.qa/` folder.
+Set `BASE_URL` if the server uses another port. `PLAYWRIGHT_EXECUTABLE_PATH` can select an installed browser. Browser checks cover desktop, 320px and short landscape layouts, the light appearance with a dark system preference, dragging and keyboard placement, drag-versus-click behavior, layout reset, minimize/restore, internal scrolling, maximize/restore, keyboard navigation, close/reopen focus, reading-position history, project anchors, all articles, clipboard actions, the real portrait, no-JavaScript reading, 404s and WCAG A/AA rules. Reports and screenshots are written to the ignored `.qa/` folder.
 
 The existing Vercel integration deploys `main`. Branch pushes create previews. No new hosting account or deployment credentials are required.
 
