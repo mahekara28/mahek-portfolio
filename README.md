@@ -23,7 +23,7 @@ Next.js App Router, React and TypeScript. The interface uses self-hosted Nunito 
 | `/blog` | Five short technical notes and the original routing essay |
 | `/blog/[slug]` | Complete, statically generated articles with source links |
 | `/blog/llm-routing` | Original article, diagrams, contents links and code copying |
-| `/projects` | Context Relay and Build, Buy or Borrow; earlier experiments in a disclosure |
+| `/projects` | Context Relay, Build, Buy or Borrow and Aura for LinkedIn; earlier experiments in a disclosure |
 | `/contact` | Email, GitHub, X and LinkedIn |
 | `/desktop` | Closed-window view; folders remain available |
 | `/about` | Permanent redirect to the introduction |
@@ -58,6 +58,6 @@ The existing Vercel integration deploys `main`. Branch pushes create previews. N
 
 ## Source review
 
-Project claims refer to public code and include implementation limits. Context Relay is a public npm beta; live model-quality evaluation is pending. Build, Buy or Borrow uses fictional scenarios. The inference note describes a measurement method, not benchmark results.
+Project claims refer to public code and include implementation limits. Context Relay is a public npm beta; live model-quality evaluation is pending. Build, Buy or Borrow uses fictional scenarios. Aura for LinkedIn is a locally loaded Chrome extension; its four-theme gallery is copied from the source repository's `docs/images/theme-collection.jpg`, with image provenance in its `ASSETS.md`. Its current version still needs installed LinkedIn verification. The inference note describes a measurement method, not benchmark results.
 
 Refresh optional repository metadata with `npm run content:refresh` (or `-- --force`). This is a local refresh-and-deploy workflow. It does not change reviewed descriptions or pinned evidence automatically. See the original [content audit](docs/content-audit.md) for the earlier repository review.

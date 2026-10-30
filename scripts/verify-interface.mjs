@@ -121,8 +121,10 @@ try {
   await page.getByRole("link", { name: "Close window", exact: true }).click();
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toBeFocused();
   await folders().getByRole("link", { name: "Projects", exact: true }).click();
-  await expect(page.locator(".md-project")).toHaveCount(2);
+  await expect(page.locator(".md-project")).toHaveCount(3);
   await expect(page.locator("#context-relay")).toContainText("Public npm beta");
+  await expect(page.locator("#aura-linkedin")).toContainText("Unpacked Chrome extension");
+  await expect(page.locator("#aura-linkedin img")).toBeVisible();
   await page.locator("#context-relay summary").click();
   await expect(page.locator("#context-relay")).toContainText(/live model-quality evaluation remains pending/i);
   await visit("/projects?focus=ai#llm-router");

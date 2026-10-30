@@ -246,6 +246,32 @@ export const projects: Project[] = [
     ],
   },
   {
+    id: "aura-linkedin",
+    title: "Aura for LinkedIn",
+    category: "Browser extension",
+    focus: ["developer"],
+    status: "Unpacked Chrome extension",
+    description:
+      "Four photographic LinkedIn themes with saved preferences, restrained motion and a local preview studio.",
+    question: "Can a familiar workspace feel more personal without making it harder to use?",
+    steps: ["Choose a theme", "Save appearance settings", "Preview the result locally"],
+    scope: "A Manifest V3 extension loaded locally in Chrome; it is not published in the Chrome Web Store.",
+    approach:
+      "Packaged CSS and images restyle LinkedIn while keeping controls readable. The popup stores theme and motion preferences locally; a separate studio previews sample feeds and profiles without posting to LinkedIn.",
+    boundary:
+      "The repository reports local source and browser checks, but version 8.3 has not been independently retested in an installed LinkedIn session. LinkedIn markup can change, and the extension is an independent customization project.",
+    stack: ["JavaScript", "CSS", "Chrome Manifest V3", "Local storage"],
+    repo: "aura-linkedin",
+    github: "https://github.com/mahekara28/aura-linkedin",
+    revision: "0df430a24d1baeec08e091061afce3bc601bae5f",
+    evidence: [
+      { label: "Theme surfaces", path: "content/themes.css" },
+      { label: "Preferences", path: "shared/settings.js" },
+      { label: "Preview studio", path: "studio.js" },
+      { label: "Verification & limits", path: "AUDIT.md" },
+    ],
+  },
+  {
     id: "knowwhen-ai",
     title: "KnowWhen AI",
     category: "Applied AI",
