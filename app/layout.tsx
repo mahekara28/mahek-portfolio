@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="dark" className={`${text.variable} ${signature.variable} ${heading.variable}`}>
+    <html lang="en" data-theme="light" className={`${text.variable} ${signature.variable} ${heading.variable}`}>
       <body>
         <DesktopShell>{children}</DesktopShell>
       </body>
