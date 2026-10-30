@@ -6,13 +6,12 @@ import { ProjectArchive } from "../components/project-archive";
 
 export const metadata: Metadata = {
   title: "Selected work",
-  description: "Context Relay, Build, Buy or Borrow and Aura for LinkedIn: practical tools and interfaces with inspectable decisions and source code.",
+  description: "Context Relay, Aura for LinkedIn and Build, Buy or Borrow: practical tools and interfaces with inspectable decisions and source code.",
 };
 
 const selected = [
   {
     id: "context-relay",
-    cover: "Context\nRelay",
     summary: "Carry the useful context forward. A local CLI, interface and MCP integration for reviewing and handing off context between supported coding agents.",
     featureHref: "https://mahekara28.github.io/context-relay/",
     featureLabel: "Project website",
@@ -20,22 +19,20 @@ const selected = [
     notesLabel: "Build notes",
   },
   {
-    id: "build-buy-borrow",
-    cover: "Build, Buy\nor Borrow",
-    summary: "Make the assumptions visible. Compare staffing approaches against time, budget and capacity, using fictional scenarios.",
-    featureHref: "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912/PORTFOLIO.md",
-    featureLabel: "Case study",
-    notesHref: "/blog/decision-assumptions",
-    notesLabel: "Build notes",
-  },
-  {
     id: "aura-linkedin",
-    cover: "",
     summary: "Make a familiar workspace feel personal. Four photographic LinkedIn themes, saved appearance controls and a studio for trying them on sample profiles.",
     featureHref: "/projects/aura-theme-collection.jpg",
     featureLabel: "View four themes",
     notesHref: "https://github.com/mahekara28/aura-linkedin/blob/0df430a24d1baeec08e091061afce3bc601bae5f/README.md",
     notesLabel: "Setup & controls",
+  },
+  {
+    id: "build-buy-borrow",
+    summary: "Make the assumptions visible. Compare staffing approaches against time, budget and capacity, using fictional scenarios.",
+    featureHref: "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912/PORTFOLIO.md",
+    featureLabel: "Case study",
+    notesHref: "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912/DESIGN-NOTES.md",
+    notesLabel: "Design notes",
   },
 ] as const;
 
@@ -48,16 +45,25 @@ export default function ProjectsPage() {
       <div className="md-projects">
         {selected.map((item) => {
           const project = projects.find((entry) => entry.id === item.id)!;
-          const aura = item.id === "aura-linkedin";
           return (
-            <article className={`md-project${aura ? " md-project--aura" : ""}`} id={project.id} key={project.id}>
-              {aura ? (
-                <a className="md-project-cover md-project-cover--image" href={item.featureHref} target="_blank" rel="noreferrer" aria-label="Open full-size previews of all four Aura themes">
+            <article className={`md-project${item.id === "context-relay" ? " md-project--featured" : ""}`} id={project.id} key={project.id}>
+              <a className="md-project-cover" href={item.featureHref} target="_blank" rel="noreferrer"
+                aria-label={item.id === "aura-linkedin" ? "Open full-size previews of all four Aura themes" : `Open ${project.title} ${item.featureLabel.toLowerCase()}`}>
+                {item.id === "context-relay" ? <>
+                  <picture className="md-project-art--dark">
+                    <source media="(max-width: 700px)" srcSet="/projects/context-relay-dark-mobile.svg" />
+                    <img src="/projects/context-relay-dark.svg" alt="Context Relay banner: keep the work, change the thread; supported coding agents and an npx command." width={1200} height={480} />
+                  </picture>
+                  <picture className="md-project-art--light">
+                    <source media="(max-width: 700px)" srcSet="/projects/context-relay-light-mobile.svg" />
+                    <img src="/projects/context-relay-light.svg" alt="Context Relay banner: keep the work, change the thread; supported coding agents and an npx command." width={1200} height={480} />
+                  </picture>
+                </> : item.id === "aura-linkedin" ? (
                   <Image src="/projects/aura-theme-collection.jpg" alt="Four sample LinkedIn profiles with pink, cosmic, motorsport and metallic themes." width={1400} height={1040} sizes="(max-width: 700px) 100vw, 420px" />
-                </a>
-              ) : (
-                <div className="md-project-cover" aria-hidden="true"><span>{item.cover}</span></div>
-              )}
+                ) : (
+                  <Image src="/projects/build-buy-borrow-cover.webp" alt="Build, Buy or Borrow scenario studio, showing a real sample staffing comparison across build, buy, borrow and blend." width={1440} height={900} sizes="(max-width: 700px) 100vw, 420px" />
+                )}
+              </a>
               <div className="md-project-body">
                 <p className="md-status">{project.category} · {project.status}</p>
                 <h2>{project.title}</h2>
