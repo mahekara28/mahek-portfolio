@@ -2,7 +2,7 @@
 
 [Visit the portfolio](https://mahekara.vercel.app/)
 
-A quiet charcoal desktop, a real portrait and a handwritten name. About, Writing, Projects and Contact are ordinary pages behind desktop folders. The introduction has no project feed.
+A sage-green desktop, a real portrait and a handwritten name. About, Writing, Projects and Contact are ordinary pages behind desktop folders. The introduction has no project feed.
 
 ## Run locally
 
@@ -30,7 +30,7 @@ Next.js App Router, React and TypeScript. The interface and headings use self-ho
 
 The shared layout is `app/components/site-shell.tsx`. Window controls use real routes, so refresh, browser history and direct links work. Escape closes the current window and returns focus to its folder. Folder navigation and reading work without JavaScript; the theme switch and clipboard actions are enhancements.
 
-Fresh documents start in charcoal. The stone theme lasts through client navigation. Mobile uses the same four folders in a horizontal row, with ordinary page scrolling. Reduced motion disables transitions. Projects remain outside the home introduction; earlier project anchors still reveal the relevant archive entry. Old `?focus=` links resolve to the complete project page, with their anchor preserved.
+Fresh documents start in the garden palette. The stone theme lasts through client navigation. Mobile uses the same four folders in a horizontal row, with ordinary page scrolling. Reduced motion disables transitions. Projects remain outside the home introduction; earlier project anchors still reveal the relevant archive entry. Old `?focus=` links resolve to the complete project page, with their anchor preserved.
 
 - `app/lib/writing.ts`: five articles, source references and reading-time calculation.
 - `app/lib/content.ts`: project descriptions, scope, pinned evidence and contact links.

@@ -53,7 +53,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
             <a href={links.github} target="_blank" rel="noreferrer">GitHub</a>
             <a href={links.x} target="_blank" rel="noreferrer">X</a>
           </nav>
-          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={isDark ? "Use stone theme" : "Use charcoal theme"} title={isDark ? "Use stone theme" : "Use charcoal theme"}>
+          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={isDark ? "Use stone theme" : "Use garden theme"} title={isDark ? "Use stone theme" : "Use garden theme"}>
             {isDark ? <Sun size={17} aria-hidden="true" /> : <Moon size={17} aria-hidden="true" />}
           </button>
         </div>

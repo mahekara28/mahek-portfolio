@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-    :root { --desk:#181b17; --desk-bar:#282d25; --desk-text:#eeeade; --desk-muted:#b5b9aa; --folder:#cebe91; --window:#242820; --window-bar:#30362b; --window-ink:#f1ecdf; --window-muted:#c1c2b5; --paper:#f5f0e5; --paper-ink:#35382e; --paper-muted:#59604f; --signature:var(--font-signature); --photo-tilt:-5deg; --photo-size:220px; color:var(--desk-text); font:14px/1.6 var(--font-text),Arial,sans-serif; background:var(--desk); position:relative; isolation:isolate; }
+    :root { --desk:#b2c29e; --desk-bar:#314e3b; --desk-text:#243d2c; --desk-muted:#3e573e; --menu-ink:#f8f4e9; --menu-muted:#dae4d0; --folder:#e5c98a; --window:#f8f4e9; --window-bar:#dee6d4; --window-ink:#2b4032; --window-muted:#55664f; --paper:#f8f4e9; --paper-ink:#2b4032; --paper-muted:#55664f; --signature:var(--font-signature); --photo-tilt:-5deg; --photo-size:220px; color:var(--desk-text); font:14px/1.6 var(--font-text),Arial,sans-serif; background:var(--desk); position:relative; isolation:isolate; }
     * { box-sizing:border-box; }
     [hidden] { display:none !important; }
     button, a { -webkit-tap-highlight-color:transparent; }
@@ -8,14 +8,14 @@
     button:focus-visible, a:focus-visible { outline:2px solid currentColor; outline-offset:5px; }
     a { color:inherit; text-decoration:none; }
     a:hover { opacity:1; }
-    .md-menubar { display:flex; align-items:center; justify-content:space-between; gap:24px; background:var(--desk-bar); padding:0 28px; min-height:48px; }
+    .md-menubar { display:flex; align-items:center; justify-content:space-between; gap:24px; background:var(--desk-bar); color:var(--menu-ink); padding:0 28px; min-height:48px; }
     .md-desktop-name { background:none; border:0; padding:8px 0; display:flex; align-items:center; gap:12px; font-size:13px; }
     .md-desktop-name .md-monogram { font:400 26px/1 var(--signature),cursive; }
-    .md-socials { display:flex; align-items:center; gap:24px; font-size:12px; color:var(--desk-muted); }
+    .md-socials { display:flex; align-items:center; gap:24px; font-size:12px; color:var(--menu-muted); }
     .md-workspace { display:grid; grid-template-columns:104px minmax(0,1fr); gap:24px; padding:32px 32px 24px 20px; min-height:718px; position:relative; }
     .md-shortcuts { display:flex; flex-direction:column; gap:24px; align-items:center; padding:12px 0; }
     .md-shortcut { background:none; border:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:5px 8px; width:88px; min-height:74px; border-radius:8px; }
-    .md-shortcut svg { width:44px !important; height:44px !important; color:var(--folder); fill:var(--folder); stroke:var(--desk); stroke-width:1; filter:drop-shadow(0 3px 1px #0003); transition:transform .18s ease; }
+    .md-shortcut svg { width:44px !important; height:44px !important; color:var(--folder); fill:var(--folder); stroke:var(--desk-text); stroke-width:1; filter:drop-shadow(0 3px 1px #0003); transition:transform .18s ease; }
     .md-shortcut[data-open="about"] svg { fill:none; stroke:var(--desk-text); stroke-width:1.4; }
     .md-shortcut[data-open="writing"] svg { fill:#e0d6bc; }
     .md-shortcut[data-open="contact"] svg { fill:none; stroke:var(--desk-text); stroke-width:1.4; }
@@ -74,7 +74,7 @@
     .md-empty { min-height:636px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--desk-muted); text-align:center; padding:40px; }
     .md-empty h1 { font:400 84px/1.2 var(--signature),cursive; color:var(--desk-text); margin:0 0 20px; }
     .md-empty p:last-child { font-size:13px; }
-    :root[data-theme="light"] { --desk:#d7d4c8; --desk-bar:#e8e4d9; --desk-text:#373e32; --desk-muted:#555c4c; --folder:#ac9671; --window:#f5f0e5; --window-bar:#e8e3d8; --window-ink:#383c30; --window-muted:#59604f; }
+    :root[data-theme="light"] { --desk:#d7d4c8; --desk-bar:#e8e4d9; --desk-text:#373e32; --desk-muted:#555c4c; --menu-ink:#373e32; --menu-muted:#555c4c; --folder:#ac9671; --window:#f5f0e5; --window-bar:#e8e3d8; --window-ink:#383c30; --window-muted:#59604f; }
     .desktop.md-flat-photo .md-underpaper, .desktop.md-flat-photo .md-tape { display:none; }
     .desktop.md-flat-photo .md-photo-print { transform:none; }
     @media(max-width:700px) {

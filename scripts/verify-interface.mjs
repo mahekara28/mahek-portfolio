@@ -37,7 +37,7 @@ try {
   await expect(page.locator("h1")).toHaveText("Mahek Ara");
   for (const project of projects) assert(!(await page.locator("main").innerText()).includes(project.title), "Projects stay in their folder");
   assert(await page.getByRole("img", { name: /Mahek Ara/ }).evaluate(image => image.complete && image.naturalWidth > 0), "Portrait loads");
-  await layout("home / desktop / charcoal");
+  await layout("home / desktop / garden");
   await page.screenshot({ path: ".qa/desktop-home.png", fullPage: true });
   await page.getByRole("button", { name: "Use stone theme" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
@@ -90,7 +90,7 @@ try {
     await page.setViewportSize({ width, height: width === 320 ? 760 : 900 });
     for (const route of routes) {
       await visit(route);
-      await layout(route + " / " + width + " / charcoal");
+      await layout(route + " / " + width + " / garden");
       await page.getByRole("button", { name: "Use stone theme" }).click();
       await layout(route + " / " + width + " / stone");
       if (width === 320 && route === "/") await page.screenshot({ path: ".qa/mobile-home.png", fullPage: true });
