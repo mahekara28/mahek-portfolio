@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { DesktopShell } from "./components/site-shell";
+import { ThemeProvider } from "./theme-provider";
 
 const text = localFont({
   src: [
@@ -35,9 +36,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" data-theme="light" className={`${text.variable} ${signature.variable} ${heading.variable}`}>
+    <html lang="en" data-theme="dark" suppressHydrationWarning className={`${text.variable} ${signature.variable} ${heading.variable}`}>
       <body>
-        <DesktopShell>{children}</DesktopShell>
+        <ThemeProvider><DesktopShell>{children}</DesktopShell></ThemeProvider>
       </body>
     </html>
   );
