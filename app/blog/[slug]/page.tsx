@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "../../components/article-tools";
+import { ArticleDiagram } from "../../components/article-diagram";
 import { notes, readingTime } from "../../lib/writing";
 
 export const dynamicParams = false;
@@ -41,6 +42,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
             <section key={section.title ?? index}>
               {section.title && <h2>{section.title}</h2>}
               {section.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
+              {section.diagram && <ArticleDiagram id={section.diagram} />}
               {section.bullets && <ul>{section.bullets.map(item => <li key={item}>{item}</li>)}</ul>}
               {section.example && <figure className="md-article-example"><figcaption>{section.example.label}</figcaption><pre>{section.example.text}</pre></figure>}
             </section>

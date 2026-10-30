@@ -151,6 +151,21 @@ main:focus { outline:none; }
 .md-article-example figcaption { font-size:12px; color:var(--paper-muted); margin-bottom:12px; }
 .md-article-example p { margin-bottom:8px; }
 .md-article-example pre { white-space:pre-wrap; overflow-wrap:anywhere; font:12px/1.8 "Plex Mono",monospace; }
+.md-architecture { width:min(780px,calc(100vw - 100px)); max-width:none; margin:34px 0 38px; border:1px solid #79877342; border-radius:10px; background:#f3f5ed; overflow:hidden; }
+.md-architecture-hint { display:none; }
+.md-architecture-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#a2ae9a transparent; }
+.md-architecture-scroll:focus-visible { outline:2px solid var(--accent); outline-offset:-3px; }
+.md-architecture svg { display:block; width:100%; min-width:760px; height:auto; color:#50614b; font-family:"Plex Mono",monospace; }
+.md-architecture figcaption { border-top:1px solid #79877336; padding:13px 17px 15px; font-size:12px; line-height:1.55; color:#4b5848; }
+.md-diagram-edge path { fill:none; stroke:#6d7b68; stroke-width:1.6; }
+.md-diagram-edge-label { font-size:10px; fill:#586852; paint-order:stroke; stroke:#f3f5ed; stroke-width:5px; stroke-linejoin:round; }
+.md-diagram-node rect { stroke:#7c897443; stroke-width:1; fill:#fffefa; }
+.md-diagram-node--mint rect { fill:#e3eddf; }
+.md-diagram-node--sand rect { fill:#f4ecdb; }
+.md-diagram-node--rose rect { fill:#f2e5e3; }
+.md-diagram-tag { font-size:9px; font-weight:700; letter-spacing:.07em; fill:#576653; }
+.md-diagram-title { font-size:14px; font-weight:700; fill:#273628; }
+.md-diagram-detail { font-size:10px; fill:#536052; }
 .md-sources { margin-top:38px; }
 .md-sources h2 { font-size:24px; }
 .md-sources ul { list-style:none; padding:0; font-size:13px; }
@@ -225,6 +240,7 @@ main:focus { outline:none; }
   .md-post strong { font-size:21px; }
   .md-article-body { font-size:15px; }
   .md-article-example { padding:16px; }
+  .md-architecture-hint { display:block; margin:0 !important; padding:9px 14px 0; font:10px/1.5 "Plex Mono",monospace; color:#4b5848; }
 }
 @media(max-width:380px) {
   .md-article h1 { font-size:30px; }

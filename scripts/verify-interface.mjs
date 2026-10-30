@@ -138,7 +138,10 @@ try {
   for (const note of notes) {
     await visit("/blog/" + note.slug);
     await expect(page.locator("h1")).toHaveText(note.title);
-    assert((await page.locator("article").innerText()).split(/\s+/).length > 300, "Finished article, not an outline");
+    assert((await page.locator("article").innerText()).split(/\s+/).length > 550, "Technical article includes enough explanation to support its diagram");
+    await expect(page.locator(".md-architecture svg[role=img]")).toHaveCount(1);
+    assert((await page.locator(".md-architecture svg title").textContent()).length > 20, "Diagram has a descriptive title");
+    assert((await page.locator(".md-architecture svg desc").textContent()).length > 80, "Diagram has a text equivalent");
     await expect(page.locator(".md-sources a")).toHaveCount(note.sources.length);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mahekara.vercel.app/blog/" + note.slug);
   }
@@ -154,6 +157,16 @@ try {
       await layout(route + " / " + width + " / sage");
       if (width === 320 && route === "/") await page.screenshot({ path: ".qa/mobile-home.png", fullPage: true });
     }
+  }
+  await page.setViewportSize({ width: 320, height: 760 });
+  for (const note of notes) {
+    await visit("/blog/" + note.slug);
+    const diagram = page.locator(".md-architecture-scroll");
+    assert(await diagram.evaluate(el => el.scrollWidth > el.clientWidth), note.slug + ": diagram can be inspected horizontally on mobile");
+    await diagram.focus();
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(() => diagram.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
+    await layout(note.slug + " diagram / mobile");
   }
   for (const viewport of [{ width: 1440, height: 900 }, { width: 320, height: 760 }, { width: 844, height: 390 }]) {
     await page.setViewportSize(viewport);

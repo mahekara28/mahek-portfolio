@@ -1,3 +1,5 @@
+import type { DiagramId } from "../components/article-diagram";
+
 export type Note = {
   slug: string;
   title: string;
@@ -9,169 +11,171 @@ export type Note = {
     paragraphs: string[];
     bullets?: string[];
     example?: { label: string; text: string };
+    diagram?: DiagramId;
   }[];
   sources: { title: string; href: string }[];
 };
 
+const relay = "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7";
+const staffing = "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912";
+
 export const notes: Note[] = [
   {
     slug: "context-relay",
-    title: "What should survive when a coding thread ends?",
-    topic: "Context Relay · Build notes",
-    description: "A useful handoff preserves decisions, their sources, and the work still open.",
+    title: "How a coding agent inherits a task without inheriting the whole chat",
+    topic: "Context Relay · System design",
+    description: "Native capture, reviewed checkpoints and MCP solve different parts of a cross-agent handoff.",
     date: "2026-10-30",
     sections: [
       { paragraphs: [
-        "A coding thread can contain three abandoned approaches, a requirement that changed halfway through, and a final fix that still needs testing. When I imagine handing that work to a fresh agent, the difficult question is what the next session should treat as current.",
-        "That is the problem behind Context Relay. The public npm beta brings a local interface, CLI, SQLite store and MCP server into one package. The useful unit is a reviewed checkpoint: a record of the goal, current instructions, acceptance criteria and unfinished work, with references back to the selected evidence."
+        "A long coding session is not a clean specification. It contains rejected approaches, tool output, corrections and instructions that were valid only for an earlier version of the task. Starting another agent with the entire transcript asks it to discover the current contract again. Starting it with a confident summary risks dropping the correction that matters most.",
+        "Context Relay treats a handoff as a reviewed state transfer. Its npm beta stores captured events locally, lets a person assemble a checkpoint, then exposes a bounded packet to a destination agent. The design question is not ‘how much chat can we move?’ It is ‘which claims can the next agent safely act on, and how can it inspect their origin?’"
+      ], diagram: "relay" },
+      { title: "Capture and MCP have different responsibilities", paragraphs: [
+        "The capture adapters read completed, visible history from the native surfaces of Claude Code, Codex, OpenCode and Goose. These are four different contracts: JSONL, app-server JSON-RPC, a loopback API and CLI JSON export. Capture is explicit and project-scoped. The adapters normalize messages and tool results into local session events with revisions. A connected MCP server cannot simply read a host's full chat; the host owns its conversation and chooses what to send to tools.",
+        "The destination path is MCP. A project-scoped server exposes sessions, checkpoints, packet inspection and handoff acceptance through tools, plus a checkpoint resource and continuation prompt. That is an access protocol for reviewed state, not a universal transcript export. Keeping these paths separate is what makes the trust boundary visible: one path imports selected native data; the other presents an approved handoff."
       ] },
-      { title: "Keep the correction attached to its source", paragraphs: [
-        "Consider an illustrative thread that begins with a thirty-day retention requirement. Later, the user changes it to seven days. A summary saying ‘we discussed retention’ discards the decision. A handoff saying ‘use seven days’ is better, but the receiving agent also needs to know where that instruction came from.",
-        "Relay lets the reviewer select source events and cite them in the checkpoint. When checkpoints disagree on an instruction key, the merge requires an explicit choice. A shorter record is useful only if the correction survives."
-      ], example: { label: "Illustrative handoff, not a captured user session", text: "Current instruction: retain records for seven days.\nEvidence: the later user correction in the source thread.\nOpen work: update the cleanup task and check its tests.\nStill uncertain: whether backups have a separate policy." } },
-      { title: "MCP is the access layer", paragraphs: [
-        "Native capture adapters read supported history from Claude Code, Codex, OpenCode and Goose. MCP exposes tools and resources so a connected agent can inspect a checkpoint or accept a handoff addressed to it. These are separate jobs: adding an MCP entry does not automatically give Relay the harness’s conversation history.",
-        "Before accepting an offered packet, the service checks its recipient, integrity and freshness, including recorded source revisions and file state. Acceptance records that the packet was acknowledged. The receiving agent still has to carry out the work and verify its result."
+      { title: "The checkpoint is the actual interface", paragraphs: [
+        "A checkpoint records a goal, instructions, acceptance criteria, open work, source session revisions, cited evidence, selected files and optional parent checkpoints. Each instruction has a stable key and event citations. When parent checkpoints disagree on a key, creating a merged checkpoint requires an explicit resolution. Duplicate instruction keys and citations to missing events are rejected. The immutable checkpoint also records a digest, file hashes and Git HEAD.",
+        "The packet is a separate export. It includes the checkpoint identity and digest, required task fields, source references, artifacts and a trust notice. The default limit is 24,000 UTF-8 bytes. Optional evidence is dropped if necessary and the omitted count is reported; if the required fields alone do not fit, packet construction fails. This is a byte bound, not a model-token guarantee. A receiving agent should still decide what fits its own context window."
+      ], example: { label: "Illustrative checkpoint shape; field names reflect the current schema", text: "goal: Finish the CSV export\ninstructions:\n  - key: output-format\n    text: CSV supersedes the earlier JSON proposal\n    sources: [session-id, correction-event-id]\ncriteria: [Saved file parses as CSV, Header matches contract]\nopenWork: [Implement export, Run readback verification]\nsources: [session-id + captured revision]" } },
+      { title: "Freshness and acceptance are narrower than completion", paragraphs: [
+        "Before an offer, Relay checks the captured source revisions, selected file SHA-256 values and Git HEAD. Acceptance checks the addressed recipient, packet integrity and freshness again. It means the destination acknowledged a valid packet. It does not mean that the task is implemented, tests pass, or the new agent has read every referenced source.",
+        "There is an important limit: a native session may have changed without being captured again. Freshness can compare against the stored revision, but it cannot detect unseen native turns. Recapture before a consequential handoff. Relay also does not move working files or restore hidden model state. The destination still needs the repository and a normal verification loop."
       ] },
-      { title: "Try the small loop first", paragraphs: [
-        "With Node 22.16 or later, run the demo command below, then open the UI. The demo uses synthetic sessions. Inspect one correction, make a checkpoint, and read the exported packet before connecting your own project.",
-        "Model-assisted drafts are optional and require review. The beta has transport and workflow checks, but live model-quality evaluation remains pending. Its value should be judged by whether the next session can resume a specific task without losing its constraints."
-      ], example: { label: "Public npm beta", text: "npx @mahekara28/context-relay@beta demo\nnpx @mahekara28/context-relay@beta ui" } }
+      { title: "What I would test next", paragraphs: [
+        "The beta has transport tests, adapter format checks and browser workflow coverage. Those establish that the software moves and validates packets under tested conditions. They do not establish that a fresh agent completes a real task better. My next evaluation would give two fresh sessions the same repository issue: one receives the raw transcript, the other a reviewed Relay packet. Score correctness against prewritten acceptance criteria, count lost constraints and unsupported assumptions, and record setup time and token use. Keep the task and harness versions fixed, then repeat across different issue types.",
+        "That experiment would expose both sides of the tradeoff. A packet may reduce rereading, but a missing decision could be more expensive than extra context. The design earns its value when a second agent can resume accurately and explain which evidence supports its next action."
+      ] }
     ],
     sources: [
-      { title: "Context Relay — workflow, installation and current limits", href: "https://github.com/mahekara28/context-relay/tree/4e52ada45c471f17a94b16b2d81ed6636495f0f7" },
-      { title: "MCP — architecture and scope", href: "https://modelcontextprotocol.io/docs/learn/architecture" },
-      { title: "Relay MCP implementation — handoff acceptance", href: "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/packages/relay/src/mcp.ts" }
+      { title: "Context Relay checkpoint, packet and freshness implementation", href: `${relay}/packages/relay/src/store.ts` },
+      { title: "Context Relay MCP server and tool contract", href: `${relay}/packages/relay/src/mcp.ts` },
+      { title: "Native harness capture versus MCP connection", href: `${relay}/docs/HARNESS_CONNECTIONS.md` },
+      { title: "Model Context Protocol architecture", href: "https://modelcontextprotocol.io/specification/2025-06-18/architecture" }
     ]
   },
   {
     slug: "working-context",
-    title: "A longer chat isn’t always better context.",
-    topic: "AI fundamentals · Context",
-    description: "A transcript records the journey. A working context helps with the next decision.",
+    title: "Working context is a projection of task state",
+    topic: "AI engineering · Context design",
+    description: "Select the decisions needed for the next action, then preserve a path back to their evidence.",
     date: "2026-10-30",
     sections: [
       { paragraphs: [
-        "A transcript is an excellent record of how a task unfolded. It can also be an awkward starting point for continuing that task. A new session may have to separate the latest instruction from an earlier idea, a successful test from a failed attempt, and an open question from a settled decision.",
-        "For designing a handoff, I find it useful to distinguish three things. The transcript is the sequence of events. The working context is the material selected for the current task. Persistent memory is information retained across sessions. Keeping something in storage does not, by itself, make it relevant or correct for the next request."
+        "A transcript is an event log. A model prompt is a working set. They have different jobs. The log should preserve what happened; the working set should make the next decision possible within a finite budget. Treating all prior turns as equally relevant creates a retrieval problem inside the prompt, and treating a compressed paragraph as authoritative creates a provenance problem.",
+        "I think of working context as a projection: take the current objective, select the source events that govern it, resolve superseded instructions, and emit a bounded view. The original events remain available for inspection. This is the mental model behind the checkpoint and packet path in Context Relay; it is not a claim that Relay can automatically infer what every future task will need."
+      ], diagram: "projection" },
+      { title: "Selection needs a rule, not just a shorter word count", paragraphs: [
+        "Suppose the next action is to finish a report export. The session contains a JSON prototype, a later user correction to CSV, a failed parser test and an unrelated discussion of chart colours. The working set needs the current output format, required columns, artifact destination and verification step. The failed test should be linked as evidence; the chart discussion can stay in history. If the next action changes to designing the chart, the projection changes too.",
+        "That rule is task-scoped relevance. It also has a precedence rule: a later explicit correction overrides an earlier proposal, but only for the scope stated. ‘CSV for this report’ should not turn into ‘always use CSV’. A durable preference, a temporary constraint and a single task decision should be represented differently, with source references where practical."
+      ], example: { label: "Illustrative selection record", text: "Task: finish the approved report\nCurrent instruction: CSV for this report [event 42]\nRequired columns: date, account, amount [event 31]\nOpen work: export, parse saved bytes, validate header\nOmitted from working packet: chart discussion\nStill inspectable: full source session and failed export [event 39]" } },
+      { title: "Budget the export without hiding omissions", paragraphs: [
+        "The current Relay packet builder measures serialized UTF-8 bytes. It reserves required fields such as the goal, instructions, criteria and open work. Optional evidence is added while the packet fits, with an omission count when some evidence does not. If the required portion exceeds the limit, the builder errors instead of silently deleting an instruction. That is a defensible failure mode for a handoff contract.",
+        "Bytes are only a transport budget. Tokenizers and model context policies differ. Even a packet that fits can carry prompt injection, stale claims or a misleading citation. Relay marks source text as untrusted and checks that cited events exist, but a reviewer still needs to verify that the cited event actually supports the instruction. Provenance makes a claim auditable; it does not make it true."
       ] },
-      { title: "Start with the next action", paragraphs: [
-        "Suppose a thread is preparing a report. It contains a discussion of JSON and CSV, two failed exports, and a correction to the required columns. The next action is to produce the final file. A useful working set should make the requested format, columns, destination and verification step easy to find.",
-        "This is an editorial decision. I would retain the correction and a pointer to the failed export, while leaving the full debugging dialogue in the source history. That gives the next agent a clear starting point and somewhere to look if the abbreviated record proves insufficient."
-      ], example: { label: "Illustrative working context", text: "Goal: export the approved report.\nFormat: CSV, superseding the earlier JSON suggestion.\nColumns: date, account, amount.\nOpen check: parse the saved file and verify the header.\nSource: link to the correction and the failed export." } },
-      { title: "Compression has a cost", paragraphs: [
-        "An omitted attempt might explain why an apparently obvious fix was rejected. A short instruction may lose the condition under which it applies. A summary can sound more certain than the discussion it came from. I would therefore keep uncertainty explicit and preserve a route back to the evidence.",
-        "The same applies to saved preferences. ‘Use CSV for this report’ should not quietly become ‘always use CSV for every task.’ Scope belongs alongside the instruction. A current decision, a reusable preference and a one-time workaround need different treatment."
-      ] },
-      { title: "A practical review question", paragraphs: [
-        "Before passing context along, ask: could someone use this to take the next step, explain the applicable constraints, and identify what still needs checking? If the answer depends on a missing correction, the handoff needs that correction. If the packet repeats material unrelated to the next step, it may be taking space without helping.",
-        "This is the design principle I use in Context Relay: review the working set beside its sources. The complete history stays valuable; the handoff earns its place by making the next decision easier to inspect."
+      { title: "Measure omission cost, not compression ratio", paragraphs: [
+        "A useful evaluation would seed tasks with known corrections, rejected approaches and unresolved questions. Prepare a working packet, then ask a fresh agent to state the next action and applicable constraints before it edits code. Compare that answer with a rubric written before the handoff. Record three failure classes: a required instruction missing from the packet, a present instruction ignored by the agent, and an unsupported inference added by the agent.",
+        "Compression ratio alone says little about whether the task survived. The practical target is enough context for correct action, with evidence available when uncertainty matters. If the reviewer cannot distinguish a current decision from an old suggestion, the projection needs another pass."
       ] }
     ],
     sources: [
-      { title: "Context Relay — checkpoints, source review and conflicts", href: "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/docs/WORKSPACE.md" }
+      { title: "Context Relay packet builder and byte-budget behavior", href: `${relay}/packages/relay/src/store.ts` },
+      { title: "Context Relay checkpoint schema", href: `${relay}/packages/relay/src/model.ts` },
+      { title: "Context Relay workbench and review workflow", href: `${relay}/docs/WORKSPACE.md` }
     ]
   },
   {
     slug: "decision-assumptions",
-    title: "A recommendation is only as good as its assumptions.",
-    topic: "Decision systems · Operations",
-    description: "A staffing planner becomes useful when its constraints and trade-offs are inspectable.",
+    title: "A staffing recommendation is a constraint check before it is a score",
+    topic: "Decision systems · Operations engineering",
+    description: "Inside the eligibility gates and greedy assignment heuristic of Build, Buy or Borrow.",
     date: "2026-10-30",
     sections: [
       { paragraphs: [
-        "A staffing recommendation needs an explanation that survives a change to the brief. If a deadline moves forward, does the suggested team still fit? If a mentor is unavailable, is the training plan still realistic? These are the questions behind Build, Buy or Borrow, my local planning application.",
-        "The app compares internal development, hiring, contracting and a blend of those approaches. It uses fictional people, example rates and explicit constraints. The results are simulated planning estimates; they are not evidence of savings on a client engagement."
+        "A project needs four roles in six weeks. One internal candidate has the right skills but no capacity; another can learn the missing skill but needs mentoring. A contractor can start sooner at a higher delivery cost. A single ‘best option’ score is premature until those constraints are evaluated.",
+        "I built Build, Buy or Borrow as a local planning tool for this kind of comparison. It takes a brief, internal talent data and cost assumptions, then generates build, hire, contractor and blended plans. The sample people and rates are fictional. The output is a scenario estimate, not a demonstrated reduction in hiring cost."
+      ], diagram: "staffing" },
+      { title: "What the engine actually computes", paragraphs: [
+        "For an internal candidate, the engine compares required and recorded skills, estimates learning hours and weeks for gaps, computes readiness and sums delivery, learning, course and mentoring costs. Capacity, interest and maximum learning time are eligibility gates. A blend adds mentor capacity as another gate. External options use hiring or contractor assumptions rather than pretending every role can be developed in time.",
+        "The assignment pass orders roles with fewer eligible internal candidates first. It then chooses candidates greedily and does not reuse the same person for another seat in that plan. This protects scarce matches from being taken by flexible roles, but it is a heuristic. It does not search all possible teams, so a feasible or cheaper global assignment can be missed. The interface should say ‘recommended under these assumptions,’ never ‘mathematically optimal.’"
+      ], example: { label: "Decision pipeline, simplified from the current engine", text: "for each role: compute eligible internal candidates\norder roles by fewest eligible candidates\nassign candidates without reusing a person\nconstruct build / buy / borrow / blend plans\nreject plans missing roles, deadline, budget or mentor capacity\nscore remaining plans on cost, readiness and retained capability\nreturn recommendation + blockers for review" } },
+      { title: "Feasibility precedes ranking", paragraphs: [
+        "A plan can be cheap and still fail the start date. Another may fit the deadline but exceed the budget. The engine marks plans blocked when roles are unfilled, readiness is late, costs exceed the budget or mentoring capacity is insufficient. It ranks feasible plans using weighted cost, readiness and retained capability, with a strong lateness penalty in candidate scoring. Those weights encode a policy choice; a different studio may reasonably choose different priorities.",
+        "The example portfolio scenario reports a blended plan for a fictional four-seat brief. Those numbers are useful for inspecting the arithmetic and UI. They should not be cited as real savings, and they cannot answer whether the skills inventory or salary assumptions match a real organisation."
       ] },
-      { title: "Write down what makes a plan possible", paragraphs: [
-        "A person’s recorded skill is only one input. The plan also depends on availability, assignment interest, time to readiness and any mentoring required. Costs include preparation as well as delivery. Making those assumptions visible gives the reviewer something concrete to challenge.",
-        "The calculation engine is separate from the interface. It uses a greedy assignment heuristic, prioritising roles with fewer eligible internal candidates. That makes the order of decisions inspectable, but it does not guarantee a globally optimal team. A plausible recommendation still needs someone to review its inputs and trade-offs."
-      ] },
-      { title: "Change one constraint at a time", paragraphs: [
-        "For an illustrative review, imagine a project starting in four weeks and an internal candidate who needs three weeks of preparation. First check whether that preparation has the required mentoring capacity. Then move the project start to two weeks away, leaving the other assumptions unchanged.",
-        "The useful output is the explanation of what no longer fits. A plan may need a different assignment, outside help, a later start, or a narrower scope. A ranking alone cannot tell the reviewer which compromise is acceptable."
-      ], bullets: [
-        "Save the original brief and its assumptions.",
-        "Change the start date, budget or mentor capacity individually.",
-        "Compare readiness, cost components and blockers.",
-        "Record the reason for the chosen plan and who must confirm it."
-      ] },
-      { title: "Keep the decision with the people doing the work", paragraphs: [
-        "A future workplace trial would need validated skills, current availability, approved costs and consent around development plans. The local app does not reserve a person across simultaneous projects, so two individually feasible scenarios can still compete for the same capacity.",
-        "The tool’s useful contribution is a repeatable comparison with an inspectable record. It helps make a conversation more specific: this option fits these assumptions, this constraint is binding, and this question remains unresolved. That is a stronger basis for a decision than a confident score on its own."
+      { title: "The stress test is a changed assumption", paragraphs: [
+        "I would test the engine with paired scenarios. Keep the people and role requirements fixed, move the start date forward, and assert that any newly late internal route becomes blocked or is explained. Then reduce mentoring capacity to zero and confirm that a blend requiring a mentor cannot remain feasible. Add a case with two roles competing for one scarce person to expose assignment order. These tests check invariants and explainability, not the realism of the input data.",
+        "For workplace use, the missing layer is operational state: validated skill evidence, current availability, salary or vendor rates approved for use, and reservations across simultaneous projects. The local tool does not reserve a person between project scenarios. Two individually feasible plans may conflict in reality. A human should review the underlying data and record why a recommendation was accepted or overridden."
       ] }
     ],
     sources: [
-      { title: "Build, Buy or Borrow — project decisions and scope", href: "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912/PORTFOLIO.md" },
-      { title: "Planning engine", href: "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912/engine.js" },
-      { title: "Constraint tests", href: "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912/tests/engine.test.cjs" }
+      { title: "Build, Buy or Borrow calculation and assignment engine", href: `${staffing}/engine.js` },
+      { title: "Build, Buy or Borrow constraint tests", href: `${staffing}/tests/engine.test.cjs` },
+      { title: "Project scope and fictional example", href: `${staffing}/PORTFOLIO.md` }
     ]
   },
   {
     slug: "inference-latency",
-    title: "Where the seconds go in an AI response.",
-    topic: "AI fundamentals · Inference",
-    description: "First output and finished output answer different questions about latency.",
+    title: "The first token is not the whole response",
+    topic: "AI engineering · Inference",
+    description: "A measurement plan for queueing, prefill, decode and what the client actually sees.",
     date: "2026-10-30",
     sections: [
       { paragraphs: [
-        "An AI response can begin quickly and take a long time to finish. It can also pause before the first word, then produce a short answer. A single ‘response time’ number hides that distinction. For an interactive tool, I want to understand both waits.",
-        "In a typical autoregressive transformer, prefill processes the input prompt. Decode then generates additional tokens using the preceding context. A key-value cache retains attention keys and values from earlier tokens, avoiding repeated computation of those values. These mechanisms help explain why input length and output length can affect different parts of the wait."
+        "A model starts streaming in half a second, then spends ten seconds finishing a long answer. Another waits three seconds, then finishes almost immediately. Calling both ‘response time’ hides the experience and the bottleneck. I would measure first useful content and complete output separately before deciding what to optimise.",
+        "For a typical autoregressive transformer, prefill processes the prompt and initializes attention state. Decode generates subsequent tokens conditioned on prior tokens. A key-value cache retains earlier attention keys and values so each step can reuse them. That mechanism explains why prompt length and generated length can affect different portions of a request. It does not mean the same latency profile holds for every model or serving stack."
+      ], diagram: "latency" },
+      { title: "Define clocks at the boundary you control", paragraphs: [
+        "From the client, start a monotonic clock immediately before the request. Record the arrival of the first network event, the first non-empty answer content and the completed response. The first event may contain metadata rather than user-visible text; a stream chunk may carry multiple tokens. I would label the metric ‘time to first content’ unless I have tokenizer-aware instrumentation that truly identifies the first token.",
+        "Client-visible first-content latency includes transport, server queueing, prefill and any output buffering. Server-side time to first token is a different measurement. Subtracting a client timestamp from an unsynchronised server clock is not a valid decomposition. To locate the wait, collect server queue and model timings separately, with a request identifier that joins both traces."
+      ], example: { label: "Proposed measurements, not benchmark results", text: "t0 = client begins request\nt1 = first non-empty answer content reaches client\nt2 = complete answer reaches client\n\nfirst-content latency = t1 - t0\ncompletion latency    = t2 - t0\nstreaming tail        = t2 - t1\n\nKeep server queue / prefill / decode timings as separate spans." } },
+      { title: "Run two controlled comparisons", paragraphs: [
+        "First, hold the requested output and generation settings steady while varying prompt length. Then hold the prompt steady while varying the requested output length. Log actual input and output token counts, because a maximum-token setting is a ceiling, not a promise of equal-length generations. Record model revision, provider or hardware, sampling settings, concurrency and cache state. Separate cold starts from warm requests and retain the distribution of runs rather than one attractive number.",
+        "Streaming can make the initial wait feel shorter without shortening the time needed for a complete structured response. If a workflow cannot act until it parses the final JSON object, completion latency is the relevant outcome. If the application can safely render partial prose, first-content latency may matter more. Track answer validity and failures alongside timings; a fast malformed response is not an improvement."
       ] },
-      { title: "Measure what the person actually sees", paragraphs: [
-        "Client-side time to first output includes more than model computation: connection overhead, queueing and buffering may all contribute. A network chunk can also contain metadata or multiple tokens. I would record the first non-empty content event separately from the first network event, and describe that measurement precisely.",
-        "Streaming makes partial output visible before completion. It can improve the experience without shortening the time needed to generate the full answer. For a tool that must parse a complete structured result, the completion time may still be the relevant wait."
-      ], example: { label: "Measurement definitions — a proposed method, not benchmark results", text: "t0 = request begins\nt1 = first non-empty answer content arrives\nt2 = response completes\n\nFirst-content latency = t1 - t0\nTotal latency = t2 - t0\nKeep server-reported token timings separate." } },
-      { title: "Make the comparison reproducible", paragraphs: [
-        "A small experiment can compare a short and long input with the same requested output. A second comparison can hold the input fixed and vary the requested output length. I would log the actual token counts because an output limit is a ceiling, not a guarantee of equal-length answers.",
-        "Record the exact model revision, serving configuration, hardware or provider, sampling settings, concurrency and cache state. Separate cold starts from warmed runs. Repeat requests, retain individual measurements and report the spread. One fast response is a poor description of what another person should expect."
-      ], bullets: [
-        "Keep prompt content and request settings with every timing record.",
-        "Count failures and interrupted streams as outcomes.",
-        "Check answer quality alongside speed.",
-        "Use server instrumentation to investigate a suspected bottleneck."
-      ] },
-      { title: "Choose an improvement after locating the wait", paragraphs: [
-        "If queueing dominates, trimming a sentence from the answer may barely help the initial pause. If a verbose answer takes most of the time, clearer output requirements may matter more. The measurements should decide which change is worth trying.",
-        "This note describes a measurement plan, not a completed latency study. Publishing the run configuration and raw observations would be the next step before making a performance claim."
+      { title: "Optimise the measured bottleneck", paragraphs: [
+        "If queueing dominates, changing prompt wording may have little effect on first content. If prefill dominates, inspect repeated or unnecessarily large input and whether the server supports a suitable reuse strategy. If decode dominates, limit needless output or consider a faster serving setup, then verify that answer quality remains acceptable. Each intervention should be evaluated against the span it is meant to change.",
+        "This is a proposed experiment, not a published benchmark for Mahek's projects. I would publish the request set, configurations, raw timing records and failure counts before claiming that a change made inference faster."
       ] }
     ],
     sources: [
-      { title: "Prefill and decode — TNG’s inference engineering explanation", href: "https://huggingface.co/blog/tngtech/llm-performance-prefill-decode-concurrent-requests" },
-      { title: "Hugging Face Transformers — how caching works", href: "https://huggingface.co/docs/transformers/en/cache_explanation" },
-      { title: "Text Generation Inference — streaming", href: "https://huggingface.co/docs/text-generation-inference/en/conceptual/streaming" }
+      { title: "Hugging Face Transformers — attention cache mechanics", href: "https://huggingface.co/docs/transformers/en/cache_explanation" },
+      { title: "NVIDIA GenAI-Perf — latency metric definitions", href: "https://docs.nvidia.com/deeplearning/triton-inference-server/user-guide/docs/perf_analyzer/genai-perf/README.html" },
+      { title: "Hugging Face — prefill, decode and concurrent requests", href: "https://huggingface.co/blog/tngtech/llm-performance-prefill-decode-concurrent-requests" }
     ]
   },
   {
     slug: "verify-the-result",
-    title: "The tool said “done.” What would I check?",
-    topic: "Operations · Verification",
-    description: "A success message is one piece of evidence. The artifact needs its own checks.",
+    title: "A tool receipt is not a verified outcome",
+    topic: "AI engineering · Verification",
+    description: "Separate a completed call from an inspected artifact and a satisfied task contract.",
     date: "2026-10-30",
     sections: [
       { paragraphs: [
-        "Imagine asking an automation to save a CSV report. The tool returns a success response and a file path. Opening that file reveals JSON. The call completed, but the requested outcome is still missing.",
-        "That small example is useful because it separates several claims that can get compressed into ‘done.’ The tool accepted the request. It wrote something. The artifact has the required format. Its contents satisfy the task. Each claim needs evidence at the appropriate level."
+        "An agent asks a tool to save a CSV. The tool returns a path and a success status. The bytes at that path are JSON. The call returned; the task failed. This small failure mode appears in more consequential workflows too: an upload receipt says little about the deployed page, and a handoff acknowledgement says nothing about whether the destination completed the work.",
+        "I use a three-part contract: define the expected artifact before execution, inspect the artifact after execution, and check the properties that matter to the user. The receipt is useful evidence about the attempted action, but it is only one stage in the chain."
+      ], diagram: "verification" },
+      { title: "Specify observable success first", paragraphs: [
+        "For a report export, the contract might include the absolute destination, CSV encoding, exact header, row schema and a task-specific invariant such as nonnegative amounts. A verifier reads the saved bytes and parses them with a CSV library. It compares the header to the contract and checks the rows. A filename extension and a tool's success message are not substitutes for parsing.",
+        "Verification has levels. A parse check proves the bytes are syntactically readable. A schema check proves they have the expected shape. A semantic check tests the task claim, such as totals reconciling with a trusted input. Stronger claims need stronger evidence; syntactic validity alone cannot prove the underlying numbers are right."
+      ], example: { label: "Illustrative verifier logic; not a library API", text: "receipt = export_report(request)\nif not receipt.ok: return FAILED_CALL\n\nbytes = read_back(expected_path)\nif bytes unavailable: return UNVERIFIED\nrows = parse_csv(bytes)\nif parse failed or header != expected_header: return FAILED_ARTIFACT\nif totals(rows) != trusted_totals: return FAILED_SEMANTICS\nreturn VERIFIED_WITH_EVIDENCE(path, checksum, checks)" } },
+      { title: "Unknown is a real state", paragraphs: [
+        "If readback is unavailable, the system should report ‘unverified,’ not turn uncertainty into success. A useful failure record says which artifact was inspected, what was expected, what was observed and which check failed. That makes a retry or manual review possible without repeating the entire conversation.",
+        "Retries must account for side effects. A local export can often be regenerated safely. Repeating an email, payment or publish operation may duplicate an external effect. Before retrying, check whether the first attempt already created the side effect and use an idempotency key or human review where the downstream API supports it. The verifier should not create a second effect just to discover the first."
       ] },
-      { title: "Define success before running the tool", paragraphs: [
-        "For a CSV export, I would write down the required destination, column names, encoding and any task-specific constraints. Then I would inspect the saved bytes with a CSV parser, check the header and validate the rows against those constraints. A filename ending in .csv is not enough.",
-        "The verifier should be owned by the application or workflow, with a clear contract. Asking the same model whether it succeeded can provide another opinion, but it does not replace a direct check of an artifact that can be read and parsed."
-      ], example: { label: "Illustrative acceptance record", text: "Requested: report.csv with date, account, amount.\nObserved: saved bytes parse as JSON.\nResult: failed format check.\nNext step: regenerate the file, then repeat validation.\nDo not mark the report ready to send." } },
-      { title: "Design the failure path too", paragraphs: [
-        "A useful check returns enough detail to fix the problem: what was expected, what was observed and which artifact was inspected. If the checker cannot read the file, that is an unverified result. It should not silently become a pass.",
-        "Retries need boundaries. Re-running a local export is different from repeating a payment or sending another email. Before retrying, the workflow should establish whether the first attempt already created an external effect, and which actions require a person’s review."
+      { title: "Apply the same boundary to agent handoffs", paragraphs: [
+        "Context Relay's accept operation checks packet identity, recipient, integrity and freshness, then records acknowledgement. That verifies a handoff boundary; it does not verify a coding outcome. The receiving agent still needs to inspect its repository, implement the change, run meaningful checks and report the commit or deployed version. Its completion evidence belongs to a later stage.",
+        "For a website release, I would connect four pieces: the requested change, the merged code, a passing build and the live page. A successful build cannot prove the live deployment is current; a green deployment cannot prove the requested interaction works. Naming these states precisely makes status updates useful to the next person who has to act."
       ] },
-      { title: "Be precise about what a receipt means", paragraphs: [
-        "Context Relay makes this distinction at the handoff boundary. An accepted packet records that a destination acknowledged a checked handoff. It does not prove the destination implemented the requested change or that its tests passed. Those outcomes need their own evidence.",
-        "For a release, I would connect the request to the changed files, the verification result and the deployed version. If any link is missing, describe the state accurately: prepared, checked locally, uploaded, or verified live. Those words help the next person know what remains to be done."
-      ] },
-      { title: "Keep the check close to the promise", paragraphs: [
-        "The general habit is simple: identify the thing the user will rely on, then inspect that thing. For a report, it is the file. For a website, it is the deployed page. For a handoff, it is the packet and its source state. A good completion message can then point to the evidence behind the promise."
+      { title: "What I would instrument", paragraphs: [
+        "A production workflow could keep a small verification record containing request ID, artifact URI, content hash, checker version, observed checks and final state. That is a proposed design, not a feature I am claiming is already in Relay. It would make an audit question answerable: which bytes did we inspect, with which rule, before we told someone the work was ready?"
       ] }
     ],
     sources: [
-      { title: "Context Relay — file-readback verification example", href: "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/examples/verified_release_desk.py" },
-      { title: "Relay’s handoff contract — acknowledgement versus completion", href: "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/packages/relay/src/mcp.ts" }
+      { title: "Context Relay offer, packet and accept implementation", href: `${relay}/packages/relay/src/store.ts` },
+      { title: "Context Relay MCP handoff contract", href: `${relay}/packages/relay/src/mcp.ts` },
+      { title: "Context Relay workspace workflow", href: `${relay}/docs/WORKSPACE.md` }
     ]
   }
 ];
