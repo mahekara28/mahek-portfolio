@@ -2,7 +2,7 @@
 
 [Visit the portfolio](https://mahekara.vercel.app/)
 
-A quiet charcoal desktop, a real portrait and a handwritten name. About, Writing, Projects and Contact are ordinary pages behind desktop folders. The introduction has no project feed.
+A sage-green desktop, a real portrait and a handwritten name. About, Writing, Projects and Contact are ordinary pages behind desktop folders. The introduction has no project feed.
 
 ## Run locally
 
@@ -28,9 +28,9 @@ Next.js App Router, React and TypeScript. The interface and headings use self-ho
 | `/desktop` | Closed-window view; folders remain available |
 | `/about` | Permanent redirect to the introduction |
 
-The shared layout is `app/components/site-shell.tsx`. Window controls use real routes, so refresh, browser history and direct links work. Escape closes the current window and returns focus to its folder. Folder navigation and reading work without JavaScript; the theme switch and clipboard actions are enhancements.
+The shared layout is `app/components/site-shell.tsx`. The desktop and its folders stay in place while the window content scrolls. The square title-bar button maximizes the window to the browser viewport; Restore or Escape returns it to its floating size. Closing the window returns focus to its folder. Escape closes an already restored window. New pages start at the top, while Back/Forward restores their reading positions. Folder navigation and reading work without JavaScript; window resizing, the theme switch and clipboard actions are enhancements.
 
-Fresh documents start in charcoal. The stone theme lasts through client navigation. Mobile uses the same four folders in a horizontal row, with ordinary page scrolling. Reduced motion disables transitions. Projects remain outside the home introduction; earlier project anchors still reveal the relevant archive entry. Old `?focus=` links resolve to the complete project page, with their anchor preserved.
+Fresh documents start in the garden palette: sage wallpaper, a forest-green menu bar and cream windows. The stone theme lasts through client navigation. Mobile keeps the four folders in a stationary horizontal row, with scrolling inside the window. Reduced motion disables transitions. Projects remain outside the home introduction; earlier project anchors still reveal the relevant archive entry. Old `?focus=` links resolve to the complete project page, with their anchor preserved.
 
 - `app/lib/writing.ts`: five articles, source references and reading-time calculation.
 - `app/lib/content.ts`: project descriptions, scope, pinned evidence and contact links.
@@ -50,7 +50,7 @@ npx playwright install chromium
 npm run verify
 ```
 
-Set `BASE_URL` if the server uses another port. `PLAYWRIGHT_EXECUTABLE_PATH` can select an installed browser. Browser checks cover desktop and 320px layouts, both themes, keyboard navigation, close/reopen focus, history, project anchors, all articles, clipboard actions, the real portrait, no-JavaScript reading, 404s and WCAG A/AA rules. Reports and screenshots are written to the ignored `.qa/` folder.
+Set `BASE_URL` if the server uses another port. `PLAYWRIGHT_EXECUTABLE_PATH` can select an installed browser. Browser checks cover desktop, 320px and short landscape layouts, both themes, internal scrolling, maximize/restore, keyboard navigation, close/reopen focus, reading-position history, project anchors, all articles, clipboard actions, the real portrait, no-JavaScript reading, 404s and WCAG A/AA rules. Reports and screenshots are written to the ignored `.qa/` folder.
 
 The existing Vercel integration deploys `main`. Branch pushes create previews. No new hosting account or deployment credentials are required.
 
