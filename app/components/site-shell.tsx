@@ -1,194 +1,87 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { ArrowUpRight, Menu, Moon, Sun, X } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { useTheme } from "../theme-provider";
+import { useSelectedLayoutSegment, useRouter } from "next/navigation";
+import { useEffect, useRef, type ReactNode } from "react";
+import { ContactRound, FolderClosed, Mail, Moon, NotebookPen, Sun, X } from "lucide-react";
 import { links } from "../lib/content";
+import { useTheme } from "../theme-provider";
 
-const navigation = [
-  { href: "/", label: "Home" },
-  { href: "/projects", label: "Projects" },
-  { href: "/blog", label: "Writing" },
+const folders = [
+  { href: "/", label: "About me", kind: "about", Icon: ContactRound },
+  { href: "/blog", label: "Writing", kind: "writing", Icon: NotebookPen },
+  { href: "/projects", label: "Projects", kind: "projects", Icon: FolderClosed },
+  { href: "/contact", label: "Contact", kind: "contact", Icon: Mail },
 ];
 
-export function ThemeSwitch() {
-  const { toggleTheme } = useTheme();
-  return (
-    <button
-      className="icon-button theme-switch"
-      onClick={toggleTheme}
-      aria-label="Toggle light and dark theme"
-      title="Toggle light and dark theme"
-    >
-      <Moon className="moon-icon" size={18} aria-hidden="true" />
-      <Sun className="sun-icon" size={18} aria-hidden="true" />
-    </button>
-  );
-}
-
-export function SiteHeader() {
-  const pathname = usePathname();
-  const dialog = useRef<HTMLDialogElement>(null);
-  const opener = useRef<HTMLButtonElement>(null);
-  const isActive = (href: string) =>
-    href === "/" ? pathname === "/" : pathname.startsWith(href);
-
-  function closeMenu() {
-    dialog.current?.close();
-    document.body.style.overflow = "";
-    opener.current?.focus();
-  }
+export function DesktopShell({ children }: { children: ReactNode }) {
+  const segment = useSelectedLayoutSegment();
+  const router = useRouter();
+  const { isDark, toggleTheme } = useTheme();
+  const returnTo = useRef<string | null>(null);
+  const navigation = useRef<HTMLElement>(null);
+  const closed = segment === "desktop";
+  // Use the rendered route tree so unknown URLs share the server's 404 frame.
+  const current = folders.find(({ href }) => href === "/" ? segment === null : segment === href.slice(1));
+  const folderHref = current?.href ?? "/";
 
   useEffect(() => {
-    const media = window.matchMedia("(min-width: 761px)");
-    const closeOnDesktop = () => {
-      if (media.matches) {
-        dialog.current?.close();
-        document.body.style.overflow = "";
+    if (closed && returnTo.current) {
+      navigation.current?.querySelector<HTMLAnchorElement>(`a[href="${returnTo.current}"]`)?.focus();
+      returnTo.current = null;
+    }
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === "Escape" && !closed && !event.defaultPrevented) {
+        returnTo.current = folderHref;
+        router.push("/desktop", { scroll: false });
       }
-    };
-    media.addEventListener("change", closeOnDesktop);
-    return () => {
-      document.body.style.overflow = "";
-      media.removeEventListener("change", closeOnDesktop);
-    };
-  }, []);
+    }
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [closed, folderHref, router]);
 
   return (
-    <>
-      <a href="#main" className="skip-link">
-        Skip to content
-      </a>
-      <header className={`site-header${pathname === "/" ? " is-home" : ""}`}>
-        <Link href="/" className="wordmark" aria-label="Mahek Ara, home">
-          <span>Mahek Ara</span>
+    <div className="desktop">
+      <a className="skip-link" href="#main">Skip to content</a>
+      <header className="md-menubar">
+        <Link className="md-desktop-name" href="/" aria-label="Mahek’s introduction">
+          <span className="md-monogram" aria-hidden="true">ma</span>
+          <span>mahek’s desktop</span>
         </Link>
-        <nav className="desktop-nav" aria-label="Main navigation">
-          {navigation.map(({ href, label }) => (
-            <Link
-              key={href}
-              href={href}
-              aria-current={isActive(href) ? "page" : undefined}
-            >
-              {label}
-            </Link>
-          ))}
-        </nav>
-        <div className="header-actions">
-          <ThemeSwitch />
-          <button
-            ref={opener}
-            className="icon-button menu-trigger"
-            aria-label="Open navigation"
-            aria-haspopup="dialog"
-            aria-controls="mobile-navigation"
-            onClick={() => {
-              dialog.current?.showModal();
-              document.body.style.overflow = "hidden";
-            }}
-          >
-            <Menu size={22} />
+        <div className="md-menu-right">
+          <nav className="md-socials" aria-label="Social profiles">
+            <a href={links.github} target="_blank" rel="noreferrer">GitHub</a>
+            <a href={links.x} target="_blank" rel="noreferrer">X</a>
+          </nav>
+          <button className="theme-toggle" type="button" onClick={toggleTheme} aria-label={isDark ? "Use stone theme" : "Use charcoal theme"} title={isDark ? "Use stone theme" : "Use charcoal theme"}>
+            {isDark ? <Sun size={17} aria-hidden="true" /> : <Moon size={17} aria-hidden="true" />}
           </button>
         </div>
       </header>
-      <dialog
-        ref={dialog}
-        id="mobile-navigation"
-        className="mobile-menu"
-        aria-label="Navigation"
-        onClose={() => {
-          document.body.style.overflow = "";
-        }}
-        onClick={(event) => {
-          if (event.target === dialog.current) closeMenu();
-        }}
-      >
-        <div className="mobile-menu-inner">
-          <button
-            className="icon-button menu-close"
-            onClick={closeMenu}
-            aria-label="Close navigation"
-            autoFocus
-          >
-            <X size={24} />
-          </button>
-          <nav aria-label="Mobile navigation">
-            {navigation.map(({ href, label }, index) => (
-              <Link
-                key={href}
-                href={href}
-                onClick={closeMenu}
-                aria-current={isActive(href) ? "page" : undefined}
-              >
-                <span className="mono">0{index + 1}</span>
-                {label}
-                <ArrowUpRight size={20} />
+      <div className="md-workspace">
+        <nav className="md-shortcuts" aria-label="Desktop folders" ref={navigation}>
+          {folders.map(({ href, label, kind, Icon }) => (
+            <Link key={href} href={href} className="md-shortcut" data-open={kind} aria-current={!closed && current?.href === href ? "page" : undefined}>
+              <Icon aria-hidden="true" /><span>{label}</span>
+            </Link>
+          ))}
+        </nav>
+        {closed ? children : (
+          <section className="md-window" aria-label={current?.label ?? "Mahek’s desktop"}>
+            <header className="md-window-bar">
+              <p className="md-window-title">{current?.label ?? "A little detour"}</p>
+              <Link href="/desktop" className="md-close" aria-label="Close window" title="Close window (Escape)" onClick={() => { returnTo.current = folderHref; }}>
+                <X size={16} aria-hidden="true" />
               </Link>
-            ))}
-          </nav>
-          <div className="mobile-menu-footer">
-            <a href={links.github} target="_blank" rel="noreferrer">
-              GitHub <ArrowUpRight size={15} />
-            </a>
-            <a href={links.linkedin} target="_blank" rel="noreferrer">
-              LinkedIn <ArrowUpRight size={15} />
-            </a>
-            <a
-              href={links.x}
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Mahek Ara on X"
-            >
-              X <ArrowUpRight size={15} />
-            </a>
-            <ThemeSwitch />
-          </div>
-        </div>
-      </dialog>
-    </>
-  );
-}
-
-export function SiteFooter() {
-  const isHome = usePathname() === "/";
-  return (
-    <footer
-      className={`site-footer${isHome ? " home-footer" : ""}`}
-      id="contact"
-    >
-      <div>
-        {!isHome && <span className="footer-greeting">Say hello.</span>}
-        <a className="contact-link" href={links.email}>
-          {links.email.replace("mailto:", "")}{" "}
-          <ArrowUpRight size={15} aria-hidden="true" />
-        </a>
+            </header>
+            {children}
+          </section>
+        )}
       </div>
-      <div className="footer-links">
-        {isHome ? <span>{new Date().getFullYear()} · Mahek Ara</span> : <>
-          <a href={links.github} target="_blank" rel="noreferrer">
-            GitHub <ArrowUpRight size={14} />
-          </a>
-          <a href={links.linkedin} target="_blank" rel="noreferrer">
-            LinkedIn <ArrowUpRight size={14} />
-          </a>
-          <a
-            href={links.x}
-            target="_blank"
-            rel="noreferrer"
-            aria-label="Mahek Ara on X"
-          >
-            X <ArrowUpRight size={14} />
-          </a>
-        </>}
-      </div>
-      {!isHome && (
-        <div className="footer-bottom">
-          <span>Mahek Ara</span>
-          <span>{new Date().getFullYear()}</span>
-        </div>
-      )}
-    </footer>
+      <footer className="md-desk-footer">
+        <p>A little corner of the internet.</p>
+        <Link href="/">Mahek Ara</Link>
+      </footer>
+    </div>
   );
 }

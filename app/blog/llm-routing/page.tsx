@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
-import { CopyButton, ReadingProgress } from "../../components/article-tools";
+import { CopyButton } from "../../components/article-tools";
 import { routingPost } from "../../lib/content";
 
 export const metadata: Metadata = {
@@ -49,7 +49,7 @@ function CodeBlock({
         <span className="mono">{language}</span>
         <CopyButton text={code} />
       </div>
-      <pre>
+      <pre tabIndex={0} aria-label={`${language} code`}>
         <code>{code}</code>
       </pre>
     </div>
@@ -99,8 +99,7 @@ function RoutingDiagram({ escalation = false }: { escalation?: boolean }) {
 
 export default function LLMRoutingPage() {
   return (
-    <main id="main" className="essay-main">
-      <ReadingProgress />
+    <main id="main" className="md-paper-view essay-main" tabIndex={-1}>
       <div className="essay-nav">
         <Link href="/blog">
           <ArrowLeft size={15} />
