@@ -141,17 +141,32 @@ main:focus { outline:none; }
 .md-article-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:32px; font-size:13px; }
 .md-article h1 { font:500 clamp(34px,4vw,48px)/1.15 var(--font-heading),Arial,sans-serif; letter-spacing:-.035em; max-width:22ch; margin:0 0 18px; }
 .md-article-meta { font-size:12px; color:var(--paper-muted); display:flex; flex-wrap:wrap; gap:8px 18px; margin-bottom:32px; }
-.md-article-body { max-width:65ch; font-size:16px; line-height:1.85; }
+.md-window:not([data-maximized=true]):has(.md-article) { max-width:1180px; }
+.md-article-deck { max-width:60ch; color:var(--paper-muted); font-size:17px; line-height:1.65; margin:0 0 24px; }
+.md-article-layout { display:grid; grid-template-columns:minmax(0,1fr) 168px; column-gap:32px; align-items:start; }
+.md-article-header { grid-column:1; grid-row:1; }
+.md-article-body { grid-column:1; grid-row:2; min-width:0; font-size:16px; line-height:1.85; }
+.md-article-body > section { scroll-margin-top:24px; }
+.md-article-body > section:focus { outline:none; }
+.md-article-body > section > p { max-width:65ch; }
+.md-article-toc { grid-column:2; grid-row:1 / span 2; position:sticky; top:26px; padding-top:5px; }
+.md-article-toc p { margin:0 0 14px; font:10px/1.5 "Plex Mono",monospace; text-transform:uppercase; letter-spacing:.08em; color:var(--paper-muted); }
+.md-article-toc ol { list-style:none; padding:0; margin:0; }
+.md-article-toc a { display:flex; align-items:baseline; gap:9px; border-left:2px solid #73816830; padding:8px 8px 8px 12px; font-size:11px; line-height:1.45; color:var(--paper-muted); }
+.md-article-toc a span { font:9px/1.5 "Plex Mono",monospace; opacity:.7; }
+.md-article-toc a[aria-current=location] { border-color:#526647; background:#e9eedf; color:#30392d; font-weight:600; }
+.md-article-toc a:hover { color:#24341e; }
+.md-article-body .md-section-references { display:flex; flex-wrap:wrap; gap:8px 18px; font-size:12px; line-height:1.6; margin:18px 0 32px; color:#526647; }
 .md-article-body p { margin:0 0 22px; }
 .md-article-body h2 { font:500 28px/1.3 var(--font-heading),Arial,sans-serif; margin:32px 0 16px; letter-spacing:-.025em; }
 .md-article-body ul, .md-article-body ol { padding-left:22px; margin:0 0 24px; }
 .md-article-body li { margin:8px 0; }
 .md-article-body a { text-decoration:underline; text-underline-offset:4px; }
 .md-article-example { background:#edf0e5; border-radius:3px; padding:20px 24px; margin:28px 0; }
-.md-article-example figcaption { font-size:12px; color:var(--paper-muted); margin-bottom:12px; }
+.md-article-example figcaption { display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:12px; color:var(--paper-muted); margin-bottom:12px; }
 .md-article-example p { margin-bottom:8px; }
 .md-article-example pre { white-space:pre-wrap; overflow-wrap:anywhere; font:12px/1.8 "Plex Mono",monospace; }
-.md-architecture { width:min(780px,calc(100vw - 100px)); max-width:none; margin:34px 0 38px; border:1px solid #79877342; border-radius:10px; background:#f3f5ed; overflow:hidden; }
+.md-architecture { width:100%; margin:34px 0 38px; border:1px solid #79877342; border-radius:10px; background:#f3f5ed; overflow:hidden; }
 .md-architecture-hint { display:none; }
 .md-architecture-scroll { overflow-x:auto; scrollbar-width:thin; scrollbar-color:#a2ae9a transparent; }
 .md-architecture-scroll:focus-visible { outline:2px solid var(--accent); outline-offset:-3px; }
@@ -166,6 +181,19 @@ main:focus { outline:none; }
 .md-diagram-tag { font-size:9px; font-weight:700; letter-spacing:.07em; fill:#576653; }
 .md-diagram-title { font-size:14px; font-weight:700; fill:#273628; }
 .md-diagram-detail { font-size:10px; fill:#536052; }
+.md-readme-architecture, .md-recorded-demo { margin:30px 0; }
+.md-readme-architecture img, .md-recorded-demo img { width:100%; height:auto; display:block; border-radius:8px; }
+.md-readme-architecture figcaption, .md-recorded-demo figcaption { font-size:12px; line-height:1.6; color:var(--paper-muted); margin-top:12px; }
+.md-demo-controls { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0 0; font-size:12px; }
+.md-demo-controls button { border:1px solid #52664755; border-radius:5px; background:#e9eedf; padding:10px 14px; font-size:12px; }
+.md-demo-controls button:hover { background:#dee7d3; }
+@media(max-width:1100px) {
+  .md-article-layout { display:flex; flex-direction:column; gap:28px; }
+  .md-article-toc { position:static; width:100%; padding:16px 0; border-block:1px solid #73816830; }
+  .md-article-toc ol { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:2px 8px; }
+  .md-article-toc a { padding:7px 8px; }
+  .md-article-body { width:100%; }
+}
 .md-sources { margin-top:38px; }
 .md-sources h2 { font-size:24px; }
 .md-sources ul { list-style:none; padding:0; font-size:13px; }
@@ -174,37 +202,6 @@ main:focus { outline:none; }
 .copy-status { font-size:11px; }
 .mono { font:11px/1.7 "Plex Mono",monospace; }
 .text-link { display:inline-flex; align-items:center; gap:8px; }
-/* Preserve the original routing essay and its copy/contents controls. */
-.essay-main { padding:36px clamp(22px,5vw,60px) 48px; }
-.essay-nav { display:flex; justify-content:space-between; align-items:center; gap:16px; font-size:13px; }
-.essay-nav > a { display:inline-flex; align-items:center; gap:8px; }
-.essay-header { padding:28px 0 32px; }
-.essay-header h1 { font:500 clamp(34px,4vw,48px)/1.15 var(--font-heading),Arial,sans-serif; letter-spacing:-.035em; margin:0; }
-.essay-meta { display:flex; flex-wrap:wrap; gap:10px 24px; margin-top:22px; }
-.essay-layout { display:flex; flex-direction:column; gap:32px; }
-.essay-toc nav { display:flex; flex-wrap:wrap; gap:12px 22px; font-size:12px; }
-.essay-toc nav a { display:flex; gap:8px; }
-.essay-toc > p { margin:0 0 14px; }
-.essay-body { min-width:0; font-size:16px; line-height:1.85; }
-.essay-lede { font-size:20px; line-height:1.7; margin:0 0 24px; }
-.essay-section { scroll-margin-top:28px; margin-bottom:32px; }
-.essay-section p { margin:0 0 20px; }
-.essay-section h2 { font:500 28px/1.3 var(--font-heading),Arial,sans-serif; margin:32px 0 18px; }
-.essay-section blockquote { padding:0; margin:24px 0; font:500 25px/1.5 var(--font-text),Arial,sans-serif; }
-.essay-section .essay-conclusion { font-size:22px; }
-.routing-diagram, .implementation-note { margin:28px 0; padding:24px; background:var(--surface); border-radius:3px; }
-.implementation-note h2 { margin:0 0 12px; }
-.implementation-note p { font-size:14px; }
-.diagram-flow { display:flex; flex-direction:column; align-items:center; gap:14px; padding-top:20px; font-size:13px; }
-.model-branches, .evaluation-branches { display:flex; flex-wrap:wrap; justify-content:center; gap:16px; text-align:center; font-size:12px; }
-.model-branches span, .evaluation-branches span { background:var(--paper); padding:8px 12px; border-radius:3px; }
-.code-block { background:var(--surface); margin:26px 0; min-width:0; }
-.code-header { display:flex; justify-content:space-between; align-items:center; padding:4px 12px 4px 20px; }
-.code-block pre { overflow:auto; padding:16px 20px; margin:0; font:12px/1.9 "Plex Mono",monospace; }
-.metric-list { padding:0; list-style:none; font-size:14px; }
-.metric-list li { display:flex; gap:18px; margin:16px 0; }
-.metric-list span { font:11px/2 "Plex Mono",monospace; }
-.essay-bottom { display:flex; flex-wrap:wrap; gap:20px; justify-content:space-between; font-size:13px; }
 @media(max-width:700px) {
   .md-menubar { padding:0 16px; gap:12px; }
   .md-socials { gap:2px; }
@@ -274,7 +271,7 @@ main:focus { outline:none; }
   html, body { height:auto; overflow:visible; }
   .desktop { display:block; height:auto; overflow:visible; background:white; }
   .md-window-content { overflow:visible; }
-  .md-menubar, .md-shortcuts, .md-window-bar, .md-desk-footer, .copy-control, .md-article-nav, .essay-nav, .skip-link { display:none; }
+  .md-menubar, .md-shortcuts, .md-window-bar, .md-desk-footer, .copy-control, .md-article-nav, .md-article-toc, .md-demo-controls, .skip-link { display:none; }
   .md-workspace { display:block; padding:0; overflow:visible; }
   .md-window, .md-window[data-maximized=true] { position:static; transform:none !important; display:block; height:auto; max-height:none; box-shadow:none; max-width:none; overflow:visible; border:0; }
   .md-paper-view { padding:0; background:white; color:black; --surface:#eee; }

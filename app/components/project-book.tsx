@@ -152,7 +152,7 @@ export function ProjectBook() {
             </div>
             <footer className="case-footer">
               <a href={project.github} target="_blank" rel="noreferrer">Open repository <ArrowUpRight size={15} aria-hidden="true" /></a>
-              {project.id === "llm-router" && <Link href="/blog/llm-routing" onClick={() => { dialog.current?.close(); document.body.style.overflow = ""; }}>Read the build notes <ArrowRight size={15} aria-hidden="true" /></Link>}
+              {project.id === "context-relay" && <Link href="/blog/context-relay" onClick={() => { dialog.current?.close(); document.body.style.overflow = ""; }}>Read the technical deep dive <ArrowRight size={15} aria-hidden="true" /></Link>}
             </footer>
           </div>
         )}
