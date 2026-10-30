@@ -47,8 +47,8 @@ try {
   await expect(page.locator("h1")).toHaveText("Mahek Ara");
   for (const project of projects) assert(!(await page.locator("main").innerText()).includes(project.title), "Projects stay in their folder");
   assert(await page.getByRole("img", { name: /Mahek Ara/ }).evaluate(image => image.complete && image.naturalWidth > 0), "Portrait loads");
-  await expect(page.locator(".md-app-icon")).toHaveCount(5);
-  await expect(folders().getByRole("link", { name: "Resume", exact: true })).toHaveAttribute("href", links.resume);
+  await expect(page.locator(".md-app-icon")).toHaveCount(4);
+  await expect(folders().getByRole("link", { name: "Resume", exact: true })).toHaveCount(0);
   await expect(page.getByRole("navigation", { name: "Social profiles" }).getByRole("link", { name: "LinkedIn" })).toHaveAttribute("href", links.linkedin);
   await layout("home / desktop / graphite");
   await page.screenshot({ path: ".qa/desktop-home.png", fullPage: true });
@@ -76,7 +76,7 @@ try {
   await page.reload({ waitUntil: "networkidle" });
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await visit("/");
-  // Pointer gestures rearrange items without navigating; explicit activation still opens them.
+  // The title bar still moves; desktop app icons stay anchored.
   async function drag(locator, dx, dy) {
     const box = await locator.boundingBox();
     assert(box, "Drag target exists");
@@ -94,33 +94,23 @@ try {
   await page.getByRole("button", { name: "Maximize window", exact: true }).click();
   await page.getByRole("button", { name: "Restore window", exact: true }).click();
   assert.deepEqual(await frame.boundingBox(), movedWindow, "Restore remembers the dragged location");
-  for (const name of ["About me", "Writing", "Projects", "Contact", "Resume"]) {
+  for (const name of ["About me", "Writing", "Projects", "Contact"]) {
     const shortcut = folders().getByRole("link", { name, exact: true });
     const before = await shortcut.boundingBox();
     await drag(shortcut, 45, 3);
     const after = await shortcut.boundingBox();
-    assert(after.x > before.x + 30, name + " moves independently");
-    await expect(page).toHaveURL(baseURL + "/");
-    assert.equal(context.pages().length, 1, "Dragging the resume cannot open an external tab");
+    assert.deepEqual(after, before, name + " stays anchored after a pointer gesture");
+    await visit("/");
   }
-  // A single large pointer move must be captured even after it leaves a small icon.
-  const resume = folders().getByRole("link", { name: "Resume", exact: true });
-  const resumeStart = await resume.boundingBox();
-  await page.mouse.move(resumeStart.x + 30, resumeStart.y + 25);
-  await page.mouse.down();
-  await page.mouse.move(resumeStart.x + 150, resumeStart.y - 35);
-  await page.mouse.up();
-  assert((await resume.boundingBox()).x > resumeStart.x + 80, "Fast drag retains the target");
-  assert.equal(context.pages().length, 1, "Fast resume drag does not open a tab");
   const writing = folders().getByRole("link", { name: "Writing", exact: true });
   const movedShortcut = await writing.boundingBox();
   await writing.focus();
   await page.keyboard.press("Alt+ArrowRight");
-  assert((await writing.boundingBox()).x > movedShortcut.x, "Keyboard can arrange icons");
+  assert.deepEqual(await writing.boundingBox(), movedShortcut, "Alt + arrow cannot move icons");
   await page.getByRole("button", { name: "Move window", exact: true }).focus();
   await page.keyboard.press("ArrowLeft");
   assert((await frame.boundingBox()).x < movedWindow.x, "Keyboard can move windows");
-  await page.getByRole("button", { name: "Reset layout", exact: true }).click();
+  await page.getByRole("button", { name: "Reset window", exact: true }).click();
   assert.deepEqual(await frame.boundingBox(), initialWindow, "Reset returns the default window position");
   await folders().getByRole("link", { name: "Writing", exact: true }).click();
   await expect(page).toHaveURL(baseURL + "/blog");
@@ -154,9 +144,20 @@ try {
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toBeFocused();
   await folders().getByRole("link", { name: "Projects", exact: true }).click();
   await expect(page.locator(".md-project")).toHaveCount(3);
+  assert.deepEqual(await page.locator(".md-project").evaluateAll(cards => cards.map(card => card.id)), ["context-relay", "aura-linkedin", "build-buy-borrow"]);
   await expect(page.locator("#context-relay")).toContainText("Public npm beta");
+  await expect(page.locator("#context-relay .md-project-art--dark img")).toBeVisible();
+  await expect(page.locator("#context-relay .md-project-art--light img")).toBeHidden();
   await expect(page.locator("#aura-linkedin")).toContainText("Unpacked Chrome extension");
   await expect(page.locator("#aura-linkedin img")).toBeVisible();
+  await expect(page.locator("#build-buy-borrow img")).toBeVisible();
+  for (const image of await page.locator(".md-project-cover img:visible").all()) {
+    assert(await image.evaluate(node => node.complete && node.naturalWidth > 0), "Project artwork loads");
+  }
+  await appearance("light");
+  await expect(page.locator("#context-relay .md-project-art--light img")).toBeVisible();
+  await expect(page.locator("#context-relay .md-project-art--dark img")).toBeHidden();
+  await appearance("dark");
   await page.locator("#context-relay summary").click();
   await expect(page.locator("#context-relay")).toContainText(/live model-quality evaluation remains pending/i);
   await visit("/projects?focus=ai#llm-router");
@@ -294,19 +295,19 @@ try {
     await page.keyboard.press("Enter");
     await expect(page.locator(".md-window")).toHaveAttribute("data-maximized", "false");
   }
-  // Real touch events cover pointer capture and cancellation, not just synthetic callbacks.
+  // Touch movement leaves the icons anchored and does not activate them.
   const touchContext = await browser.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true });
   const touchPage = await touchContext.newPage();
   await touchPage.goto(baseURL + "/", { waitUntil: "networkidle" });
-  const touchIcon = touchPage.locator('[data-open="resume"]');
+  const touchIcon = touchPage.locator('[data-open="contact"]');
   const touchStart = await touchIcon.boundingBox();
   const touchClient = await touchContext.newCDPSession(touchPage);
   const finger = { x: touchStart.x + touchStart.width / 2, y: touchStart.y + 20 };
   await touchClient.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [finger] });
   await touchClient.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: finger.x - 80, y: finger.y + 10 }] });
   await touchClient.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
-  await expect.poll(async () => (await touchIcon.boundingBox()).x).toBeLessThan(touchStart.x - 50);
-  assert.equal(touchContext.pages().length, 1, "Touch drag does not open resume");
+  assert.deepEqual(await touchIcon.boundingBox(), touchStart, "Touch gesture leaves the icon anchored");
+  assert.equal(touchContext.pages().length, 1, "Touch gesture does not open an external tab");
   await expect(touchPage).toHaveURL(baseURL + "/");
   // A narrow viewport gets an accessible default arrangement rather than stranded controls.
   await touchPage.setViewportSize({ width: 320, height: 760 });
@@ -338,5 +339,5 @@ try {
   assert.deepEqual(remoteRequests, [], "No third-party services needed to render");
   await writeFile(".qa/interface-report.json", JSON.stringify({ report, errors, remoteRequests }, null, 2));
   assert.equal(report.flatMap(item => item.violations).length, 0, "Accessibility issues: see .qa/interface-report.json");
-  console.log("Desktop navigation, history, article links, unchanged icons, responsive layout, persisted dark/light themes, keyboard, no-JS reading and accessibility checks passed.");
+  console.log("Desktop navigation, anchored icons, project artwork and order, history, article links, responsive layout, persisted dark/light themes, keyboard, no-JS reading and accessibility checks passed.");
 } finally { await writeFile(".qa/interface-report.json", JSON.stringify({ report, errors, remoteRequests }, null, 2)); await browser.close(); }

@@ -1,0 +1,5 @@
+# Project cover sources
+
+- `context-relay-dark.svg`, `context-relay-light.svg`, and their `-mobile.svg` variants are exact copies of the matching `docs/assets/workspace/hero*.svg` banners in [mahekara28/context-relay](https://github.com/mahekara28/context-relay/tree/4e52ada45c471f17a94b16b2d81ed6636495f0f7/docs/assets/workspace). Copied at source commit `4e52ada45c471f17a94b16b2d81ed6636495f0f7`. The banners contain harness logos attributed in that repository's third-party license file.
+- `build-buy-borrow-cover.webp` is an original presentation image made from this repository's `build-buy-borrow.png` screenshot. The app interface and sample numbers inside the screenshot are unchanged; the surrounding gradient, heading, and frame were added locally. The screenshot shows an illustrative fictional scenario from [mahekara28/build-buy-borrow](https://github.com/mahekara28/build-buy-borrow).
+- `aura-theme-collection.jpg` is copied from [mahekara28/aura-linkedin](https://github.com/mahekara28/aura-linkedin/blob/0df430a24d1baeec08e091061afce3bc601bae5f/docs/images/theme-collection.jpg). Its source repository documents the sample imagery.
