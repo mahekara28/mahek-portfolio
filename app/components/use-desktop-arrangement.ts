@@ -6,7 +6,7 @@ type Point = { x: number; y: number };
 type Drag = { id: string; pointerId: number; start: Point; origin: Point; moved: boolean };
 const zero: Point = { x: 0, y: 0 };
 
-/** Keep the layout in normal document flow; only user-arranged items get offsets. */
+/** Keep the window in normal document flow until it is moved. */
 export function useDesktopArrangement(workspace: RefObject<HTMLDivElement | null>, maximized: boolean) {
   const [offsets, setOffsets] = useState<Record<string, Point>>({});
   const [dragging, setDragging] = useState<string | null>(null);
@@ -77,7 +77,7 @@ export function useDesktopArrangement(workspace: RefObject<HTMLDivElement | null
       onPointerDown(event: PointerEvent<HTMLElement>) {
         if (!enabled || event.button !== 0 || !event.isPrimary) return;
         active.current = { id, pointerId: event.pointerId, start: { x: event.clientX, y: event.clientY }, origin: positions.current[id] ?? zero, moved: false };
-        // Capture immediately so a fast gesture cannot outrun a small app icon.
+        // Capture immediately so a fast gesture cannot outrun the title bar.
         event.currentTarget.setPointerCapture(event.pointerId);
       },
       onPointerMove(event: PointerEvent<HTMLElement>) {

@@ -12,12 +12,11 @@ import { DesktopRest } from "./desktop-rest";
 import { useDesktopArrangement } from "./use-desktop-arrangement";
 import { useTheme } from "../theme-provider";
 
-const folders: { href: string; label: string; kind: DesktopIconKind; external?: boolean }[] = [
+const folders: { href: string; label: string; kind: DesktopIconKind }[] = [
   { href: "/", label: "About me", kind: "about" },
   { href: "/blog", label: "Writing", kind: "writing" },
   { href: "/projects", label: "Projects", kind: "projects" },
   { href: "/contact", label: "Contact", kind: "contact" },
-  { href: links.resume, label: "Resume", kind: "resume", external: true },
 ];
 
 export function DesktopShell({ children }: { children: ReactNode }) {
@@ -34,7 +33,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
   const minimized = minimizedSegment !== undefined && minimizedSegment === segment && !closed;
   const maximized = expanded && !closed && !minimized;
   const arrangement = useDesktopArrangement(workspace, maximized);
-  const current = folders.find(({ href, external }) => !external && (href === "/" ? segment === null : segment === href.slice(1)));
+  const current = folders.find(({ href }) => href === "/" ? segment === null : segment === href.slice(1));
   const folderHref = current?.href ?? "/";
 
   function reveal() { setMinimizedSegment(undefined); }
@@ -67,7 +66,6 @@ export function DesktopShell({ children }: { children: ReactNode }) {
   return (
     <div className="desktop" data-maximized={maximized} data-dragging={Boolean(arrangement.dragging)}>
       <a className="skip-link" href={minimized ? "#desktop-main" : "#main"}>Skip to content</a>
-      <p className="sr-only" id="shortcut-move-help">Drag to move this app, or hold Alt and use arrow keys while focused. Reset layout returns all items to their starting positions.</p>
       <p className="sr-only" id="window-move-help">Drag the title bar to move the window. When this title is focused, use arrow keys to move, or Shift and arrow keys for smaller steps. Double-click to maximize or restore.</p>
       <header className="md-menubar" inert={maximized}>
         <Link className="md-desktop-name" href="/" aria-label="Mahek’s introduction" title="Mahek Ara" onClick={reveal}>
@@ -91,17 +89,12 @@ export function DesktopShell({ children }: { children: ReactNode }) {
       </header>
       <div className="md-workspace" ref={workspace}>
         <nav className="md-shortcuts" aria-label="Desktop folders" ref={navigation} inert={maximized}>
-          {folders.map(({ href, label, kind, external }) => {
-            const shared = {
-              ...arrangement.item(kind), ...arrangement.handle(kind),
-              className: "md-shortcut", "data-open": kind, draggable: false,
-              "aria-describedby": "shortcut-move-help",
-              children: <><DesktopIcon kind={kind} /><span>{label}</span></>,
-            };
-            return external
-              ? <a key={kind} href={href} target="_blank" rel="noreferrer" {...shared} title="Open resume in Google Drive" />
-              : <Link key={kind} href={href} {...shared} aria-current={!closed && !minimized && current?.href === href ? "page" : undefined} onClick={reveal} />;
-          })}
+          {folders.map(({ href, label, kind }) => (
+            <Link key={kind} href={href} className="md-shortcut" data-open={kind} draggable={false}
+              aria-current={!closed && !minimized && current?.href === href ? "page" : undefined} onClick={reveal}>
+              <DesktopIcon kind={kind} /><span>{label}</span>
+            </Link>
+          ))}
         </nav>
         {closed ? children : <>
           {minimized && <DesktopRest id="desktop-main" />}
@@ -130,7 +123,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
         <p>Built with curiosity. Always a work in progress.</p>
         <div className="md-desktop-actions">
           {minimized && <button className="md-resume-window" onClick={() => { reveal(); requestAnimationFrame(() => maximizeControl.current?.focus()); }}>Open {current?.label ?? "window"}</button>}
-          <button className="md-reset-layout" onClick={arrangement.reset} title="Reset the positions of all apps and windows"><RotateCcw size={13} aria-hidden="true" /> Reset layout</button>
+          <button className="md-reset-layout" onClick={arrangement.reset} title="Reset the window position"><RotateCcw size={13} aria-hidden="true" /> Reset window</button>
         </div>
       </footer>
     </div>

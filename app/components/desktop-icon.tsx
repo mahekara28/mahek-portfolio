@@ -1,13 +1,12 @@
 import { useId } from "react";
 
-export type DesktopIconKind = "about" | "writing" | "projects" | "contact" | "resume";
+export type DesktopIconKind = "about" | "writing" | "projects" | "contact";
 
 const silhouettes: Record<DesktopIconKind, string> = {
   about: "M11 29 28 14a6 6 0 0 1 8 0l17 15v21a4 4 0 0 1-4 4H38V41a6 6 0 0 0-12 0v13H15a4 4 0 0 1-4-4Z",
   writing: "M18 11h28a4 4 0 0 1 4 4v38H18a6 6 0 0 1-6-6V17a6 6 0 0 1 6-6Z",
   projects: "M12 18h13l6 6h20a4 4 0 0 1 4 4v22a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4V22a4 4 0 0 1 4-4Z",
   contact: "M17 11h30a4 4 0 0 1 4 4v31H13V15a4 4 0 0 1 4-4Zm-7 36h44l2 6a2 2 0 0 1-2 3H10a2 2 0 0 1-2-3Z",
-  resume: "M18 9h21l12 12v31a3 3 0 0 1-3 3H18a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4Z",
 };
 
 /** Original sage objects with a shallow rim, pale face and engraved details. */
@@ -45,12 +44,6 @@ export function DesktopIcon({ kind }: { kind: DesktopIconKind }) {
         <path d="M24 38c0-8 16-8 16 0" fill="#6f895b" />
         <path d="M11 49h42" stroke="#f8fbef" strokeWidth="1.5" strokeLinecap="round" />
         <path d="M27 49h10" stroke="#93aa7d" strokeWidth="2" strokeLinecap="round" />
-      </>}
-      {kind === "resume" && <>
-        <path d="M39 10v10a2 2 0 0 0 2 2h9" fill="#e8f0dc" stroke="#94ab80" strokeWidth="1.2" strokeLinejoin="round" />
-        <circle cx="26" cy="26" r="4" fill="#769062" />
-        <path d="M20 36c0-7 12-7 12 0" fill="#769062" />
-        <path d="M36 29h7m-7 6h7m-22 8h22m-22 5h15" stroke="#80986c" strokeWidth="1.7" strokeLinecap="round" />
       </>}
     </svg>
   );
