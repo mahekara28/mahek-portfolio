@@ -15,7 +15,7 @@ References: [ZenML](https://www.zenml.io/) (reviewed October 30, 2026) for gener
 - Existing Plex Mono remains for code and small interface labels. Its existing license is retained.
 - `app/components/desktop-icon.tsx`: original standalone SVG house, notebook, code folder, contact laptop and resume illustrations. The owner’s sidebar reference informs their pale sage faces, bright upper edges, shallow darker rims and compact scale. The previous colored square tiles are retired. No third-party icon artwork is bundled. Lucide supplies the window-control symbols and reset icon under the installed package’s ISC license.
 
-- The header uses only the existing MA monogram from `app/icon.svg`, rendered as an inline vector with an accessible home-link name.
+- The header uses a handwritten MA monogram outlined from the bundled Allura font in `app/components/brand-mark.tsx`, with an accessible home-link name. `app/icon.svg` uses the same outlines on Graphite, with slightly reinforced strokes for tab-size legibility; `app/favicon.ico` contains matching 16, 32, 48 and 64px fallbacks. The outlines need no font download to render and retain Allura’s existing SIL OFL attribution.
 
 - Resume: the existing Google Drive link from the earlier portfolio, restored from repository history. Verified on October 30, 2026: the public viewer responds with “Mahek_Ara_Resume.pdf”. LinkedIn and GitHub links retain the established profile URLs. External profiles and the PDF open only after activation.
 

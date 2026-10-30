@@ -7,6 +7,7 @@ import { Minus, Plus, X, Copy, RotateCcw, Sun, Moon } from "lucide-react";
 import { links } from "../lib/content";
 import { WindowContent } from "./window-content";
 import { DesktopIcon, type DesktopIconKind } from "./desktop-icon";
+import { BrandMark } from "./brand-mark";
 import { DesktopRest } from "./desktop-rest";
 import { useDesktopArrangement } from "./use-desktop-arrangement";
 import { useTheme } from "../theme-provider";
@@ -70,9 +71,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
       <p className="sr-only" id="window-move-help">Drag the title bar to move the window. When this title is focused, use arrow keys to move, or Shift and arrow keys for smaller steps. Double-click to maximize or restore.</p>
       <header className="md-menubar" inert={maximized}>
         <Link className="md-desktop-name" href="/" aria-label="Mahek’s introduction" title="Mahek Ara" onClick={reveal}>
-          <svg className="md-brand-mark" viewBox="8 17 56 30" fill="currentColor" aria-hidden="true" focusable="false">
-            <path d="M12 43V21h4l8 14 8-14h4v22h-4V29l-8 13-8-13v14zm28 0 8-22h4l8 22h-4l-2-6h-8l-2 6zm7-10h6l-3-8z" />
-          </svg>
+          <BrandMark />
         </Link>
         <div className="md-menu-actions">
           <button className="md-theme-toggle" type="button" onClick={toggleTheme} aria-label="Switch color theme">
