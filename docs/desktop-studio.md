@@ -2,7 +2,7 @@
 
 ## Direction
 
-The current direction is a light sage desktop with cream windows, muted green accents and dimensional app icons. The owner’s screenshot supplies the portrait treatment: a tilted photo print over lined paper with translucent tape, centered above the handwritten name. The beach wallpaper remains retired. Work and writing live in their own apps, and the introduction points directly to both. A closed window reveals “Mahek Ara” in the same signature font.
+The current direction is a light sage desktop with cream windows, muted green accents and small, sculpted sage app icons. The owner’s screenshot supplies the portrait treatment: a tilted photo print over lined paper with translucent tape, centered above the handwritten name. The beach wallpaper remains retired. Work and writing live in their own apps, and the introduction points directly to both. A closed window reveals “Mahek Ara” in the same signature font.
 
 References: [ZenML](https://www.zenml.io/) (reviewed October 30, 2026) for generous medium-weight headings, monospace labels, muted surfaces, rounded actions and fine texture; [PostHog](https://posthog.com/) for the desktop metaphor; [April Leihuanani](https://aprilleihuanani.com/) for a personal portrait collage; [TypeUI Agentic public preview](https://www.typeui.sh/design-skills/agentic) for editorial typography and spacing. No source code or proprietary assets from those sites were copied. TypeUI’s paid skill file was not installed; the public preview informed the design.
 
@@ -13,7 +13,9 @@ References: [ZenML](https://www.zenml.io/) (reviewed October 30, 2026) for gener
 - Existing Hanken Grotesk supplies the medium-weight editorial headings; its bundled SIL Open Font License is retained. The reference uses Borna; no font files from ZenML are copied.
 - `public/images/desktop-grain.svg`: original, static SVG turbulence used at low opacity behind the desktop. No third-party wallpaper.
 - Existing Plex Mono remains for code and small interface labels. Its existing license is retained.
-- `app/components/desktop-icon.tsx`: original SVG profile-card, notebook, folder, envelope and resume illustrations. Rounded tiles, gentle shading and familiar objects take inspiration from desktop app icons; no Apple artwork is bundled. Lucide supplies the window-control symbols and reset icon under the installed package’s ISC license.
+- `app/components/desktop-icon.tsx`: original standalone SVG house, notebook, code folder, contact laptop and resume illustrations. The owner’s sidebar reference informs their pale sage faces, bright upper edges, shallow darker rims and compact scale. The previous colored square tiles are retired. No third-party icon artwork is bundled. Lucide supplies the window-control symbols and reset icon under the installed package’s ISC license.
+
+- The header uses only the existing MA monogram from `app/icon.svg`, rendered as an inline vector with an accessible home-link name.
 
 - Resume: the existing Google Drive link from the earlier portfolio, restored from repository history. Verified on October 30, 2026: the public viewer responds with “Mahek_Ara_Resume.pdf”. LinkedIn and GitHub links retain the established profile URLs. External profiles and the PDF open only after activation.
 
