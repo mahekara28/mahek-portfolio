@@ -2,7 +2,7 @@
 
 [Visit the portfolio](https://mahekara.vercel.app/)
 
-A Graphite desktop with a Soft ivory light mode, fixed sage app icons, draggable windows, a layered photo print and a handwritten name. About, Writing, Projects and Contact open ordinary pages. The introduction has no project feed.
+A charcoal-and-sage desktop with a Soft ivory light mode, fixed sage app icons, draggable windows, a layered photo print and a compact serif name. The photo is centered above the name and introduction. About adapts to its window height so the photo, introduction and links fit together on phones and laptops. It remains scrollable for unusually small or zoomed views rather than clipping content. About, Writing, Projects and Contact open ordinary pages. The introduction has no project feed.
 
 ## Run locally
 
@@ -13,13 +13,13 @@ npm ci
 npm run dev
 ```
 
-Next.js App Router, React and TypeScript. The interface uses self-hosted Nunito and headings use Hanken Grotesk; Mahek’s handwritten name uses Allura. Fonts, icons and the portrait are served locally. No analytics, external font requests or social API calls are needed to render the site.
+Next.js App Router, React and TypeScript. The interface and headings use self-hosted Instrument Sans; Mahek’s name uses Fraunces. Plex Mono remains for code and small technical labels. Fonts, icons and the portrait are served locally. No analytics, external font requests or social API calls are needed to render the site.
 
 ## Routes and content
 
 | Route | Contents |
 | --- | --- |
-| `/` | Layered portrait, handwritten name and builder introduction |
+| `/` | Layered portrait, name and builder introduction |
 | `/blog` | The Context Relay technical deep dive |
 | `/blog/context-relay` | Statically generated article with architecture diagrams, contents links and source references |
 | `/projects` | Context Relay, Aura for LinkedIn, then Build, Buy or Borrow; earlier experiments in a disclosure |
@@ -27,11 +27,11 @@ Next.js App Router, React and TypeScript. The interface uses self-hosted Nunito 
 | `/desktop` | Closed-window view; folders remain available |
 | `/about` | Permanent redirect to the introduction |
 
-The shared layout is `app/components/site-shell.tsx`. Red closes the window, yellow minimizes it, and green maximizes or restores it. Minimizing keeps the content and reading position; the footer or the app icon reopens the window. Closing shows Mahek’s handwritten name on the desktop and returns focus to the app. Escape restores a maximized window, then closes a floating one.
+The shared layout is `app/components/site-shell.tsx`. Red closes the window, yellow minimizes it, and green maximizes or restores it. Minimizing keeps the content and reading position; the footer or the app icon reopens the window. Closing reveals a pixel-flower paper sketch and Mahek’s name, and returns focus to the app. The flower grows once and settles; reduced motion shows the finished sketch immediately. Escape restores a maximized window, then closes a floating one.
 
 Drag the title bar to move a window within the workspace. The four app icons stay in place. With the title focused, arrow keys move the window; Shift makes smaller moves. Reset window restores its default position. Window position survives page navigation; resizing the viewport restores the default to keep controls reachable. Only the window’s content scrolls. New pages start at the top, while Back/Forward restores reading positions. Ordinary links and reading work without JavaScript.
 
-The site starts in Graphite: neutral charcoal surfaces, off-white text and restrained lilac accents. The menu-bar theme control switches to Soft ivory, a lighter cream-and-sage appearance. The choice persists across navigation and reloads in the dedicated `mahek-appearance` storage key; `next-themes` applies it before hydration. The centered portrait uses a tilted photo print, lined paper and translucent tape, following the owner’s screenshot. The original four sage icons retain their artwork, colors, dimensions and fixed positions in both themes. Icons, fonts and the portrait are local assets. The menu bar has an MA logo linking home, plus compact GitHub, LinkedIn and X links. Mobile has a four-app row and internal window scrolling. Reduced motion disables transitions. Projects stay outside the home introduction; older project anchors still reveal the relevant archive entry.
+The site starts in Graphite: charcoal surfaces, off-white text and sage accents. The menu-bar theme control switches to Soft ivory, a lighter cream-and-sage appearance. The choice persists across navigation and reloads in the dedicated `mahek-appearance` storage key; `next-themes` applies it before hydration. The portrait is centered above the introduction and uses a tilted photo print, lined paper and translucent tape, following the owner’s screenshot. The original four sage icons retain their artwork, colors, dimensions and fixed positions in both themes. Icons, fonts and the portrait are local assets. The menu bar has a custom pixel-flower logo linking home, matching the SVG and ICO favicons, plus compact GitHub, LinkedIn and X links. Mobile has a four-app row and internal window scrolling. Reduced motion disables transitions. Projects stay outside the home introduction; older project anchors still reveal the relevant archive entry.
 
 Selected work uses the Context Relay npm banner from its repository in a theme-matched, mobile-aware cover. Aura uses its four-theme gallery. Build, Buy or Borrow uses a new cover composed from a real sample screenshot of its scenario studio. The project covers, source files and provenance are recorded in [`public/projects/ASSETS.md`](public/projects/ASSETS.md).
 

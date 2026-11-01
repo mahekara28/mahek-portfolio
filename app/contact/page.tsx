@@ -6,9 +6,9 @@ export const metadata: Metadata = { title: "Say hello", description: "Get in tou
 export default function ContactPage() {
   return (
     <main id="main" className="md-paper-view md-contact" tabIndex={-1}>
-      <p className="md-eyebrow">A conversation starts somewhere</p>
+      <p className="md-eyebrow">Contact</p>
       <h1>Let’s say hello.</h1>
-      <p className="md-intro">Have a useful problem to work on, a question about a project, or something worth exploring together?</p>
+      <p className="md-intro">Questions about the code, something you’re working on, or just a hello — my inbox is open.</p>
       <a className="md-email" href={links.email}>mahekarabangi28@gmail.com</a>
       <nav className="md-contact-links" aria-label="Contact profiles">
         <a href={links.github} target="_blank" rel="noreferrer">GitHub</a>

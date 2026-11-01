@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const selected = [
   {
     id: "context-relay",
-    summary: "Carry the useful context forward. A local CLI, interface and MCP integration for reviewing and handing off context between supported coding agents.",
+    summary: "A local CLI and interface for deciding what context to keep when moving between coding agents, with MCP integration for supported tools.",
     featureHref: "https://mahekara28.github.io/context-relay/",
     featureLabel: "Project website",
     notesHref: "/blog/context-relay",
@@ -20,7 +20,7 @@ const selected = [
   },
   {
     id: "aura-linkedin",
-    summary: "Make a familiar workspace feel personal. Four photographic LinkedIn themes, saved appearance controls and a studio for trying them on sample profiles.",
+    summary: "Four photographic themes for LinkedIn, with saved appearance settings and a studio to try them on sample profiles.",
     featureHref: "/projects/aura-theme-collection.jpg",
     featureLabel: "View four themes",
     notesHref: "https://github.com/mahekara28/aura-linkedin/blob/0df430a24d1baeec08e091061afce3bc601bae5f/README.md",
@@ -28,7 +28,7 @@ const selected = [
   },
   {
     id: "build-buy-borrow",
-    summary: "Make the assumptions visible. Compare staffing approaches against time, budget and capacity, using fictional scenarios.",
+    summary: "A way to compare staffing choices against time, budget and capacity. Change the assumptions and see the trade-offs, using fictional scenarios.",
     featureHref: "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912/PORTFOLIO.md",
     featureLabel: "Case study",
     notesHref: "https://github.com/mahekara28/build-buy-borrow/blob/bd642ab465fa10c5487707cde4e46c0ed0495912/DESIGN-NOTES.md",
@@ -38,12 +38,12 @@ const selected = [
 
 export default function ProjectsPage() {
   return (
-    <main id="main" className="md-paper-view" tabIndex={-1}>
+    <main id="main" className="md-paper-view md-project-view" tabIndex={-1}>
       <p className="md-eyebrow">Selected work</p>
       <h1>A few things I’ve built.</h1>
-      <p className="md-intro">Small, practical tools and interfaces with decisions you can inspect and code you can explore.</p>
+      <p className="md-intro">What I was trying to solve, how I approached it, and the code if you want a closer look.</p>
       <div className="md-projects">
-        {selected.map((item) => {
+        {selected.map((item, index) => {
           const project = projects.find((entry) => entry.id === item.id)!;
           return (
             <article className={`md-project${item.id === "context-relay" ? " md-project--featured" : ""}`} id={project.id} key={project.id}>
@@ -65,7 +65,7 @@ export default function ProjectsPage() {
                 )}
               </a>
               <div className="md-project-body">
-                <p className="md-status">{project.category} · {project.status}</p>
+                <p className="md-status"><span className="md-project-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>{project.category} · {project.status}</p>
                 <h2>{project.title}</h2>
                 <p>{item.summary}</p>
                 <div className="md-project-links">

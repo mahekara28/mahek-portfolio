@@ -44,6 +44,35 @@ async function layout(label) {
 }
 try {
   await visit("/");
+  // About should fit rather than hiding its links below an inner scrollbar.
+  for (const viewport of [
+    { width: 1440, height: 900 }, { width: 1366, height: 768 },
+    { width: 665, height: 532 }, { width: 844, height: 390 },
+    { width: 390, height: 844 }, { width: 360, height: 640 },
+    { width: 320, height: 568 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const content = page.locator(".md-window-content");
+    await expect.poll(() => content.evaluate(el => el.scrollHeight - el.clientHeight), {
+      message: `About fits at ${viewport.width}×${viewport.height}`,
+    }).toBeLessThanOrEqual(1);
+    const bounds = await content.boundingBox();
+    const linksBox = await page.locator(".md-about-links").boundingBox();
+    assert(linksBox.y >= bounds.y && linksBox.y + linksBox.height <= bounds.y + bounds.height + 1, "About links stay inside the window");
+    await expect(page.locator(".md-signature")).toBeInViewport();
+    if (viewport.width === 320) await page.screenshot({ path: ".qa/about-small-phone.png", animations: "disabled" });
+    if (viewport.width === 360) await page.screenshot({ path: ".qa/about-phone.png", animations: "disabled" });
+    if (viewport.width === 665) await page.screenshot({ path: ".qa/about-short-window.png", animations: "disabled" });
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const photo = page.locator(".md-photo-print");
+  const restingPhoto = await photo.evaluate(el => getComputedStyle(el).transform);
+  await page.locator(".md-portrait-composition").hover();
+  await expect.poll(() => photo.evaluate(el => getComputedStyle(el).transform)).not.toBe(restingPhoto);
+  await page.mouse.move(1380, 810);
+  await expect(page.locator(".md-grid-focus")).toHaveAttribute("data-visible", "true");
+  await page.getByRole("button", { name: "Switch color theme" }).hover();
+  await expect(page.locator(".md-grid-focus")).not.toHaveAttribute("data-visible");
   await expect(page.locator("h1")).toHaveText("Mahek Ara");
   for (const project of projects) assert(!(await page.locator("main").innerText()).includes(project.title), "Projects stay in their folder");
   assert(await page.getByRole("img", { name: /Mahek Ara/ }).evaluate(image => image.complete && image.naturalWidth > 0), "Portrait loads");
@@ -139,6 +168,13 @@ try {
   await expect(page.locator(".md-window")).toHaveCount(0);
   await expect(page.locator("h1")).toHaveText("Mahek Ara");
   await layout("closed desktop / graphite");
+  await expect(page.getByRole("img", { name: /A little room for curiosity/ })).toBeVisible();
+  await page.screenshot({ path: ".qa/desktop-closed.png", fullPage: true, animations: "disabled" });
+  await appearance("light");
+  await layout("closed desktop / soft ivory");
+  await page.screenshot({ path: ".qa/desktop-closed-light.png", fullPage: true, animations: "disabled" });
+  await appearance("dark");
+  await folders().getByRole("link", { name: "Writing", exact: true }).focus();
   await page.keyboard.press("Enter"); await expect(page).toHaveURL(baseURL + "/blog");
   await page.getByRole("link", { name: "Close window", exact: true }).click();
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toBeFocused();
@@ -280,7 +316,8 @@ try {
     await expect.poll(() => content.evaluate(el => el.scrollTop)).toBe(500);
     const readingPosition = await content.evaluate(el => el.scrollTop);
     await folders().getByRole("link", { name: "About me", exact: true }).click();
-    await expect(page.locator(".md-welcome")).toBeInViewport();
+    await expect(page.locator(".md-signature")).toBeInViewport();
+    await expect(page.locator(".md-bio")).toBeInViewport();
     await expect.poll(() => page.locator(".md-window-content").evaluate(el => el.scrollTop)).toBe(0);
     await page.goBack();
     await expect(page).toHaveURL(baseURL + "/blog/context-relay");
@@ -319,6 +356,18 @@ try {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await visit("/");
   assert.equal(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === "running").length), 0);
+  await page.getByRole("button", { name: "Minimize window", exact: true }).click();
+  await expect(page.getByRole("img", { name: /A little room for curiosity/ })).toBeVisible();
+  assert.equal(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === "running").length), 0, "Desktop sketch respects reduced motion");
+  await page.getByRole("link", { name: "Back to my introduction" }).click();
+  await expect(page.locator(".md-window")).toBeVisible();
+  await page.getByRole("link", { name: "Close window", exact: true }).click();
+  await layout("closed desktop / mobile / reduced motion");
+  await page.screenshot({ path: ".qa/mobile-closed.png", fullPage: true });
+  await page.getByRole("link", { name: "Back to my introduction" }).click();
+  await expect(page.locator(".md-signature")).toBeInViewport();
+  await expect(page.locator(".md-bio")).toBeInViewport();
+  await visit("/");
   await page.keyboard.press("Tab");
   await expect(page.getByRole("link", { name: "Skip to content" })).toBeFocused();
   await page.keyboard.press("Enter"); await expect(page.locator("main")).toBeFocused();

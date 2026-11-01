@@ -9,6 +9,7 @@ import { WindowContent } from "./window-content";
 import { DesktopIcon, type DesktopIconKind } from "./desktop-icon";
 import { BrandMark } from "./brand-mark";
 import { DesktopRest } from "./desktop-rest";
+import { DesktopGrid } from "./desktop-grid";
 import { useDesktopArrangement } from "./use-desktop-arrangement";
 import { useTheme } from "../theme-provider";
 
@@ -65,11 +66,13 @@ export function DesktopShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="desktop" data-maximized={maximized} data-dragging={Boolean(arrangement.dragging)}>
+      <DesktopGrid />
       <a className="skip-link" href={minimized ? "#desktop-main" : "#main"}>Skip to content</a>
       <p className="sr-only" id="window-move-help">Drag the title bar to move the window. When this title is focused, use arrow keys to move, or Shift and arrow keys for smaller steps. Double-click to maximize or restore.</p>
       <header className="md-menubar" inert={maximized}>
         <Link className="md-desktop-name" href="/" aria-label="Mahek’s introduction" title="Mahek Ara" onClick={reveal}>
           <BrandMark />
+          <span className="md-desktop-label">Mahek’s desktop</span>
         </Link>
         <div className="md-menu-actions">
           <button className="md-theme-toggle" type="button" onClick={toggleTheme} aria-label="Switch color theme">
@@ -97,7 +100,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
           ))}
         </nav>
         {closed ? children : <>
-          {minimized && <DesktopRest id="desktop-main" />}
+          {minimized && <DesktopRest id="desktop-main" onReturn={reveal} />}
           <section className="md-window" {...arrangement.item("window", !maximized)} data-maximized={maximized} hidden={minimized} aria-label={current?.label ?? "Mahek’s desktop"}>
             <header className="md-window-bar">
               <div className="md-window-controls">
@@ -112,7 +115,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
                 </button>
               </div>
               <button className="md-window-drag" type="button" aria-label="Move window" aria-describedby="window-move-help" {...arrangement.handle("window", !maximized)} onDoubleClick={() => setExpanded(value => !value)}>
-                <span className="md-window-title">{current?.label ?? "A little detour"}</span>
+                <span className="md-window-title"><span className="md-title-grip" aria-hidden="true" />{current?.label ?? "A little detour"}</span>
               </button>
             </header>
             <WindowContent>{children}</WindowContent>
@@ -120,7 +123,7 @@ export function DesktopShell({ children }: { children: ReactNode }) {
         </>}
       </div>
       <footer className="md-desk-footer" inert={maximized}>
-        <p>Built with curiosity. Always a work in progress.</p>
+        <p>Made by Mahek. Still tinkering.</p>
         <div className="md-desktop-actions">
           {minimized && <button className="md-resume-window" onClick={() => { reveal(); requestAnimationFrame(() => maximizeControl.current?.focus()); }}>Open {current?.label ?? "window"}</button>}
           <button className="md-reset-layout" onClick={arrangement.reset} title="Reset the window position"><RotateCcw size={13} aria-hidden="true" /> Reset window</button>
