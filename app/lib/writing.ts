@@ -5,23 +5,105 @@ export type Note = {
   title: string;
   topic: string;
   description: string;
-  date: string;
+  date?: string;
   sections: {
     id: string;
-    title: string;
+    title?: string;
     label: string;
     paragraphs: string[];
+    paragraphsAfterMedia?: string[];
     example?: { label: string; text: string };
     diagram?: DiagramId;
-    media?: "architecture" | "demo";
+    media?: "architecture" | "demo" | "agent-latency";
     references?: { title: string; href: string }[];
   }[];
   sources: { title: string; href: string }[];
 };
 
+const sources = {
+  agentSysBench: { title: "AgentSysBench paper", href: "https://arxiv.org/abs/2608.15127" },
+  propagation: { title: "Context propagation documentation", href: "https://opentelemetry.io/docs/concepts/context-propagation/" },
+  conventions: { title: "OpenTelemetry agent conventions", href: "https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md" },
+  tail: { title: "The Tail at Scale", href: "https://research.google/pubs/the-tail-at-scale/" },
+};
+
+const agentLatencyNote: Note = {
+  slug: "agent-latency",
+  title: "The Model Was Fast. Why Did the Agent Take 12 Seconds?",
+  topic: "Agent performance",
+  description: "An agent’s speed depends on how quickly it thinks, what it chooses to do, and what must wait for what.",
+  sections: [
+    {
+      id: "model-time", label: "Model time vs. task time",
+      paragraphs: [
+        "A developer asks an AI assistant why checkout errors increased after a deployment. The assistant retrieves logs, checks the deployment history, and returns an explanation twelve seconds later.",
+        "The monitoring dashboard reports three seconds of model calls.",
+        "Nothing is necessarily wrong with either measurement. They describe different boundaries: one measures model requests; the other measures the experience of completing a task.",
+        "That difference is easy to overlook when model benchmarks become our main reference for application performance.",
+      ],
+    },
+    {
+      id: "reconstruct-the-wait", title: "To improve the wait, first reconstruct it.", label: "Reconstruct the wait",
+      paragraphs: [
+        "Consider an illustrative workflow: the model spends one second choosing tools, the logs lookup takes five seconds, and the deployment lookup takes three. A second model call spends two seconds interpreting the results. Request handling, transport, and rendering account for the remaining second. These are example timings, not production measurements.",
+      ],
+      media: "agent-latency",
+      paragraphsAfterMedia: [
+        "Halving the duration of both model calls would reduce the total to 10.5 seconds, assuming the workflow and answer quality stayed the same. Even instantaneous model calls would leave nine seconds of other work.",
+        "That calculation puts a limit on what a model-speed improvement alone can achieve.",
+        "There is evidence for looking beyond inference. In the 2026 AgentSysBench preprint, researchers studied ten agentic applications and found that non-LLM components dominated latency in five. They also found that bottlenecks changed across workloads and deployments. The result supports measuring the whole application; it does not establish that tools dominate every agent.",
+      ],
+    },
+    {
+      id: "critical-path", title: "The sequence can matter as much as the speed of each step.", label: "The critical path",
+      paragraphs: [
+        "Our assistant fetches logs before fetching deployment details. If both requests already know the service and time window, neither needs to wait for the other.",
+        "Running them together could reduce their combined wait from eight seconds to roughly five, bringing the example to nine seconds. That depends on the requests being independent and the services having capacity to handle both.",
+        "If the logs reveal which deployment to inspect, the dependency is real. Parallel execution would be premature.",
+        "This is the practical meaning of the critical path: the chain of dependent work that determines when the result can be ready. Improving a step helps completion time when it shortens that path. Simply adding every span’s duration is misleading when operations overlap or contain other spans.",
+      ],
+    },
+    {
+      id: "decisions", title: "But a slow tool call can also be evidence of a poor decision.", label: "Work the model creates",
+      paragraphs: [
+        "Suppose the model requests the same logs twice. Each lookup takes five seconds. The trace shows ten seconds of tool activity, but making the logs service faster is only one possible response. Preventing the duplicate request removes an entire lookup.",
+        "This separates two questions: how much time did the model consume, and how much work did its choices create?",
+        "A model that responds more slowly could still finish a task sooner by making fewer unnecessary calls. A faster model could lose its advantage through retries or an inefficient plan. Model comparisons should therefore include the complete workflow, with answer quality held to the same standard.",
+      ],
+    },
+    {
+      id: "traces", title: "A useful trace connects decisions to execution.", label: "Follow a request",
+      paragraphs: [
+        "A trace groups the operations belonging to a request. Each timed operation is a span. To follow work across services, instrumentation propagates identifiers so downstream operations can be connected to their parents. OpenTelemetry commonly uses the W3C traceparent HTTP header for this.",
+        "For our assistant, I would inspect the model’s selected tool arguments alongside the tool’s duration and result. Did the query search the right time window? Did the result supply new evidence? Did it cause another necessary step?",
+        "A five-second tool span alone cannot answer those questions. Nor does it reveal how much time the remote service spent in its database. That requires further instrumentation. A model-call span similarly includes whatever the client observes, potentially including transport and provider waiting, rather than just GPU computation.",
+      ],
+    },
+    {
+      id: "observability-tools", title: "The tools provide different parts of this visibility.", label: "Observability tools",
+      paragraphs: [
+        "LangSmith records operations as runs, groups related runs into traces, and exposes nested execution details such as timing, retries, inputs, and outputs. Its trajectory view presents the sequence of messages and actions across a session. That makes it useful for examining both the route an agent chose and the time spent following it.",
+        "Agent Zero is an agent framework. Its community Langfuse Observability plugin adds tracing for model calls, tool executions, and agent interactions, with a trace viewer inside Agent Zero. Langfuse provides the observability backend in that arrangement.",
+        "OpenTelemetry’s GenAI semantic conventions supply shared names and meanings for the telemetry. Examples include invoke_agent, execute_tool, gen_ai.request.model, and token-usage fields. The conventions also define metrics for operations such as model calls. They describe the data; instrumentation produces it and a backend displays it. HTTP, database, queue, and browser measurements still need their own coverage. These conventions continue to evolve.",
+      ],
+    },
+    {
+      id: "measure-again", title: "One clean trace is the start of an investigation.", label: "Measure again",
+      paragraphs: [
+        "Production requests vary. A tool that is usually quick may occasionally stall, and an agent waiting for several required results inherits the slowest response. This is a familiar distributed-systems problem: Dean and Barroso’s The Tail at Scale explains how occasional delays can become significant as services grow more complex. The same concern applies when an agent coordinates several services.",
+        "After a change, compare the same task set under comparable load and cache conditions. Track correctness and failures alongside median completion time and a high percentile such as p95—the point by which roughly 95% of measured requests finish. Keep timeouts visible rather than dropping them from the comparison.",
+        "Measure from submission to a useful result as well as to completion. Streaming can deliver useful evidence earlier, but an immediate “I’m checking” message does not mean the investigation finished sooner.",
+        "The most valuable outcome of observability is an explanation you can test: this query was too broad, this lookup was repeated, or these two operations waited unnecessarily. Once the delay has a cause, the next performance change becomes a reasoned choice.",
+      ],
+    },
+  ],
+  sources: Object.values(sources),
+};
+
 export const relaySource = "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7";
 
 export const notes: Note[] = [
+  agentLatencyNote,
   {
     slug: "context-relay",
     title: "Context Relay: carrying a coding task across agents",
@@ -134,6 +216,6 @@ export const notes: Note[] = [
 ];
 
 export function readingTime(note: Note) {
-  const words = note.sections.flatMap(section => [section.title, ...section.paragraphs, section.example?.text ?? ""]).join(" ").trim().split(/\s+/).length;
+  const words = note.sections.flatMap(section => [section.title ?? "", ...section.paragraphs, ...(section.paragraphsAfterMedia ?? []), section.example?.text ?? ""]).join(" ").trim().split(/\s+/).length;
   return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }

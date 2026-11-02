@@ -6,6 +6,7 @@ import { CopyButton } from "../../components/article-tools";
 import { ArticleDiagram } from "../../components/article-diagram";
 import { ArticleContents } from "../../components/article-contents";
 import { RecordedRelayDemo } from "../../components/recorded-relay-demo";
+import { AgentLatencyAnimation } from "../../components/agent-latency-animation";
 import { notes, readingTime } from "../../lib/writing";
 
 export const dynamicParams = false;
@@ -39,7 +40,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
           <p className="md-article-deck">{note.description}</p>
           <div className="md-article-meta">
             <span>By Mahek Ara</span>
-            <time dateTime={note.date}>{new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(note.date))}</time>
+            {note.date && <time dateTime={note.date}>{new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(note.date))}</time>}
             <span>{readingTime(note)}</span>
           </div>
         </header>
@@ -47,7 +48,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
         <div className="md-article-body">
           {note.sections.map(section => (
             <section key={section.id} id={section.id} tabIndex={-1}>
-              <h2>{section.title}</h2>
+              {section.title && <h2>{section.title}</h2>}
               {section.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
               {section.media === "architecture" && <figure className="md-readme-architecture">
                 <picture>
@@ -57,6 +58,8 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
                 <figcaption>The architecture from the Context Relay README. Native capture and MCP share the service; optional model proposals return to review.</figcaption>
               </figure>}
               {section.media === "demo" && <RecordedRelayDemo />}
+              {section.media === "agent-latency" && <AgentLatencyAnimation />}
+              {section.paragraphsAfterMedia?.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
               {section.diagram && <ArticleDiagram id={section.diagram} />}
               {section.example && <figure className="md-article-example"><figcaption><span>{section.example.label}</span><CopyButton text={section.example.text} /></figcaption><pre>{section.example.text}</pre></figure>}
               {section.references && <p className="md-section-references">{section.references.map(source => <a key={source.href} href={source.href} target="_blank" rel="noreferrer">{source.title}</a>)}</p>}

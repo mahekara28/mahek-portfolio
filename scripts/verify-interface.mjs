@@ -3,7 +3,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { chromium, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 import { projects, links } from "../app/lib/content.ts";
-import { notes } from "../app/lib/writing.ts";
+import { notes, readingTime } from "../app/lib/writing.ts";
 
 const baseURL = process.env.BASE_URL || "http://127.0.0.1:3000";
 await mkdir(".qa", { recursive: true });
@@ -144,8 +144,11 @@ try {
   await folders().getByRole("link", { name: "Writing", exact: true }).click();
   await expect(page).toHaveURL(baseURL + "/blog");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
-  await expect(page.locator(".md-post")).toHaveCount(1);
-  await page.locator(".md-post").first().click();
+  await expect(page.locator(".md-post")).toHaveCount(notes.length);
+  await expect(page.locator('.md-post[href="/blog/agent-latency"]')).toContainText("The Model Was Fast. Why Did the Agent Take 12 Seconds?");
+  await expect(page.locator('.md-post[href*="notion"]')).toHaveCount(0);
+  await page.screenshot({ path: ".qa/writing-updated.png", fullPage: true });
+  await page.locator('.md-post[href="/blog/context-relay"]').click();
   await expect(page).toHaveURL(baseURL + "/blog/context-relay");
   await expect(folders().getByRole("link", { name: "Writing", exact: true })).toHaveAttribute("aria-current", "page");
   const reading = page.locator(".md-window-content");
@@ -222,16 +225,44 @@ try {
   for (const note of notes) {
     await visit("/blog/" + note.slug);
     await expect(page.locator("h1")).toHaveText(note.title);
-    assert((await page.locator("article").innerText()).split(/\s+/).length > 1200, "Deep dive includes the complete implementation path");
-    await expect(page.locator(".md-architecture svg[role=img]")).toHaveCount(2);
+    const articleText = await page.locator("article").innerText();
+    if (note.slug === "context-relay") assert(articleText.split(/\s+/).length > 1200, "Deep dive includes the complete implementation path");
+    await expect(page.locator(".md-architecture svg[role=img]")).toHaveCount(note.sections.filter(section => section.diagram).length);
     for (const svg of await page.locator(".md-architecture svg").all()) {
       assert((await svg.locator("title").textContent()).length > 20, "Diagram has a descriptive title");
       assert((await svg.locator("desc").textContent()).length > 80, "Diagram has a text equivalent");
     }
-    await expect(page.locator(".md-readme-architecture img")).toBeVisible();
-    await expect(page.locator(".md-article-meta")).toContainText(/[6-8] min read/);
+    if (note.sections.some(section => section.media === "architecture")) await expect(page.locator(".md-readme-architecture img")).toBeVisible();
+    await expect(page.locator(".md-article-meta")).toContainText(readingTime(note));
     await expect(page.locator(".md-sources a")).toHaveCount(note.sources.length);
     await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", "https://mahekara.vercel.app/blog/" + note.slug);
+    if (note.slug === "agent-latency") {
+      assert(articleText.includes("These are example timings, not production measurements."));
+      assert(articleText.includes("Once the delay has a cause, the next performance change becomes a reasoned choice."));
+      await expect(page.locator('article a[href*="notion"]')).toHaveCount(0);
+      await expect(page.locator(".md-article-meta time")).toHaveCount(0);
+      await page.screenshot({ path: ".qa/agent-latency-article.png", animations: "disabled" });
+      const illustration = page.locator("#agent-latency-animation");
+      await illustration.scrollIntoViewIfNeeded();
+      await expect(illustration).toHaveAttribute("src", /architecture\.gif$/);
+      await expect.poll(() => illustration.evaluate(img => img.complete && img.naturalWidth === 1200)).toBe(true);
+      assert(await illustration.evaluate(img => img.complete && img.naturalWidth === 1200), "Local illustration loads");
+      await page.getByRole("button", { name: "Stop animation", exact: true }).click();
+      await expect(illustration).toHaveAttribute("src", /architecture\.png$/);
+      await page.getByRole("button", { name: "Play animation", exact: true }).click();
+      await expect(illustration).toHaveAttribute("src", /architecture\.gif$/);
+      await page.emulateMedia({ reducedMotion: "reduce" });
+      await expect(illustration).toHaveAttribute("src", /architecture\.png$/);
+      await expect(page.getByRole("button", { name: "Stop animation", exact: true })).toHaveCount(0);
+      await page.emulateMedia({ reducedMotion: "no-preference" });
+      await expect(illustration).toHaveAttribute("src", /architecture\.gif$/);
+      await page.getByRole("button", { name: "Stop animation", exact: true }).click();
+      await expect(illustration).toHaveAttribute("src", /architecture\.png$/);
+      await expect(page.locator(".md-section-references")).toHaveCount(0);
+      await expect(page.locator(".md-sources a")).toHaveCount(4);
+      await page.getByRole("navigation", { name: "On this page" }).locator('a[href="#critical-path"]').click();
+      await expect(page.locator("#critical-path h2")).toBeInViewport();
+    }
   }
   await visit("/contact");
   await expect(page.locator(".md-email")).toHaveAttribute("href", links.email);
@@ -244,7 +275,7 @@ try {
   await visit("/blog/context-relay#packet");
   await expect(page.locator("#packet h2")).toBeInViewport();
   await expect(contents.locator('a[href="#packet"]')).toHaveAttribute("aria-current", "location");
-  const routes = ["/", "/blog", "/projects", "/contact", "/blog/context-relay"];
+  const routes = ["/", "/blog", "/projects", "/contact", ...notes.map(note => "/blog/" + note.slug)];
   for (const width of [1440, 320]) {
     await page.setViewportSize({ width, height: width === 320 ? 760 : 900 });
     for (const route of routes) {

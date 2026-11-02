@@ -265,6 +265,10 @@ main:focus { outline:none; }
 .md-diagram-title { font-size:14px; font-weight:700; fill:var(--diagram-text); }
 .md-diagram-detail { font-size:10px; fill:var(--diagram-muted); }
 .md-readme-architecture, .md-recorded-demo { margin:30px 0; }
+.md-latency-figure { margin:30px 0; }
+.md-latency-figure .md-architecture-scroll { border:1px solid var(--rule); border-radius:8px; }
+.md-latency-figure img { display:block; width:100%; min-width:760px; height:auto; max-width:none; }
+.md-latency-figure figcaption { margin-top:12px; color:var(--paper-muted); font-size:12px; line-height:1.6; }
 .md-readme-architecture img, .md-recorded-demo img { width:100%; height:auto; display:block; border-radius:8px; }
 .md-readme-architecture figcaption, .md-recorded-demo figcaption { font-size:12px; line-height:1.6; color:var(--paper-muted); margin-top:12px; }
 .md-demo-controls { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0 0; font-size:12px; }
