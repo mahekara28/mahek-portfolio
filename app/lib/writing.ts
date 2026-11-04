@@ -14,7 +14,7 @@ export type Note = {
     paragraphsAfterMedia?: string[];
     example?: { label: string; text: string };
     diagram?: DiagramId;
-    media?: "architecture" | "demo" | "agent-latency";
+    media?: "architecture" | "demo" | "agent-latency" | "agent-cloud-workload";
     references?: { title: string; href: string }[];
   }[];
   sources: { title: string; href: string }[];
@@ -25,6 +25,77 @@ const sources = {
   propagation: { title: "Context propagation documentation", href: "https://opentelemetry.io/docs/concepts/context-propagation/" },
   conventions: { title: "OpenTelemetry agent conventions", href: "https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md" },
   tail: { title: "The Tail at Scale", href: "https://research.google/pubs/the-tail-at-scale/" },
+};
+
+const agentCloudWorkloadNote: Note = {
+  slug: "agent-cloud-workload",
+  title: "An Agent Is Becoming a Cloud Workload",
+  topic: "Agent infrastructure",
+  description: "What has to survive when the process running it disappears?",
+  sections: [
+    {
+      id: "when-the-worker-stops", label: "When the worker stops",
+      paragraphs: [
+        "Imagine a sales-report agent that reads a spreadsheet, calculates revenue, and drafts a summary. Before publishing, it pauses for your approval.",
+        "You go for coffee. A deployment restarts the worker running the agent.",
+        "When you return, the draft should still be there. The approval should still be pending. And if publishing had already started, the system should establish what happened before trying again.",
+        "These are reasonable expectations. Meeting them takes quite a bit more than a good model response.",
+        "That is why I find the move toward managed agent infrastructure interesting. OpenAI’s September 2026 Agents API launch packages a harness for long-running work, including context management, tools, and subagents. My reading: providers are increasingly selling the machinery that carries a task through to completion.",
+      ],
+    },
+    {
+      id: "harness-and-sandbox", label: "Harness and sandbox",
+      paragraphs: [
+        "For the report agent, I would start with a task ID and asynchronous execution: accept the job, expose its status, and let it continue independently of the browser connection. The user should be able to close the tab and return to the same work.",
+        "Start with the harness: the software that runs the agent loop. It prepares context, calls the model, routes tool requests, receives results, and continues or pauses. This is the control plane, where execution is coordinated.",
+        "The sandbox is the execution environment where code runs and working files live. A tool that queries a business API can run elsewhere; every tool call does not need a sandbox. Keeping these responsibilities separate makes it possible to replace a worker without losing the records needed to recover the task.",
+      ],
+      media: "agent-cloud-workload",
+    },
+    {
+      id: "three-kinds-of-state", label: "Three kinds of state",
+      paragraphs: [
+        "The tricky part is deciding what “remembering the task” means.",
+        "Context is what the model receives for its next decision: instructions, relevant messages, and tool results. Context compaction condenses earlier material to fit within the model’s context window. That helps a long conversation continue, but a summary saying “the report is ready” is not evidence that a file was saved.",
+        "Execution state records where the workflow stands: calculations completed, draft saved at a particular location, approval pending. With durable execution, this progress survives the process running the work. Temporal, for example, uses a persisted event history to reconstruct workflow progress after a worker fails.",
+        "There is another kind of state worth naming: effect state. Did the outside action actually happen? If the agent published the report, the publishing service’s record is the authority. Temporal’s agent-memory example makes this distinction explicit: remembered information, workflow progress, and external effects answer different questions.",
+      ],
+    },
+    {
+      id: "retrying-safely", label: "Retrying safely",
+      paragraphs: [
+        "That distinction becomes very practical when a request times out.",
+        "Suppose the publishing service creates the report, but its response never reaches the agent. The agent sees a timeout. Retrying blindly could create a second report. Even a saved checkpoint cannot remove this uncertainty if the crash happened before success was recorded.",
+        "An idempotency key can help: reuse one identifier for attempts at the same logical operation, and have the receiving service enforce duplicate protection. The key alone does nothing. The service’s implementation and retention rules matter; Stripe’s API documents both. If a tool offers no such guarantee, recovery needs a way to check whether the action already happened before repeating it.",
+        "For our report agent, I would save the validated draft durably before requesting approval, tie the approval to that version, and use a stable operation ID when publishing. Temporary read failures could retry with backoff, meaning a delay that increases between attempts, plus a timeout and an attempt limit.",
+      ],
+    },
+    {
+      id: "access-and-limits", label: "Access and limits",
+      paragraphs: [
+        "The same care belongs around access and cost. Give the calculation sandbox only the files and permissions it needs. Keep publishing behind an explicit approval gate. Least privilege still matters inside a sandbox: generated code can access the credentials and network connections available to that environment.",
+        "I would also set limits on run duration, tool calls, spending, and concurrency—how much work can run at once. Cancellation should stop new work and report actions already completed. Observability should connect model calls, tools, retries, and approval waits to the same task ID, so a developer can explain where time and money went.",
+        "A polished paragraph is only part of success. For this task, success means a validated report, a saved artifact, the required approval, and confirmed publication.",
+      ],
+    },
+    {
+      id: "who-runs-the-runtime", label: "Who runs the runtime?",
+      paragraphs: [
+        "Who operates all of this is a separate decision. A managed harness takes on more orchestration and session management. Running an SDK inside your application gives your team more control over deployment, storage, and integration—and more operational responsibility. OpenAI’s runtime comparison separates those choices from where the sandbox runs.",
+        "You can run your own orchestration while using a hosted model. You can also use a managed harness with your own execution environment. Either way, your product still defines who can access the data, which actions require approval, and what counts as finished.",
+        "For me, that is the useful test of an agent architecture: can the work continue correctly after the worker disappears?",
+        "The user who went for coffee should come back to the same task, with its progress intact and an honest account of what happened.",
+      ],
+    },
+  ],
+  sources: [
+    { title: "OpenAI’s Agents API announcement", href: "https://openai.com/index/introducing-the-agents-api/" },
+    { title: "Sandbox architecture", href: "https://developers.openai.com/api/docs/guides/agents/sandboxes" },
+    { title: "Temporal event history", href: "https://docs.temporal.io/encyclopedia/event-history" },
+    { title: "Agent memory, workflow state and external effects", href: "https://docs.temporal.io/ai/featured/memory-state-stripe" },
+    { title: "Stripe’s idempotent requests", href: "https://docs.stripe.com/api/idempotent_requests" },
+    { title: "Compare agent runtimes", href: "https://developers.openai.com/api/docs/guides/agents" },
+  ],
 };
 
 const agentLatencyNote: Note = {
@@ -103,6 +174,7 @@ const agentLatencyNote: Note = {
 export const relaySource = "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7";
 
 export const notes: Note[] = [
+  agentCloudWorkloadNote,
   agentLatencyNote,
   {
     slug: "context-relay",

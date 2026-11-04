@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notes, readingTime } from "../lib/writing";
 
-export const metadata: Metadata = { title: "Writing", description: "Notes on agent performance, LLM context and developer tools, including agent latency and Context Relay." };
+export const metadata: Metadata = { title: "Writing", description: "Notes on agent infrastructure, performance, LLM context and developer tools." };
 
 export default function BlogPage() {
   return (

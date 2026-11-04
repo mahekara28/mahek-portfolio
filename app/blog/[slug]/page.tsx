@@ -59,6 +59,12 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
               </figure>}
               {section.media === "demo" && <RecordedRelayDemo />}
               {section.media === "agent-latency" && <AgentLatencyAnimation />}
+              {section.media === "agent-cloud-workload" && <figure className="md-readme-architecture">
+                <a href="/images/agent-cloud-workload/architecture.png" target="_blank" rel="noreferrer" aria-label="Open full-size architecture illustration">
+                  <Image src="/images/agent-cloud-workload/architecture.png" width={3000} height={1920} sizes="(max-width: 700px) 90vw, 850px" alt="The application handles identity and approvals. An agent harness coordinates the model API, sandbox and external services, while durable storage holds task progress and saved reports. Tracing, cost limits and cancellation apply across the workflow." />
+                </a>
+                <figcaption>A conceptual architecture for the report agent. The boxes represent responsibilities, not individual servers. Working files need an explicit path into durable storage. <a href="/images/agent-cloud-workload/architecture.png" target="_blank" rel="noreferrer">View full-size diagram</a>.</figcaption>
+              </figure>}
               {section.paragraphsAfterMedia?.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
               {section.diagram && <ArticleDiagram id={section.diagram} />}
               {section.example && <figure className="md-article-example"><figcaption><span>{section.example.label}</span><CopyButton text={section.example.text} /></figcaption><pre>{section.example.text}</pre></figure>}
