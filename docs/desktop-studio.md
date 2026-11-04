@@ -73,6 +73,8 @@ References: [ZenML](https://www.zenml.io/) (reviewed October 30, 2026) for gener
 
 ## Content
 
+“An Agent Is Becoming a Cloud Workload” is available at `/blog/agent-cloud-workload`. The owner selected the second, more conversational version from the supplied Notion document. Its wording and original architecture illustration are retained, with six core sources collected at the end. The article and image are hosted locally, without a Notion link or embed. Contents links group the continuous essay without inserting extra visible headings. No publication date was supplied.
+
 Writing includes “The Model Was Fast. Why Did the Agent Take 12 Seconds?” at `/blog/agent-latency`, alongside the Context Relay deep dive. The new article retains the author-supplied text, illustration and four core research/documentation references at the end, without repeated inline lists. The article and its GIF are hosted locally, with no Notion link or embed. The GIF starts when the illustration comes into view, stops when it leaves view, and has a stop/play control. Reduced-motion preferences and no-JavaScript reading use the still frame. The source did not specify a publication date, so none is invented. Project evidence is pinned; Context Relay was reviewed at `4e52ada45c471f17a94b16b2d81ed6636495f0f7`.
 
 The earlier project index is available as an archive inside Projects. The old query filter is retired; project hash links still open the archive automatically. Source code and implementation links remain available for every project.

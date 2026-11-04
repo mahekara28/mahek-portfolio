@@ -20,7 +20,9 @@ Next.js App Router, React and TypeScript. The interface and headings use self-ho
 | Route | Contents |
 | --- | --- |
 | `/` | Layered portrait, name and builder introduction |
-| `/blog` | The Context Relay technical deep dive |
+| `/blog` | Notes on agent infrastructure, latency and Context Relay |
+| `/blog/agent-cloud-workload` | An Agent Is Becoming a Cloud Workload, with the original architecture illustration |
+| `/blog/agent-latency` | The Model Was Fast. Why Did the Agent Take 12 Seconds?, with the original animated illustration |
 | `/blog/context-relay` | Statically generated article with architecture diagrams, contents links and source references |
 | `/projects` | Context Relay, Aura for LinkedIn, then Build, Buy or Borrow; earlier experiments in a disclosure |
 | `/contact` | Email, GitHub, X and LinkedIn |
@@ -35,7 +37,8 @@ The site starts in Graphite: charcoal surfaces, off-white text and sage accents.
 
 Selected work uses the Context Relay npm banner from its repository in a theme-matched, mobile-aware cover. Aura uses its four-theme gallery. Build, Buy or Borrow uses a new cover composed from a real sample screenshot of its scenario studio. The project covers, source files and provenance are recorded in [`public/projects/ASSETS.md`](public/projects/ASSETS.md).
 
-- `app/lib/writing.ts`: the agent-latency and Context Relay articles, source references and reading-time calculation.
+- `app/lib/writing.ts`: the cloud-workload, agent-latency and Context Relay articles, source references and reading-time calculation.
+- `public/images/agent-cloud-workload/`: the author’s original architecture illustration, served locally.
 - `public/images/agent-latency/`: the author’s original animated illustration and a still frame for reading without motion.
 - `app/lib/content.ts`: project descriptions, scope, pinned evidence and contact links.
 - `app/lib/github-snapshot.json`: optional public repository metadata snapshot.
