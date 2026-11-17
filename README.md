@@ -1,68 +1,61 @@
-# Mahek Ara — a personal desktop
+# Mahek Ara — A universe in progress
 
-[Visit the portfolio](https://mahekara.vercel.app/)
+A spatial portfolio made of five connected scenes. The landing scene is a constellation of floating destinations; navigation travels through a moving star field. Work, About, Notes, and Contact each have their own composition.
 
-A charcoal-and-sage desktop with a Soft ivory light mode, fixed sage app icons, draggable windows, a layered photo print and a compact serif name. The photo is centered above the name and introduction. About adapts to its window height so the photo, introduction and links fit together on phones and laptops. It remains scrollable for unusually small or zoomed views rather than clipping content. About, Writing, Projects and Contact open ordinary pages. The introduction has no project feed.
+For replacing the existing Vercel portfolio, start with [DEPLOYMENT_HANDOFF.md](DEPLOYMENT_HANDOFF.md).
 
 ## Run locally
 
-Use Node.js 24.
+Use Node.js 20 or newer. There is nothing to install.
 
-```sh
-npm ci
+```powershell
+cd "C:\Users\Mehek\Documents\Codex\2026-09-13\create-an-image-of\portfolio"
 npm run dev
 ```
 
-Next.js App Router, React and TypeScript. The interface and headings use self-hosted Instrument Sans; Mahek’s name uses Fraunces. Plex Mono remains for code and small technical labels. Fonts, icons and the portrait are served locally. No analytics, external font requests or social API calls are needed to render the site.
+Open http://127.0.0.1:4173. Keep the terminal running. Do not open `index.html` directly with `file://`; the project uses JavaScript modules and loads its content from JSON.
 
-## Routes and content
+## What is included
 
-| Route | Contents |
-| --- | --- |
-| `/` | Layered portrait, name and builder introduction |
-| `/blog` | Notes on agent infrastructure, latency and Context Relay |
-| `/blog/agent-cloud-workload` | An Agent Is Becoming a Cloud Workload, with the original architecture illustration |
-| `/blog/agent-latency` | The Model Was Fast. Why Did the Agent Take 12 Seconds?, with the original animated illustration |
-| `/blog/context-relay` | Statically generated article with architecture diagrams, contents links and source references |
-| `/projects` | Context Relay, Aura for LinkedIn, then Build, Buy or Borrow; earlier experiments in a disclosure |
-| `/contact` | Email, GitHub, X and LinkedIn |
-| `/desktop` | Closed-window view; folders remain available |
-| `/about` | Permanent redirect to the introduction |
+- Original procedural nebula and a depth-based star field, generated in WebGL and Canvas.
+- Five scenes with camera transitions, pointer parallax, suspended artwork, and shooting stars.
+- An orbit-shaped navigation control and a full-screen constellation menu.
+- Three selected projects: Context Relay, Aura, and Build, Buy & Borrow, with source links and project notes.
+- Three complete articles with references and their original illustrations.
+- Existing bio, résumé, and contact links from Mahek’s earlier portfolio.
+- Original orbital line sculpture in place of the portrait; subtle pointer glow and topic filters for writing.
+- Mobile layouts, native keyboard-accessible dialogs, Escape dismissal, and clear text-based controls.
+- Automatic background shooting stars every few seconds, with an optional “Make a wish” interaction. There is no on-page motion toggle; the device’s reduced-motion setting is respected. CSS artwork remains available when WebGL is unavailable.
+- No paid libraries, subscriptions, accounts, API keys, analytics, or external font requests.
 
-The shared layout is `app/components/site-shell.tsx`. Red closes the window, yellow minimizes it, and green maximizes or restores it. Minimizing keeps the content and reading position; the footer or the app icon reopens the window. Closing reveals a pixel-flower paper sketch and Mahek’s name, and returns focus to the app. The flower grows once and settles; reduced motion shows the finished sketch immediately. Escape restores a maximized window, then closes a floating one.
+## Edit
 
-Drag the title bar to move a window within the workspace. The four app icons stay in place. With the title focused, arrow keys move the window; Shift makes smaller moves. Reset window restores its default position. Window position survives page navigation; resizing the viewport restores the default to keep controls reachable. Only the window’s content scrolls. New pages start at the top, while Back/Forward restores reading positions. Ordinary links and reading work without JavaScript.
+- `content.json`: projects and full article content. Content descriptions preserve the source portfolio’s stated prototype limits.
+- `index.html`: biography, social links, landing composition, and scene structure.
+- `styles.css`: core spatial layout, motion, responsive styles, and scene appearance.
+- `refinements.css`: the responsive application grid, reading typography, the orbital sculpture, and the interactive editorial index.
+- `app.js`: navigation, project artwork, readers, and interaction behavior.
+- `sky.js`: procedural nebula, star volume, camera motion, and shooting stars.
 
-The site starts in Graphite: charcoal surfaces, off-white text and sage accents. The menu-bar theme control switches to Soft ivory, a lighter cream-and-sage appearance. The choice persists across navigation and reloads in the dedicated `mahek-appearance` storage key; `next-themes` applies it before hydration. The portrait is centered above the introduction and uses a tilted photo print, lined paper and translucent tape, following the owner’s screenshot. The original four sage icons retain their artwork, colors, dimensions and fixed positions in both themes. Icons, fonts and the portrait are local assets. The menu bar has a custom pixel-flower logo linking home, matching the SVG and ICO favicons, plus compact GitHub, LinkedIn and X links. Mobile has a four-app row and internal window scrolling. Reduced motion disables transitions. Projects stay outside the home introduction; older project anchors still reveal the relevant archive entry.
+The imported project descriptions are a snapshot, not a live GitHub sync. Edit `content.json` when a project changes. For consistency, update contact links in `index.html` and the email-copy text in `app.js` together.
 
-Selected work uses the Context Relay npm banner from its repository in a theme-matched, mobile-aware cover. Aura uses its four-theme gallery. Build, Buy or Borrow uses a new cover composed from a real sample screenshot of its scenario studio. The project covers, source files and provenance are recorded in [`public/projects/ASSETS.md`](public/projects/ASSETS.md).
+## Export
 
-- `app/lib/writing.ts`: the cloud-workload, agent-latency and Context Relay articles, source references and reading-time calculation.
-- `public/images/agent-cloud-workload/`: the author’s original architecture illustration, served locally.
-- `public/images/agent-latency/`: the author’s original animated illustration and a still frame for reading without motion.
-- `app/lib/content.ts`: project descriptions, scope, pinned evidence and contact links.
-- `app/lib/github-snapshot.json`: optional public repository metadata snapshot.
-- `docs/desktop-studio.md`: visual references, asset provenance and verification scope.
-
-Past visual-study components and their data remain in the repository as retired experiments; active routes do not import them. Existing artifact/content unit tests remain available.
-
-## Verify and deploy
-
-```sh
-npm run lint
+```powershell
+npm run check
 npm run build
-npm run start
-# In another terminal, against that local server:
-npx playwright install chromium
-npm run verify
 ```
 
-Set `BASE_URL` if the server uses another port. `PLAYWRIGHT_EXECUTABLE_PATH` can select an installed browser. Browser checks cover desktop, 320px and short landscape layouts, both appearances, keyboard theme switching, persistence after navigation and reloads, fixed icon positions, window dragging and keyboard placement, project order and artwork, window reset, minimize/restore, internal scrolling, maximize/restore, keyboard navigation, close/reopen focus, reading-position history, project anchors, the Context Relay article, clipboard actions, the real portrait, no-JavaScript reading, 404s and WCAG A/AA rules. Reports and screenshots are written to the ignored `.qa/` folder.
+Upload the contents of `dist/` to a static host. Relative asset paths also support hosting under a repository subpath.
 
-The existing Vercel integration deploys `main`. Branch pushes create previews. No new hosting account or deployment credentials are required.
+`vercel.json` configures Vercel to build this static site and serve `dist/` when placed at the root of the connected repository. The deployment handoff covers migration from the existing Next.js project and its legacy URLs.
 
-## Source review
+Old portfolio paths still resolve. `/projects`, `/contact`, and `/blog` open Work, Contact, and Writing. `/about` opens About. `/desktop` opens the home scene, because the desktop window is no longer a separate page. `/blog/agent-cloud-workload`, `/blog/agent-latency`, and `/blog/context-relay` open those essays. `/blog/working-context` opens the Context Relay essay. `/blog/decision-assumptions`, `/blog/inference-latency`, `/blog/verify-the-result`, and `/blog/llm-routing` open Writing. Unknown paths stay missing instead of falling through to the home page.
 
-Project claims refer to public code and include implementation limits. Context Relay is a public npm beta; live model-quality evaluation is pending. Build, Buy or Borrow uses fictional scenarios. Aura for LinkedIn is a locally loaded Chrome extension; its four-theme gallery is copied from the source repository's `docs/images/theme-collection.jpg`, with image provenance in [`public/projects/ASSETS.md`](public/projects/ASSETS.md). Its current version still needs installed LinkedIn verification.
+For a zero-cost hosting option, GitHub Pages is available for public repositories on GitHub Free, using a `github.io` URL. A purchased custom domain is optional. See [GitHub’s hosting documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
 
-Refresh optional repository metadata with `npm run content:refresh` (or `-- --force`). This is a local refresh-and-deploy workflow. It does not change reviewed descriptions or pinned evidence automatically. See the original [content audit](docs/content-audit.md) for the earlier repository review.
+To use GitHub Pages, put the exported files at the root of a new public repository, then choose that branch and root folder as the Pages publishing source. Publishing is a separate step; this deliverable is a local preview and source package.
+
+## Assets and licenses
+
+Instrument Sans, Fraunces, and IBM Plex Mono are bundled with their license files in `assets/fonts/`. The article assets were copied from Mahek’s existing portfolio. Context Relay’s original attribution remains in `assets/images/context-relay/THIRD_PARTY_LICENSE.txt`. The new nebula, star field, project diagrams, monogram, and interface are code-native assets authored for this portfolio.

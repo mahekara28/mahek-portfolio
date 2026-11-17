@@ -1,9 +1,10 @@
-<!-- BEGIN:nextjs-agent-rules -->
+# Portfolio agent notes
 
-## This is NOT the Next.js you know
+This repository is a static site. There is no Next.js app, package install, or API key.
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
+- Edit `content.json` for projects and essays, `index.html` for biography and links, `styles.css` and `refinements.css` for layout, `app.js` for interaction, and `sky.js` for the background.
+- Run `npm run check`, then `npm run build`. The build writes `dist/` and does not install dependencies.
+- Preview with `npm run dev` at http://127.0.0.1:4173/. Do not open `index.html` through `file://`.
+- Keep `vercel.json` at the repository root. It selects a static build and serves `dist/`.
+- Legacy URLs are listed in `vercel.json` and `scripts/serve.mjs`. Article entry uses `/#notes/<slug>` after a short query redirect. Do not add a catch-all rewrite.
+- Do not restore the removed portrait or describe prototypes as production systems.

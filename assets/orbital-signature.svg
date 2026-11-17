@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" fill="none">
+  <defs>
+    <linearGradient id="metal" x1="90" y1="70" x2="370" y2="420" gradientUnits="userSpaceOnUse"><stop stop-color="#f4e1ce"/><stop offset=".3" stop-color="#b8c2fa"/><stop offset=".53" stop-color="#7873a9"/><stop offset=".72" stop-color="#f1d0e2"/><stop offset="1" stop-color="#7c9ed2"/></linearGradient>
+    <radialGradient id="aura"><stop stop-color="#a696e8" stop-opacity=".19"/><stop offset=".55" stop-color="#849acb" stop-opacity=".05"/><stop offset="1" stop-color="#849acb" stop-opacity="0"/></radialGradient>
+    <radialGradient id="core"><stop stop-color="#fff4e6"/><stop offset=".18" stop-color="#e0c7ef" stop-opacity=".8"/><stop offset="1" stop-color="#aa9cde" stop-opacity="0"/></radialGradient>
+  </defs>
+  <circle cx="240" cy="240" r="235" fill="url(#aura)"/>
+  <g stroke="url(#metal)" transform="rotate(-32 240 240)">
+    <ellipse cx="240" cy="240" rx="157" ry="178" stroke-width=".6" opacity=".3"/>
+    <ellipse cx="240" cy="240" rx="145" ry="172" stroke-width=".7" opacity=".5"/>
+    <ellipse cx="240" cy="240" rx="130" ry="167" stroke-width=".8" opacity=".75"/>
+    <ellipse cx="240" cy="240" rx="111" ry="162" stroke-width="1.1"/>
+    <ellipse cx="240" cy="240" rx="89" ry="157" stroke-width="1.25"/>
+    <ellipse cx="240" cy="240" rx="64" ry="152" stroke-width="1.2"/>
+    <ellipse cx="240" cy="240" rx="36" ry="146" stroke-width=".8" opacity=".8"/>
+    <ellipse cx="240" cy="240" rx="11" ry="140" stroke-width=".6" opacity=".5"/>
+  </g>
+  <g stroke="url(#metal)" transform="rotate(42 240 240)">
+    <ellipse cx="240" cy="240" rx="190" ry="68" stroke-width="1.1"/>
+    <ellipse cx="240" cy="240" rx="184" ry="56" stroke-width=".65" opacity=".65"/>
+    <ellipse cx="240" cy="240" rx="178" ry="44" stroke-width=".5" opacity=".35"/>
+  </g>
+  <circle cx="240" cy="240" r="39" fill="url(#core)" opacity=".6"/>
+  <path d="M224 240h32m-16-16v32" stroke="#f8e7ef" stroke-width=".7"/>
+  <circle cx="240" cy="240" r="3" fill="#faedf3"/>
+  <circle cx="131" cy="116" r="3.2" fill="#eed7cf"/>
+  <circle cx="357" cy="355" r="2.4" fill="#b8c6f3"/>
+  <path d="M60 240h16m328 0h16M240 32v16m0 384v16" stroke="#b2a7c7" stroke-width=".7" opacity=".5"/>
+</svg>

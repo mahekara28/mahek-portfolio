@@ -1,0 +1,541 @@
+{
+  "name": "Mahek Ara",
+  "bio": "I write Python, experiment with LLM context, and try to understand where tools go wrong. I like swapping notes with other developers and sharing what I learn.",
+  "links": {
+    "github": "https://github.com/mahekara28",
+    "x": "https://x.com/mahekara28",
+    "linkedin": "https://www.linkedin.com/in/mahek-ara/",
+    "email": "mailto:mahekarabangi28@gmail.com",
+    "resume": "https://drive.google.com/file/d/1ieDdXUTnlAKEhHyRuVNN0C0Y5Sn8vDR3/view?usp=sharing"
+  },
+  "projects": [
+    {
+      "id": "context-relay",
+      "title": "Context Relay",
+      "category": "Agent tooling",
+      "focus": [
+        "ai",
+        "developer"
+      ],
+      "status": "Public npm beta",
+      "description": "A local CLI, interface and MCP server for reviewed context handoffs between supported coding agents.",
+      "question": "What should a fresh coding session inherit?",
+      "steps": [
+        "Capture selected history",
+        "Review a cited checkpoint",
+        "Offer a checked handoff"
+      ],
+      "scope": "Public beta with four capture adapters; live model-quality evaluation remains pending.",
+      "approach": "Native adapters import selected history. Reviewed checkpoints keep instructions, acceptance criteria and open work with source citations. SQLite stores local state; MCP exposes packet inspection and addressed handoff acceptance. Optional Nebius drafts return to the editor for review.",
+      "boundary": "Supported formats and harness versions have limits. A handoff receipt acknowledges the packet, not completion of the task. Live model-quality evaluation remains pending. Relay does not edit native conversation databases.",
+      "stack": [
+        "TypeScript",
+        "Node.js",
+        "SQLite",
+        "MCP"
+      ],
+      "repo": "context-relay",
+      "github": "https://github.com/mahekara28/context-relay",
+      "revision": "4e52ada45c471f17a94b16b2d81ed6636495f0f7",
+      "evidence": [
+        {
+          "label": "MCP handoff tools",
+          "path": "packages/relay/src/mcp.ts"
+        },
+        {
+          "label": "Local store and packets",
+          "path": "packages/relay/src/store.ts"
+        },
+        {
+          "label": "Connections and limits",
+          "path": "docs/HARNESS_CONNECTIONS.md"
+        }
+      ]
+    },
+    {
+      "id": "aura-linkedin",
+      "title": "Aura",
+      "category": "Browser extension",
+      "focus": [
+        "developer"
+      ],
+      "status": "Unpacked Chrome extension",
+      "description": "Four photographic LinkedIn themes with saved preferences, restrained motion and a local preview studio.",
+      "question": "Can a familiar workspace feel more personal without making it harder to use?",
+      "steps": [
+        "Choose a theme",
+        "Save appearance settings",
+        "Preview the result locally"
+      ],
+      "scope": "A Manifest V3 extension loaded locally in Chrome; it is not published in the Chrome Web Store.",
+      "approach": "Packaged CSS and images restyle LinkedIn while keeping controls readable. The popup stores theme and motion preferences locally; a separate studio previews sample feeds and profiles without posting to LinkedIn.",
+      "boundary": "The repository reports local source and browser checks, but version 8.3 has not been independently retested in an installed LinkedIn session. LinkedIn markup can change, and the extension is an independent customization project.",
+      "stack": [
+        "JavaScript",
+        "CSS",
+        "Chrome Manifest V3",
+        "Local storage"
+      ],
+      "repo": "aura-linkedin",
+      "github": "https://github.com/mahekara28/aura-linkedin",
+      "revision": "0df430a24d1baeec08e091061afce3bc601bae5f",
+      "evidence": [
+        {
+          "label": "Theme surfaces",
+          "path": "content/themes.css"
+        },
+        {
+          "label": "Preferences",
+          "path": "shared/settings.js"
+        },
+        {
+          "label": "Preview studio",
+          "path": "studio.js"
+        },
+        {
+          "label": "Verification & limits",
+          "path": "AUDIT.md"
+        }
+      ]
+    },
+    {
+      "id": "build-buy-borrow",
+      "title": "Build, Buy & Borrow",
+      "category": "Decision support",
+      "focus": [
+        "operations"
+      ],
+      "status": "Local application",
+      "description": "Compare training, hiring and contracting against a project's time, budget and skills.",
+      "question": "Train, hire or contract for the next project?",
+      "steps": [
+        "Set time and budget",
+        "Check people and skills",
+        "Compare the plans"
+      ],
+      "scope": "A single-user planning tool using fictional people and example costs.",
+      "approach": "A separate JavaScript engine assigns scarce roles first using a greedy heuristic. Each plan breaks down costs and blockers. Saved snapshots keep the assumptions behind an exported decision brief.",
+      "boundary": "The people, projects and rates are made up for the demo. This is a single-user planning tool, not an optimiser or HR system, and the numbers aren't client savings. Saving one plan doesn't reserve its people for other scenarios.",
+      "stack": [
+        "JavaScript",
+        "Constraint checks",
+        "Scenario analysis",
+        "Node tests"
+      ],
+      "repo": "build-buy-borrow",
+      "github": "https://github.com/mahekara28/build-buy-borrow",
+      "revision": "bd642ab465fa10c5487707cde4e46c0ed0495912",
+      "evidence": [
+        {
+          "label": "Planning engine",
+          "path": "engine.js"
+        },
+        {
+          "label": "Constraint tests",
+          "path": "tests/engine.test.cjs"
+        },
+        {
+          "label": "Decisions & scope",
+          "path": "PORTFOLIO.md"
+        }
+      ]
+    }
+  ],
+  "notes": [
+    {
+      "slug": "agent-cloud-workload",
+      "title": "An Agent Is Becoming a Cloud Workload",
+      "topic": "Agent infrastructure",
+      "description": "What has to survive when the process running it disappears?",
+      "sections": [
+        {
+          "id": "when-the-worker-stops",
+          "label": "When the worker stops",
+          "paragraphs": [
+            "Imagine a sales-report agent that reads a spreadsheet, calculates revenue, and drafts a summary. Before publishing, it pauses for your approval.",
+            "You go for coffee. A deployment restarts the worker running the agent.",
+            "When you return, the draft should still be there. The approval should still be pending. And if publishing had already started, the system should establish what happened before trying again.",
+            "These are reasonable expectations. Meeting them takes quite a bit more than a good model response.",
+            "That is why I find the move toward managed agent infrastructure interesting. OpenAI’s September 2026 Agents API launch packages a harness for long-running work, including context management, tools, and subagents. My reading: providers are increasingly selling the machinery that carries a task through to completion."
+          ]
+        },
+        {
+          "id": "harness-and-sandbox",
+          "label": "Harness and sandbox",
+          "paragraphs": [
+            "For the report agent, I would start with a task ID and asynchronous execution: accept the job, expose its status, and let it continue independently of the browser connection. The user should be able to close the tab and return to the same work.",
+            "Start with the harness: the software that runs the agent loop. It prepares context, calls the model, routes tool requests, receives results, and continues or pauses. This is the control plane, where execution is coordinated.",
+            "The sandbox is the execution environment where code runs and working files live. A tool that queries a business API can run elsewhere; every tool call does not need a sandbox. Keeping these responsibilities separate makes it possible to replace a worker without losing the records needed to recover the task."
+          ],
+          "media": "agent-cloud-workload"
+        },
+        {
+          "id": "three-kinds-of-state",
+          "label": "Three kinds of state",
+          "paragraphs": [
+            "The tricky part is deciding what “remembering the task” means.",
+            "Context is what the model receives for its next decision: instructions, relevant messages, and tool results. Context compaction condenses earlier material to fit within the model’s context window. That helps a long conversation continue, but a summary saying “the report is ready” is not evidence that a file was saved.",
+            "Execution state records where the workflow stands: calculations completed, draft saved at a particular location, approval pending. With durable execution, this progress survives the process running the work. Temporal, for example, uses a persisted event history to reconstruct workflow progress after a worker fails.",
+            "There is another kind of state worth naming: effect state. Did the outside action actually happen? If the agent published the report, the publishing service’s record is the authority. Temporal’s agent-memory example makes this distinction explicit: remembered information, workflow progress, and external effects answer different questions."
+          ]
+        },
+        {
+          "id": "retrying-safely",
+          "label": "Retrying safely",
+          "paragraphs": [
+            "That distinction becomes very practical when a request times out.",
+            "Suppose the publishing service creates the report, but its response never reaches the agent. The agent sees a timeout. Retrying blindly could create a second report. Even a saved checkpoint cannot remove this uncertainty if the crash happened before success was recorded.",
+            "An idempotency key can help: reuse one identifier for attempts at the same logical operation, and have the receiving service enforce duplicate protection. The key alone does nothing. The service’s implementation and retention rules matter; Stripe’s API documents both. If a tool offers no such guarantee, recovery needs a way to check whether the action already happened before repeating it.",
+            "For our report agent, I would save the validated draft durably before requesting approval, tie the approval to that version, and use a stable operation ID when publishing. Temporary read failures could retry with backoff, meaning a delay that increases between attempts, plus a timeout and an attempt limit."
+          ]
+        },
+        {
+          "id": "access-and-limits",
+          "label": "Access and limits",
+          "paragraphs": [
+            "The same care belongs around access and cost. Give the calculation sandbox only the files and permissions it needs. Keep publishing behind an explicit approval gate. Least privilege still matters inside a sandbox: generated code can access the credentials and network connections available to that environment.",
+            "I would also set limits on run duration, tool calls, spending, and concurrency—how much work can run at once. Cancellation should stop new work and report actions already completed. Observability should connect model calls, tools, retries, and approval waits to the same task ID, so a developer can explain where time and money went.",
+            "A polished paragraph is only part of success. For this task, success means a validated report, a saved artifact, the required approval, and confirmed publication."
+          ]
+        },
+        {
+          "id": "who-runs-the-runtime",
+          "label": "Who runs the runtime?",
+          "paragraphs": [
+            "Who operates all of this is a separate decision. A managed harness takes on more orchestration and session management. Running an SDK inside your application gives your team more control over deployment, storage, and integration—and more operational responsibility. OpenAI’s runtime comparison separates those choices from where the sandbox runs.",
+            "You can run your own orchestration while using a hosted model. You can also use a managed harness with your own execution environment. Either way, your product still defines who can access the data, which actions require approval, and what counts as finished.",
+            "For me, that is the useful test of an agent architecture: can the work continue correctly after the worker disappears?",
+            "The user who went for coffee should come back to the same task, with its progress intact and an honest account of what happened."
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "title": "OpenAI’s Agents API announcement",
+          "href": "https://openai.com/index/introducing-the-agents-api/"
+        },
+        {
+          "title": "Sandbox architecture",
+          "href": "https://developers.openai.com/api/docs/guides/agents/sandboxes"
+        },
+        {
+          "title": "Temporal event history",
+          "href": "https://docs.temporal.io/encyclopedia/event-history"
+        },
+        {
+          "title": "Agent memory, workflow state and external effects",
+          "href": "https://docs.temporal.io/ai/featured/memory-state-stripe"
+        },
+        {
+          "title": "Stripe’s idempotent requests",
+          "href": "https://docs.stripe.com/api/idempotent_requests"
+        },
+        {
+          "title": "Compare agent runtimes",
+          "href": "https://developers.openai.com/api/docs/guides/agents"
+        }
+      ]
+    },
+    {
+      "slug": "agent-latency",
+      "title": "The Model Was Fast. Why Did the Agent Take 12 Seconds?",
+      "topic": "Agent performance",
+      "description": "An agent’s speed depends on how quickly it thinks, what it chooses to do, and what must wait for what.",
+      "sections": [
+        {
+          "id": "model-time",
+          "label": "Model time vs. task time",
+          "paragraphs": [
+            "A developer asks an AI assistant why checkout errors increased after a deployment. The assistant retrieves logs, checks the deployment history, and returns an explanation twelve seconds later.",
+            "The monitoring dashboard reports three seconds of model calls.",
+            "Nothing is necessarily wrong with either measurement. They describe different boundaries: one measures model requests; the other measures the experience of completing a task.",
+            "That difference is easy to overlook when model benchmarks become our main reference for application performance."
+          ]
+        },
+        {
+          "id": "reconstruct-the-wait",
+          "title": "To improve the wait, first reconstruct it.",
+          "label": "Reconstruct the wait",
+          "paragraphs": [
+            "Consider an illustrative workflow: the model spends one second choosing tools, the logs lookup takes five seconds, and the deployment lookup takes three. A second model call spends two seconds interpreting the results. Request handling, transport, and rendering account for the remaining second. These are example timings, not production measurements."
+          ],
+          "media": "agent-latency",
+          "paragraphsAfterMedia": [
+            "Halving the duration of both model calls would reduce the total to 10.5 seconds, assuming the workflow and answer quality stayed the same. Even instantaneous model calls would leave nine seconds of other work.",
+            "That calculation puts a limit on what a model-speed improvement alone can achieve.",
+            "There is evidence for looking beyond inference. In the 2026 AgentSysBench preprint, researchers studied ten agentic applications and found that non-LLM components dominated latency in five. They also found that bottlenecks changed across workloads and deployments. The result supports measuring the whole application; it does not establish that tools dominate every agent."
+          ]
+        },
+        {
+          "id": "critical-path",
+          "title": "The sequence can matter as much as the speed of each step.",
+          "label": "The critical path",
+          "paragraphs": [
+            "Our assistant fetches logs before fetching deployment details. If both requests already know the service and time window, neither needs to wait for the other.",
+            "Running them together could reduce their combined wait from eight seconds to roughly five, bringing the example to nine seconds. That depends on the requests being independent and the services having capacity to handle both.",
+            "If the logs reveal which deployment to inspect, the dependency is real. Parallel execution would be premature.",
+            "This is the practical meaning of the critical path: the chain of dependent work that determines when the result can be ready. Improving a step helps completion time when it shortens that path. Simply adding every span’s duration is misleading when operations overlap or contain other spans."
+          ]
+        },
+        {
+          "id": "decisions",
+          "title": "But a slow tool call can also be evidence of a poor decision.",
+          "label": "Work the model creates",
+          "paragraphs": [
+            "Suppose the model requests the same logs twice. Each lookup takes five seconds. The trace shows ten seconds of tool activity, but making the logs service faster is only one possible response. Preventing the duplicate request removes an entire lookup.",
+            "This separates two questions: how much time did the model consume, and how much work did its choices create?",
+            "A model that responds more slowly could still finish a task sooner by making fewer unnecessary calls. A faster model could lose its advantage through retries or an inefficient plan. Model comparisons should therefore include the complete workflow, with answer quality held to the same standard."
+          ]
+        },
+        {
+          "id": "traces",
+          "title": "A useful trace connects decisions to execution.",
+          "label": "Follow a request",
+          "paragraphs": [
+            "A trace groups the operations belonging to a request. Each timed operation is a span. To follow work across services, instrumentation propagates identifiers so downstream operations can be connected to their parents. OpenTelemetry commonly uses the W3C traceparent HTTP header for this.",
+            "For our assistant, I would inspect the model’s selected tool arguments alongside the tool’s duration and result. Did the query search the right time window? Did the result supply new evidence? Did it cause another necessary step?",
+            "A five-second tool span alone cannot answer those questions. Nor does it reveal how much time the remote service spent in its database. That requires further instrumentation. A model-call span similarly includes whatever the client observes, potentially including transport and provider waiting, rather than just GPU computation."
+          ]
+        },
+        {
+          "id": "observability-tools",
+          "title": "The tools provide different parts of this visibility.",
+          "label": "Observability tools",
+          "paragraphs": [
+            "LangSmith records operations as runs, groups related runs into traces, and exposes nested execution details such as timing, retries, inputs, and outputs. Its trajectory view presents the sequence of messages and actions across a session. That makes it useful for examining both the route an agent chose and the time spent following it.",
+            "Agent Zero is an agent framework. Its community Langfuse Observability plugin adds tracing for model calls, tool executions, and agent interactions, with a trace viewer inside Agent Zero. Langfuse provides the observability backend in that arrangement.",
+            "OpenTelemetry’s GenAI semantic conventions supply shared names and meanings for the telemetry. Examples include invoke_agent, execute_tool, gen_ai.request.model, and token-usage fields. The conventions also define metrics for operations such as model calls. They describe the data; instrumentation produces it and a backend displays it. HTTP, database, queue, and browser measurements still need their own coverage. These conventions continue to evolve."
+          ]
+        },
+        {
+          "id": "measure-again",
+          "title": "One clean trace is the start of an investigation.",
+          "label": "Measure again",
+          "paragraphs": [
+            "Production requests vary. A tool that is usually quick may occasionally stall, and an agent waiting for several required results inherits the slowest response. This is a familiar distributed-systems problem: Dean and Barroso’s The Tail at Scale explains how occasional delays can become significant as services grow more complex. The same concern applies when an agent coordinates several services.",
+            "After a change, compare the same task set under comparable load and cache conditions. Track correctness and failures alongside median completion time and a high percentile such as p95—the point by which roughly 95% of measured requests finish. Keep timeouts visible rather than dropping them from the comparison.",
+            "Measure from submission to a useful result as well as to completion. Streaming can deliver useful evidence earlier, but an immediate “I’m checking” message does not mean the investigation finished sooner.",
+            "The most valuable outcome of observability is an explanation you can test: this query was too broad, this lookup was repeated, or these two operations waited unnecessarily. Once the delay has a cause, the next performance change becomes a reasoned choice."
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "title": "AgentSysBench paper",
+          "href": "https://arxiv.org/abs/2608.15127"
+        },
+        {
+          "title": "Context propagation documentation",
+          "href": "https://opentelemetry.io/docs/concepts/context-propagation/"
+        },
+        {
+          "title": "OpenTelemetry agent conventions",
+          "href": "https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md"
+        },
+        {
+          "title": "The Tail at Scale",
+          "href": "https://research.google/pubs/the-tail-at-scale/"
+        }
+      ]
+    },
+    {
+      "slug": "context-relay",
+      "title": "Context Relay: carrying a coding task across agents",
+      "topic": "Engineering Context Relay",
+      "description": "Why a fresh coding session loses the thread, and how native capture, reviewed checkpoints and MCP make a handoff inspectable.",
+      "date": "2026-10-30",
+      "sections": [
+        {
+          "id": "the-problem",
+          "title": "The conversation grows. The task state gets harder to find.",
+          "label": "The problem",
+          "paragraphs": [
+            "You have spent an afternoon in a coding thread. The first approach failed. A requirement changed. The tests caught a regression. Now the conversation is large enough that you want a fresh session, perhaps in another coding agent. The repository contains the edits, but it does not contain every decision that explains them. You have to reconstruct the task before the next agent can continue.",
+            "Consider a retention feature. The initial request says thirty days; a later correction says seven. The thread also contains an unsuccessful cleanup query and a reminder to test timezone boundaries. A handoff that says ‘implement retention’ loses the correction. Copying everything preserves it, but asks the next session to distinguish current instructions from abandoned work again.",
+            "I built Context Relay around that transition. It turns selected history into a reviewed, versioned handoff: the current goal, cited instructions, acceptance criteria and unfinished work. This article follows the npm beta's implementation, including the checks that make a packet usable and the limits those checks cannot remove."
+          ]
+        },
+        {
+          "id": "architecture",
+          "title": "One local service, two integration paths",
+          "label": "Architecture",
+          "paragraphs": [
+            "The package ships a CLI, browser workbench, local service, SQLite store and MCP server. The CLI and UI operate on the same local state. Native capture adapters import session history; the MCP server exposes reviewed state to a receiving agent. These paths meet at the service, but they have different responsibilities.",
+            "That separation matters because an MCP connection does not expose a host's entire conversation. The host controls what a server receives. Relay therefore needs explicit capture integrations to read history, while MCP gives the destination a standard interface for inspecting a handoff. The protocol standardizes access; Relay's checkpoint and packet schemas define the meaning of the transferred state.",
+            "The service binds to loopback and authenticates requests. Working files remain in the repository; packets carry paths and digests. SQLite holds the captured evidence and reviewed records. This keeps the default workflow local and makes its boundaries visible before any optional model request."
+          ],
+          "media": "architecture",
+          "references": [
+            {
+              "title": "README architecture",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/README.md#where-mcp-fits"
+            },
+            {
+              "title": "MCP host and server boundaries",
+              "href": "https://modelcontextprotocol.io/specification/2025-06-18/architecture"
+            }
+          ]
+        },
+        {
+          "id": "capture",
+          "title": "Capture history without rewriting it",
+          "label": "Native capture",
+          "paragraphs": [
+            "Each harness has a different history surface. Claude Code uses project-filtered JSONL. Codex uses read-only app-server JSON-RPC for completed turns. OpenCode exposes session and message endpoints over a loopback API. Goose provides CLI JSON export. Relay normalizes completed, visible messages and tool results into events with a source identity and role.",
+            "Imports are project-scoped and transactional. Repeating a capture is idempotent; a changed event under an already captured ID is rejected rather than silently replacing its evidence. Sessions have revisions so a checkpoint can name the captured state it reviewed. Reasoning blocks and unfinished assistant turns are excluded.",
+            "This is where portability costs engineering work. An adapter must validate the native format, match the project root and report partial failures. A common MCP interface cannot make those upstream formats identical. Relay has format and transport tests for all four paths, but those tests do not certify every installed harness version."
+          ],
+          "references": [
+            {
+              "title": "Capture contracts and compatibility limits",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/docs/HARNESS_CONNECTIONS.md"
+            }
+          ]
+        },
+        {
+          "id": "checkpoint",
+          "title": "Make the checkpoint the unit of review",
+          "label": "Checkpoint contract",
+          "paragraphs": [
+            "A checkpoint separates decisions from the events supporting them. An instruction has a stable key, current text and citations to source events. The checkpoint also records the goal, criteria, open work, source revisions and selected repository files. The reviewer can inspect an instruction beside its evidence before saving an immutable snapshot.",
+            "The store rejects citations outside the selected sessions and references to missing events. It also rejects duplicate instruction keys. When two parent checkpoints assign different text to the same key, a merge requires an explicit resolution matching the new instruction. The result records its parents and resolution; the original checkpoints remain intact.",
+            "These rules validate provenance and consistency. They cannot decide whether a cited sentence actually supports an interpretation. That judgment remains part of review. A plausible summary with incorrect citations should never become authoritative just because its JSON parses."
+          ],
+          "example": {
+            "label": "Illustrative instruction using Relay's actual schema",
+            "text": "{\n  \"key\": \"retention-days\",\n  \"text\": \"Retain records for seven days.\",\n  \"sources\": [\n    { \"sessionId\": \"session-a\", \"eventId\": \"user-correction-7\" }\n  ]\n}"
+          },
+          "diagram": "projection",
+          "references": [
+            {
+              "title": "Checkpoint schema and validation",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/packages/relay/src/model.ts"
+            }
+          ]
+        },
+        {
+          "id": "packet",
+          "title": "Bound the packet without deleting the contract",
+          "label": "Packet budget",
+          "paragraphs": [
+            "A checkpoint is the reviewed record; a packet is its bounded continuation view. The packet contains the goal, instructions, criteria, open work, source references, file digests, Git state and a trust notice. Its default budget is 24,000 UTF-8 bytes, measured after canonical serialization.",
+            "The builder first checks whether required fields fit. If they exceed the budget, it returns an error asking for a narrower checkpoint. It then tries each selected evidence item in order, retaining it when the packet fits and counting omissions otherwise. An oversized item can be skipped while a later, smaller one still fits. A final size check accounts for the omission counter itself.",
+            "This makes the budget policy inspectable. It also leaves a deliberate limitation: bytes are a transport bound, not a tokenizer-specific context budget. The receiving harness still controls prompt assembly. Source text and tool results remain untrusted data, even when a reviewed packet references them."
+          ],
+          "references": [
+            {
+              "title": "packet() and its budget checks",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/packages/relay/src/store.ts"
+            }
+          ]
+        },
+        {
+          "id": "handoff",
+          "title": "Recheck state at the handoff boundary",
+          "label": "Freshness and MCP",
+          "paragraphs": [
+            "Before offering a packet, Relay compares the recorded session revisions, selected file SHA-256 values and Git HEAD with current local state. Acceptance checks freshness again, along with recipient and packet integrity. If relevant state changed between review and acceptance, the destination cannot acknowledge the stale offer as current.",
+            "The destination uses relay_handoff_inspect to read an addressed handoff and relay_handoff_accept to acknowledge it. Other MCP tools expose captured source events and bounded checkpoint packets; a checkpoint resource and continuation prompt support inspection. Each server connection is scoped to a project and receiving harness. Acceptance records delivery, while implementation and result verification remain work for the receiving session.",
+            "Freshness only covers what Relay can observe. New native messages are invisible until recaptured. Unselected files are outside the file-digest check. A Git HEAD match does not prove an entire working tree is unchanged. The practical sequence is to capture again, review the relevant files and create a new checkpoint when the task state moves."
+          ],
+          "diagram": "handoff",
+          "references": [
+            {
+              "title": "MCP tools and project scoping",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/packages/relay/src/mcp.ts"
+            }
+          ]
+        },
+        {
+          "id": "model-proposals",
+          "title": "Use a model to propose the handoff",
+          "label": "Optional Nebius",
+          "paragraphs": [
+            "Manual review works without an API key. Nebius Token Factory can draft a checkpoint from explicitly selected evidence. The UI previews the exact redacted payload, requests consent and returns the model output to the editor. Applying a proposal requires review again; it does not create or accept a checkpoint by itself.",
+            "The request is bounded to forty events and 48,000 input bytes, with a thirty-second timeout. Responses must satisfy the schema, use unique instruction keys and cite only selected events. Malformed or truncated output is rejected, and there are no automatic retries. These checks contain structural failures; they do not establish that the model chose the right decisions. That is why the review step stays in the path."
+          ],
+          "references": [
+            {
+              "title": "Provider data flow and limits",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/docs/WORKSPACE.md#nebius-proposals"
+            }
+          ]
+        },
+        {
+          "id": "demo",
+          "title": "Follow one correction through the workbench",
+          "label": "Watch and try it",
+          "paragraphs": [
+            "The README recording follows the seven-day retention correction from a captured Claude Code thread into review and a Codex handoff. It uses the actual npm workspace with synthetic sessions. Watch which source event supports the instruction, then inspect what appears in the exported packet. The recording demonstrates the handoff UI; it does not include a live model call or completed coding task.",
+            "With Node 22.16 or later, run the pinned beta below. The demo creates its own synthetic project. The dedicated data directory keeps this walkthrough separate from other Relay experiments; use the same path on each command. In the UI, open Threads, review the correction, choose a recipient and inspect the offered handoff."
+          ],
+          "media": "demo",
+          "example": {
+            "label": "Run the README demo from npm",
+            "text": "npx @mahekara28/context-relay@0.3.0-beta.1 demo --data-dir ./relay-demo\nnpx @mahekara28/context-relay@0.3.0-beta.1 ui --data-dir ./relay-demo\n\n# Stop the walkthrough service when finished.\nnpx @mahekara28/context-relay@0.3.0-beta.1 stop --data-dir ./relay-demo"
+          },
+          "references": [
+            {
+              "title": "Interactive project tour",
+              "href": "https://mahekara28.github.io/context-relay/"
+            },
+            {
+              "title": "How the recording was produced",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/docs/assets/workspace/README.md"
+            },
+            {
+              "title": "Reproduce the capture",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/scripts/npm/render-demo.mjs"
+            }
+          ]
+        },
+        {
+          "id": "evaluation",
+          "title": "The remaining question is continuation quality",
+          "label": "What is proven",
+          "paragraphs": [
+            "The release documents Node tests for imports, provenance, conflicts, budgets, stale state and recipient checks, plus real transport and browser workflows. Those establish behavior at the software boundaries. A successful packet transfer still leaves the harder question open: does a fresh agent complete the task more accurately or with less repeated work?",
+            "I would evaluate that with repository tasks containing known corrections and rejected approaches. Compare a raw transcript, a conventional summary and a reviewed Relay packet using the same starting commit, harness and acceptance tests. Measure task success, lost constraints, unsupported assumptions, reviewer time and token use. Repeat across tasks and report failures alongside successful runs.",
+            "Relay's current contribution is an inspectable handoff contract. It preserves decisions with evidence, surfaces stale state and gives different harnesses a common entry point. The next proof should come from measured continuation outcomes."
+          ],
+          "references": [
+            {
+              "title": "Release verification and untested boundaries",
+              "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/docs/releases/NPM_VERIFICATION.md"
+            }
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "title": "Context Relay npm beta README and recorded demo",
+          "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/README.md"
+        },
+        {
+          "title": "Checkpoint, packet, offer and acceptance implementation",
+          "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/packages/relay/src/store.ts"
+        },
+        {
+          "title": "Checkpoint and packet types",
+          "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/packages/relay/src/model.ts"
+        },
+        {
+          "title": "Project-scoped MCP server",
+          "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/packages/relay/src/mcp.ts"
+        },
+        {
+          "title": "Capture adapters and harness compatibility",
+          "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/docs/HARNESS_CONNECTIONS.md"
+        },
+        {
+          "title": "Workspace operations and optional model proposals",
+          "href": "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7/docs/WORKSPACE.md"
+        },
+        {
+          "title": "MCP architecture specification",
+          "href": "https://modelcontextprotocol.io/specification/2025-06-18/architecture"
+        }
+      ]
+    }
+  ]
+}

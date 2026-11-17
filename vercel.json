@@ -1,0 +1,22 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build",
+  "installCommand": "",
+  "outputDirectory": "dist",
+  "redirects": [
+    { "source": "/about", "destination": "/?scene=about", "permanent": false },
+    { "source": "/projects", "destination": "/?scene=work", "permanent": true },
+    { "source": "/contact", "destination": "/?scene=contact", "permanent": true },
+    { "source": "/desktop", "destination": "/?scene=universe", "permanent": false },
+    { "source": "/blog/working-context", "destination": "/?note=context-relay", "permanent": true },
+    { "source": "/blog/decision-assumptions", "destination": "/?scene=notes", "permanent": false },
+    { "source": "/blog/inference-latency", "destination": "/?scene=notes", "permanent": false },
+    { "source": "/blog/verify-the-result", "destination": "/?scene=notes", "permanent": false },
+    { "source": "/blog/llm-routing", "destination": "/?scene=notes", "permanent": false },
+    { "source": "/blog", "destination": "/?scene=notes", "permanent": true },
+    { "source": "/blog/agent-cloud-workload", "destination": "/?note=agent-cloud-workload", "permanent": true },
+    { "source": "/blog/agent-latency", "destination": "/?note=agent-latency", "permanent": true },
+    { "source": "/blog/context-relay", "destination": "/?note=context-relay", "permanent": true }
+  ]
+}
