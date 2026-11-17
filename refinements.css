@@ -401,3 +401,57 @@ h1 em,h2 em,.note-quote em,.map-link em {
 .about-interests { gap: 16px; }
 .scene-overline { flex-wrap: wrap; row-gap: 6px; }
 .quiet-label { margin-left: auto; max-width: 100%; }
+
+/* A larger voice on the same sky: Fraunces for the name and the headlines, a ruled index at home, and quieter controls. */
+:root { --display: Fraunces, Georgia, serif; }
+.brand { font-family: var(--display); font-size: 20px; font-weight: 500; letter-spacing: -0.03em; }
+.live-dot, .project-status:before, .cross-mark { display: none; }
+h1, h2, .destination-name, .map-link strong { font-family: var(--display); font-weight: 460; font-synthesis: none; }
+.home-intro h1 { font-size: clamp(76px, 8.4vw, 128px); line-height: 0.9; letter-spacing: -0.045em; margin-top: 18px; }
+.home-description { max-width: 18em; font-size: 18px; line-height: 1.65; }
+.project-intro h2 { font-size: clamp(52px, 5.6vw, 84px); line-height: 0.96; letter-spacing: -0.04em; }
+.project-read { background: transparent; color: #f4eef6; border: 0; border-bottom: 1px solid #e6d4ea; border-radius: 0; padding: 6px 0; box-shadow: none; }
+.project-read:hover { background: transparent; color: #f4eef6; box-shadow: none; border-color: #f2e4c8; }
+.project-art-plane { animation: none; }
+.about-content h2, .writing-intro h2 { font-size: clamp(48px, 4.6vw, 72px); line-height: 1.02; letter-spacing: -0.04em; }
+.essay-row { grid-template-columns: 2.4rem minmax(0, 1fr) auto; padding-top: 28px; padding-bottom: 28px; }
+.essay-row h3 { font-size: clamp(28px, 2.5vw, 40px); line-height: 1.15; margin-top: 8px; }
+.essay-orbit { display: none; }
+.essay-action { font-family: var(--display); font-size: 15px; }
+.contact-space h2 { font-size: clamp(72px, 8vw, 120px); line-height: 0.92; }
+.email-row > a { font-family: var(--display); font-size: clamp(22px, 2.2vw, 34px); border-bottom-color: #e6d4ea88; }
+.map-link strong { font-size: 40px; letter-spacing: -0.03em; }
+@media (min-width: 801px) {
+  .spatial-field { grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.7fr); grid-template-rows: repeat(4, auto); align-content: center; align-items: center; gap: 0 80px; max-width: 1120px; }
+  .home-intro { grid-column: 1; grid-row: 1 / span 4; align-self: center; padding: 0 8% 0 0; }
+  .human-destination, .work-destination, .notes-destination, .contact-destination { grid-column: 2; width: 100%; max-width: none; justify-self: stretch; }
+  .human-destination { grid-row: 1; }
+  .work-destination { grid-row: 2; }
+  .notes-destination { grid-row: 3; }
+  .contact-destination { grid-row: 4; }
+  .destination > div { display: grid; grid-template-columns: 84px minmax(0, 1fr); align-items: center; column-gap: 18px; width: 100%; animation: none; }
+  .notes-destination .note-fragment { display: none; }
+  .notes-destination .destination-label { grid-column: 1 / -1; }
+  .destination { width: 100%; padding: 16px 0; border-top: 1px solid #d8c8e62e; }
+  .contact-destination { border-bottom: 1px solid #d8c8e62e; }
+  .destination-label, .human-destination .destination-label, .work-destination .destination-label, .notes-destination .destination-label, .contact-destination .destination-label { margin: 0; }
+  .destination-name { font-size: 28px; line-height: 1.1; }
+  .signature-fragment { width: 76px; margin: 0; }
+  .project-constellation { width: 84px; margin: 0; }
+  .note-fragment { width: auto; padding: 0; transform: none; background: none; border: 0; box-shadow: none; }
+  .note-fragment:after, .note-topline, .note-rule { display: none; }
+  .note-quote { margin: 0; font-size: 13px; line-height: 1.35; font-family: var(--sans); }
+  .contact-beacon { width: 58px; height: 58px; margin: 0; }
+  .contact-beacon svg { width: 46px; height: 46px; inset: 6px; }
+  .beacon-core { inset: 22px; }
+  .home-threads { opacity: .28; }
+  .contact-space { align-items: flex-start; text-align: left; padding-left: 4vw; }
+  .email-row, .social-links { justify-content: flex-start; }
+}
+@media (min-width: 801px) and (max-height: 760px) {
+  .destination { padding: 8px 0; }
+  .destination-name { font-size: 22px; }
+  .home-intro h1 { font-size: clamp(60px, 7vw, 88px); }
+  .signature-fragment { width: 58px; }
+  .project-constellation { width: 68px; }
+}
