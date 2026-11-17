@@ -384,3 +384,20 @@ em { font-weight:400; }
   .orbit-navigation { bottom:29px; height:54px; }
 }
 @media(prefers-reduced-motion:reduce) { .cursor-aura { display:none; } .essay-orbit,.signature-object,.project-art-plane { transition:none; animation:none; } }
+
+/* Hallmark v2.0.0. built: the project. redesign: polish. The tracked capital labels and the single italic word in each headline were the generated tells. Layout, colour and motion stay. */
+.eyebrow,.quiet-label,.tiny-coordinate,.destination-number,.note-topline,.location,.project-kicker,.reader-kicker,.map-link>span,.reader-toolbar .eyebrow,.dialog-header>.eyebrow,.about-signature figcaption>span:first-child {
+  font-family: var(--sans);
+  letter-spacing: 0;
+  text-transform: none;
+}
+h1 em,h2 em,.note-quote em,.map-link em {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+.about-interests { gap: 16px; }
+.scene-overline { flex-wrap: wrap; row-gap: 6px; }
+.quiet-label { margin-left: auto; max-width: 100%; }

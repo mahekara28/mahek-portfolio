@@ -12,7 +12,7 @@ function updateMotion(){
 function toast(text){clearTimeout(toastTimer);$('#toast').textContent=text;$('#toast').classList.add('visible');toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200);}
 reducedMotion.addEventListener('change',updateMotion);updateMotion();sky=createUniverse(isPaused);
 
-const sceneTitles={universe:'A UNIVERSE IN PROGRESS',work:'EXPLORING / THE WORK',about:'EXPLORING / THE HUMAN',notes:'EXPLORING / THE NOTES',contact:'EXPLORING / A CONNECTION'};
+const sceneTitles={universe:'A universe in progress',work:'The work',about:'The human',notes:'The notes',contact:'A connection'};
 function routeScene(name,immediate=false){
   if(!sceneTitles[name])name='universe';
   const id=++transitionId,previous=$(`#scene-${activeScene}`),next=$(`#scene-${name}`);
@@ -137,7 +137,7 @@ $('#previous-project').addEventListener('click',()=>shiftProject(-1));$('#next-p
 document.addEventListener('keydown',e=>{if(activeScene!=='work'||$('dialog[open]')||e.altKey||e.ctrlKey||e.metaKey)return;if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();shiftProject(e.key==='ArrowRight'?1:-1);}});
 function showReader(label,html){$('#reader-label').textContent=label;$('#reader-content').innerHTML=html;openDialog($('#reader'));}
 function openProject(p){
-  showReader('PROJECT NOTES / '+p.title.toUpperCase(),`<p class="reader-kicker">${escape(p.category.toUpperCase())} · ${escape(p.status.toUpperCase())}</p><h2 id="reader-title">${escape(p.title)}</h2><p class="reader-lede">${escape(p.question)}</p><div class="reader-steps">${p.steps.map((s,i)=>`<div><span>0${i+1}</span>${escape(s)}</div>`).join('')}</div><h3>What I built</h3><p>${escape(p.description)}</p><p>${escape(p.approach)}</p><div class="reader-boundary"><h3>Scope & current limits</h3><p>${escape(p.boundary)}</p></div><h3>Under the hood</h3><div class="reader-links">${p.evidence.map(item=>`<a href="${escape(p.github)}/blob/${encodeURIComponent(p.revision)}/${item.path.split('/').map(encodeURIComponent).join('/')}" target="_blank" rel="noreferrer">${escape(item.label)}</a>`).join('')}</div><a class="text-link" href="${escape(p.github)}" target="_blank" rel="noreferrer">Explore the repository</a>`);
+  showReader('Project notes, '+p.title,`<p class="reader-kicker">${escape(p.category)}, ${escape(p.status)}</p><h2 id="reader-title">${escape(p.title)}</h2><p class="reader-lede">${escape(p.question)}</p><div class="reader-steps">${p.steps.map((s,i)=>`<div><span>0${i+1}</span>${escape(s)}</div>`).join('')}</div><h3>What I built</h3><p>${escape(p.description)}</p><p>${escape(p.approach)}</p><div class="reader-boundary"><h3>Scope & current limits</h3><p>${escape(p.boundary)}</p></div><h3>Under the hood</h3><div class="reader-links">${p.evidence.map(item=>`<a href="${escape(p.github)}/blob/${encodeURIComponent(p.revision)}/${item.path.split('/').map(encodeURIComponent).join('/')}" target="_blank" rel="noreferrer">${escape(item.label)}</a>`).join('')}</div><a class="text-link" href="${escape(p.github)}" target="_blank" rel="noreferrer">Explore the repository</a>`);
 }
 function readingTime(note){const words=note.sections.flatMap(s=>[...(s.paragraphs||[]),...(s.paragraphsAfterMedia||[])]).join(' ').trim().split(/\s+/).length;return Math.max(1,Math.ceil(words/220));}
 function renderArticles(){
@@ -162,7 +162,7 @@ function articleMedia(type){
 function openArticle(slug){
   const n=data.notes.find(n=>n.slug===slug);if(!n)return;
   const refs=items=>`<ul class="article-references">${items.map(r=>`<li><a href="${escape(r.href)}" target="_blank" rel="noreferrer">${escape(r.title)}</a></li>`).join('')}</ul>`;
-  showReader('TRANSMISSIONS / '+n.topic.toUpperCase(),`<p class="reader-kicker">BY MAHEK ARA</p><h2 id="reader-title">${escape(n.title)}</h2><p class="reader-lede">${escape(n.description)}</p><nav class="article-contents" aria-label="Article sections">${n.sections.map(s=>`<a href="#article-${escape(s.id)}">${escape(s.label)}</a>`).join('')}</nav>${n.sections.map(s=>`<section class="article-section" id="article-${escape(s.id)}"><h3>${escape(s.title||s.label)}</h3>${s.paragraphs.map(p=>`<p>${escape(p)}</p>`).join('')}${s.example?`<div class="article-example"><strong>${escape(s.example.label)}</strong><p>${escape(s.example.text)}</p></div>`:''}${s.media?articleMedia(s.media):''}${(s.paragraphsAfterMedia||[]).map(p=>`<p>${escape(p)}</p>`).join('')}${s.references?refs(s.references):''}</section>`).join('')}${n.sources.length?`<section class="article-section"><h3>References & further reading</h3>${refs(n.sources)}</section>`:''}`);
+  showReader(n.topic,`<p class="reader-kicker">By Mahek Ara</p><h2 id="reader-title">${escape(n.title)}</h2><p class="reader-lede">${escape(n.description)}</p><nav class="article-contents" aria-label="Article sections">${n.sections.map(s=>`<a href="#article-${escape(s.id)}">${escape(s.label)}</a>`).join('')}</nav>${n.sections.map(s=>`<section class="article-section" id="article-${escape(s.id)}"><h3>${escape(s.title||s.label)}</h3>${s.paragraphs.map(p=>`<p>${escape(p)}</p>`).join('')}${s.example?`<div class="article-example"><strong>${escape(s.example.label)}</strong><p>${escape(s.example.text)}</p></div>`:''}${s.media?articleMedia(s.media):''}${(s.paragraphsAfterMedia||[]).map(p=>`<p>${escape(p)}</p>`).join('')}${s.references?refs(s.references):''}</section>`).join('')}${n.sources.length?`<section class="article-section"><h3>References & further reading</h3>${refs(n.sources)}</section>`:''}`);
   $$('.article-contents a').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();$(a.getAttribute('href'),$('#reader'))?.scrollIntoView({behavior:isPaused()?'instant':'smooth',block:'start'});}));
 }
 async function loadContent(){
@@ -171,7 +171,7 @@ async function loadContent(){
     const order=['context-relay','aura-linkedin','build-buy-borrow'];
     projects=order.map(id=>data.projects.find(p=>p.id===id)).filter(Boolean);
     renderProject();renderArticles();
-    $('#project-list').innerHTML=projects.map((p,i)=>`<button class="project-list-item" data-project-index="${i}"><span>${String(i+1).padStart(2,'0')}</span><div><h3>${escape(p.title)}</h3><p>${escape(p.category)} · ${escape(p.status)}</p></div></button>`).join('');
+    $('#project-list').innerHTML=projects.map((p,i)=>`<button class="project-list-item" data-project-index="${i}"><span>${String(i+1).padStart(2,'0')}</span><div><h3>${escape(p.title)}</h3><p>${escape(p.category)}, ${escape(p.status)}</p></div></button>`).join('');
     $$('[data-project-index]').forEach(button=>button.addEventListener('click',()=>{projectIndex=Number(button.dataset.projectIndex);renderProject();$('#project-index').close();$('#scene-work').scrollTop=0;}));
     if(pendingNote)openArticle(pendingNote);
   }catch{
