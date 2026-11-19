@@ -15,6 +15,7 @@ export type Note = {
     example?: { label: string; text: string };
     diagram?: DiagramId;
     media?: "architecture" | "demo" | "agent-latency" | "agent-cloud-workload";
+    comparison?: { caption: string; columns: [string, string, string]; rows: [string, string, string][] };
     references?: { title: string; href: string }[];
   }[];
   sources: { title: string; href: string }[];
@@ -283,6 +284,101 @@ export const notes: Note[] = [
       { title: "Capture adapters and harness compatibility", href: `${relaySource}/docs/HARNESS_CONNECTIONS.md` },
       { title: "Workspace operations and optional model proposals", href: `${relaySource}/docs/WORKSPACE.md` },
       { title: "MCP architecture specification", href: "https://modelcontextprotocol.io/specification/2025-06-18/architecture" }
+    ]
+  },
+  {
+    slug: "inference-provider-evaluation",
+    title: "How I would compare inference providers for a real workload",
+    topic: "Inference field notes",
+    description: "A practical test for latency, cost and deployment fit, with a source-backed map of Simplismart, Modal and Baseten.",
+    date: "2026-11-20",
+    sections: [
+      {
+        id: "the-decision", title: "A faster model demo is not yet a buying decision", label: "The decision",
+        paragraphs: [
+          "An inference vendor can show an impressive latency number and still leave the buyer's hardest question unanswered: will this deployment meet our response-time target when the real traffic arrives, in the place our data is allowed to run, at a cost we can sustain? One median latency number cannot answer all three.",
+          "I started this comparison while studying how inference platforms describe themselves. Simplismart's published Ema case study reports a drop from 10 seconds to 0.9 seconds in median end-to-end routing latency after changes to batching, scheduling, kernels and scaling. That is a useful account of one customer's workload. It is not a controlled benchmark against another provider, and I would not present it as one.",
+          "A founder or buyer needs a decision record: the workload, the constraints, the options that qualify, the measurement method and the unresolved risks. The rest of this note is the evaluation I would use to produce that record."
+        ],
+        references: [{ title: "Simplismart's Ema case study", href: "https://simplismart.ai/case-study/from-10-seconds-to-1-how-ema-made-agentic-routing-feel-instant-with-simplismart" }]
+      },
+      {
+        id: "request-path", title: "First, separate the time spent waiting from the time spent generating", label: "Request path",
+        paragraphs: [
+          "For a streaming language model, the user sees a request path: network and gateway, admission or queue, prefill of the input, then token-by-token decode. Time to first token captures the wait until output begins; inter-token latency describes the pace after that. End-to-end latency includes the whole request. Those quantities change differently as load rises.",
+          "The measurement boundary matters. vLLM can report server-side queue time and time to first token after scheduling, while a client timer includes network and any time before the server admits the request. For a cross-provider comparison I would use the same client-side timer for every endpoint and treat server metrics as diagnostic evidence when available. I would record p50 and p95, not just a single mean.",
+          "A burst adds another path: if no suitable replica is ready, the request waits for scale-up or fails. Keeping a warm replica reduces that risk but changes the bill. A fair comparison therefore measures steady traffic, a burst, and the first request after idle separately."
+        ],
+        diagram: "inference",
+        references: [
+          { title: "vLLM per-request timing definitions", href: "https://docs.vllm.ai/en/latest/features/per_request_metrics/" },
+          { title: "Modal on warm capacity and scale to zero", href: "https://modal.com/docs/guide/scale" }
+        ]
+      },
+      {
+        id: "workload-contract", title: "Write the workload contract before opening a pricing page", label: "Workload contract",
+        paragraphs: [
+          "Here is an illustrative support-copilot brief, not measured customer traffic: a fixed model and revision; a representative distribution of 1,200-token inputs and 180-token outputs; four requests per second normally, with a short twenty-request-per-second peak; streaming responses; a p95 first-token target and a p95 completion target; and a requirement to keep prompts in a specified cloud account. The exact thresholds would come from the product owner. The point is to make them explicit before testing.",
+          "The run record should keep model revision, tokenizer, sampling settings, precision, hardware, prompt set, output lengths, request arrival pattern, concurrency, region and deployment mode. If two providers cannot run the same model or the same data boundary, I would compare product fit and operating responsibilities, not publish a latency ranking. Different models can be a separate quality-versus-cost decision, but they are not a clean serving comparison.",
+          "vLLM's benchmark tooling supports controlled request rates, concurrency limits and burstiness. For a hosted endpoint, the client may need a separate load generator, but the principle is the same: use the same arrival trace, warm-up policy and success criteria for each eligible path. Keep failed and throttled requests in the results."
+        ],
+        references: [{ title: "vLLM benchmark load patterns", href: "https://docs.vllm.ai/en/latest/benchmarking/cli/" }]
+      },
+      {
+        id: "market-map", title: "Compare operating boundaries before claiming a winner", label: "Market map",
+        paragraphs: [
+          "Public documentation establishes a useful first cut. Simplismart offers shared and dedicated serving, managed infrastructure inside a customer's cloud, and an imported Kubernetes path. Modal documents shared and dedicated endpoints on Modal-managed capacity, with configurable scale-to-zero for dedicated endpoints. Baseten describes managed cloud, dedicated and self-hosted deployments in a customer's VPC. These are vendor descriptions of available paths, not proof that any one path is faster for the same task.",
+          "This matters for positioning. 'We support BYOC' alone is not a defensible distinction when another provider offers self-hosted deployment. The sharper question is what the team owns in each mode: cluster provisioning, model optimization, autoscaling policy, observability, support and the commercial commitment. Simplismart's own BYOC guide distinguishes its managed-cluster path from importing an existing cluster; that difference belongs in the buyer's evaluation."
+        ],
+        comparison: {
+          caption: "Public product paths as of 20 November 2026. Capability and contract details should be confirmed in a vendor trial.",
+          columns: ["Platform", "Documented deployment paths", "Question to resolve"],
+          rows: [
+            ["Simplismart", "Shared, dedicated, managed BYOC, imported Kubernetes", "Who owns node scaling, optimization and incident response in the chosen mode?"],
+            ["Modal", "Shared and dedicated endpoints on managed capacity", "How do warm replicas and scale-to-zero affect p95 and monthly cost?"],
+            ["Baseten", "Managed cloud, dedicated and self-hosted VPC", "Which data and control-plane boundaries apply to the proposed contract?"]
+          ]
+        },
+        references: [
+          { title: "Simplismart BYOC operating modes", href: "https://simplismart.ai/blog/byoc-ai-infrastructure" },
+          { title: "Modal endpoint modes", href: "https://modal.com/docs/guide/endpoints" },
+          { title: "Baseten deployment boundaries", href: "https://www.baseten.co/security/" }
+        ]
+      },
+      {
+        id: "economic-test", title: "Count qualified requests, not only cheap tokens", label: "Economic test",
+        paragraphs: [
+          "For each candidate, I would report successful requests per second that satisfy both latency targets. That is the useful throughput for this product, rather than raw generated tokens per second. My working cost measure is total inference spend during the observation window divided by the number of successful, target-compliant requests. The numerator includes token or compute charges, warm capacity, platform fees and any separately billed supporting infrastructure. The denominator excludes errors and requests that miss the agreed target, but the report still shows those failures explicitly.",
+          "That calculation should be repeated at normal load, peak load and after idle. A low per-token price can coexist with high queue delay. An always-warm deployment can have excellent response time and poor utilization. A scale-to-zero path can look cheap until cold-start failures are counted. The right result is a feasible region: which options meet the workload contract, and at what fully loaded cost?",
+          "I made a blank run sheet for this analysis. It records assumptions, measured p50 and p95 values, errors, spend, evidence links and open questions in one row per run. It contains no invented benchmark results."
+        ],
+        example: { label: "Decision metric, computed for each comparable run", text: "qualified_request_cost = total_inference_spend / successful_requests_meeting_both_latency_targets\n\nReport alongside: error rate, p95 first-token time, p95 end-to-end time, and qualified requests per second." },
+        references: [
+          { title: "Download the blank inference run sheet", href: "/downloads/inference-run-sheet.csv" },
+          { title: "vLLM goodput and latency metrics", href: "https://docs.vllm.ai/en/latest/benchmarking/cli/" }
+        ]
+      },
+      {
+        id: "founder-brief", title: "What I would hand the founder", label: "Founder brief",
+        paragraphs: [
+          "My one-page brief would start with the customer workload and the decision deadline. It would show the eligible deployment paths, a link to each measured run, the cost per qualified request, and the reason any option was excluded. It would end with one recommendation and the next experiment needed to reduce uncertainty. No traffic trace, no comparable result: no winner.",
+          "For Simplismart, the first research hypothesis I would test is whether buyers with bursty traffic and a fixed data perimeter value one team that can tune serving and operate the deployment across their chosen infrastructure. The Ema case study and the BYOC guide make that a plausible positioning angle, but it remains a hypothesis until customer interviews and matched trials test it. A small, evidence-led operating process would give the founding team a better answer than another generic comparison chart."
+        ],
+        references: [
+          { title: "Simplismart's infrastructure thesis", href: "https://simplismart.ai/blog/nvidia-backs-our-14m-series-b" },
+          { title: "Simplismart's Ema case study", href: "https://simplismart.ai/case-study/from-10-seconds-to-1-how-ema-made-agentic-routing-feel-instant-with-simplismart" }
+        ]
+      }
+    ],
+    sources: [
+      { title: "Simplismart: Ema routing case study", href: "https://simplismart.ai/case-study/from-10-seconds-to-1-how-ema-made-agentic-routing-feel-instant-with-simplismart" },
+      { title: "Simplismart: BYOC infrastructure modes", href: "https://simplismart.ai/blog/byoc-ai-infrastructure" },
+      { title: "Simplismart: platform and inference positioning", href: "https://simplismart.ai/blog/nvidia-backs-our-14m-series-b" },
+      { title: "Modal: shared and dedicated endpoints", href: "https://modal.com/docs/guide/endpoints" },
+      { title: "Modal: autoscaling and warm capacity", href: "https://modal.com/docs/guide/scale" },
+      { title: "Baseten: managed, dedicated and self-hosted deployment", href: "https://www.baseten.co/security/" },
+      { title: "vLLM: per-request metrics", href: "https://docs.vllm.ai/en/latest/features/per_request_metrics/" },
+      { title: "vLLM: benchmark load patterns", href: "https://docs.vllm.ai/en/latest/benchmarking/cli/" }
     ]
   }
 ];

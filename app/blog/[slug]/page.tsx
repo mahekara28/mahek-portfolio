@@ -67,8 +67,21 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
               </figure>}
               {section.paragraphsAfterMedia?.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
               {section.diagram && <ArticleDiagram id={section.diagram} />}
+              {section.comparison && <figure className="md-article-comparison">
+                <div className="md-article-comparison-scroll" tabIndex={0} role="region" aria-label="Inference platform comparison; scroll horizontally on small screens">
+                  <table>
+                    <thead><tr>{section.comparison.columns.map(column => <th key={column} scope="col">{column}</th>)}</tr></thead>
+                    <tbody>{section.comparison.rows.map(([platform, paths, question]) => <tr key={platform}>
+                      <th scope="row">{platform}</th><td>{paths}</td><td>{question}</td>
+                    </tr>)}</tbody>
+                  </table>
+                </div>
+                <figcaption>{section.comparison.caption}</figcaption>
+              </figure>}
               {section.example && <figure className="md-article-example"><figcaption><span>{section.example.label}</span><CopyButton text={section.example.text} /></figcaption><pre>{section.example.text}</pre></figure>}
-              {section.references && <p className="md-section-references">{section.references.map(source => <a key={source.href} href={source.href} target="_blank" rel="noreferrer">{source.title}</a>)}</p>}
+              {section.references && <p className="md-section-references">{section.references.map(source => source.href.startsWith("/")
+                ? <a key={source.href} href={source.href} download>{source.title}</a>
+                : <a key={source.href} href={source.href} target="_blank" rel="noreferrer">{source.title}</a>)}</p>}
             </section>
           ))}
           <section className="md-sources" id="sources" tabIndex={-1} aria-labelledby="sources-title">

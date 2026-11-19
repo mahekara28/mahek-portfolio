@@ -1,4 +1,4 @@
-type DiagramId = "projection" | "handoff";
+type DiagramId = "projection" | "handoff" | "inference";
 
 type Node = { x: number; y: number; w: number; h: number; tag: string; title: string; detail: string; tone?: "mint" | "rose" | "sand" };
 type Edge = { x1: number; y1: number; x2: number; y2: number; label?: string; dashed?: boolean };
@@ -44,6 +44,27 @@ const diagrams: Record<DiagramId, Diagram> = {
       { x1: 605, y1: 122, x2: 605, y2: 220, label: "inspect" },
       { x1: 520, y1: 261, x2: 440, y2: 261, label: "pass" },
       { x1: 310, y1: 122, x2: 165, y2: 220, label: "stale", dashed: true },
+    ],
+  },
+  inference: {
+    title: "Inference request path and the capacity decision",
+    description: "A request passes through a gateway and queue, input prefill, then token decode. Replica readiness and scaling affect queue delay; spend and successful responses determine cost per qualified request.",
+    caption: "Measure from the client for a cross-provider comparison. Server timing helps explain whether the wait came from queuing, prefill or decode.",
+    source: { label: "vLLM timing definitions", href: "https://docs.vllm.ai/en/latest/features/per_request_metrics/" },
+    nodes: [
+      { x: 18, y: 48, w: 150, h: 78, tag: "ARRIVAL", title: "Request", detail: "network + gateway" },
+      { x: 202, y: 48, w: 150, h: 78, tag: "WAIT", title: "Admission", detail: "queue or reject", tone: "rose" },
+      { x: 386, y: 48, w: 150, h: 78, tag: "COMPUTE", title: "Prefill", detail: "process input", tone: "sand" },
+      { x: 570, y: 48, w: 150, h: 78, tag: "STREAM", title: "Decode", detail: "tokens over time", tone: "mint" },
+      { x: 202, y: 220, w: 150, h: 78, tag: "CAPACITY", title: "Replica ready?", detail: "warm or scale-up", tone: "sand" },
+      { x: 478, y: 220, w: 242, h: 78, tag: "DECISION", title: "Qualified requests", detail: "SLO passes / total spend", tone: "mint" },
+    ],
+    edges: [
+      { x1: 168, y1: 87, x2: 202, y2: 87 },
+      { x1: 352, y1: 87, x2: 386, y2: 87 },
+      { x1: 536, y1: 87, x2: 570, y2: 87 },
+      { x1: 277, y1: 220, x2: 277, y2: 126, label: "affects" },
+      { x1: 645, y1: 126, x2: 600, y2: 220, label: "measure" },
     ],
   },
 };

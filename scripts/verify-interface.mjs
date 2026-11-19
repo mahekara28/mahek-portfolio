@@ -222,12 +222,19 @@ try {
   await expect(page.locator("#relay-recording")).toHaveAttribute("src", /workflow\.gif$/);
   await page.getByRole("button", { name: "Stop demo", exact: true }).click();
   await expect(page.locator("#relay-recording")).toHaveAttribute("src", /threads\.png$/);
+  await visit("/blog/inference-provider-evaluation");
+  await expect(page.locator(".md-article-comparison tbody tr")).toHaveCount(3);
+  await expect(page.getByRole("navigation", { name: "On this page" }).getByRole("link", { name: /Market map/ })).toHaveAttribute("href", "#market-map");
+  await expect(page.getByRole("link", { name: "Download the blank inference run sheet" })).toHaveAttribute("href", "/downloads/inference-run-sheet.csv");
+  await layout("inference article / desktop / graphite");
+  await page.screenshot({ path: ".qa/inference-article.png", fullPage: true });
   for (const note of notes) {
     await visit("/blog/" + note.slug);
     await expect(page.locator("h1")).toHaveText(note.title);
     const articleText = await page.locator("article").innerText();
     if (note.slug === "context-relay") assert(articleText.split(/\s+/).length > 1200, "Deep dive includes the complete implementation path");
     await expect(page.locator(".md-architecture svg[role=img]")).toHaveCount(note.sections.filter(section => section.diagram).length);
+    if (note.slug === "inference-provider-evaluation") assert(articleText.split(/\s+/).length > 900, "Inference article has a substantive analysis");
     for (const svg of await page.locator(".md-architecture svg").all()) {
       assert((await svg.locator("title").textContent()).length > 20, "Diagram has a descriptive title");
       assert((await svg.locator("desc").textContent()).length > 80, "Diagram has a text equivalent");
@@ -296,6 +303,10 @@ try {
       await diagram.focus();
       await page.keyboard.press("ArrowRight");
       await expect.poll(() => diagram.evaluate(el => el.scrollLeft)).toBeGreaterThan(0);
+    }
+    if (note.slug === "inference-provider-evaluation") {
+      const comparison = page.locator(".md-article-comparison-scroll");
+      assert(await comparison.evaluate(el => el.scrollWidth > el.clientWidth), "Comparison is horizontally inspectable on mobile");
     }
     await layout(note.slug + " diagrams / mobile");
   }
