@@ -3,7 +3,7 @@ export const links = {
   x: "https://x.com/mahekara28",
   linkedin: "https://www.linkedin.com/in/mahek-ara/",
   email: "mailto:mahekarabangi28@gmail.com",
-  resume: "https://drive.google.com/file/d/1ieDdXUTnlAKEhHyRuVNN0C0Y5Sn8vDR3/view?usp=sharing",
+  resume: "/resume/mahek-ara-bangi.pdf",
 };
 
 export const reviewedOn = "2026-10-24";

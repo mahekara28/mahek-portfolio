@@ -273,7 +273,8 @@ try {
   }
   await visit("/contact");
   await expect(page.locator(".md-email")).toHaveAttribute("href", links.email);
-  await expect(page.locator(".md-contact-links a")).toHaveCount(3);
+  await expect(page.locator(".md-contact-links a")).toHaveCount(4);
+  await expect(page.getByRole("link", { name: "Resume (PDF)" })).toHaveAttribute("href", links.resume);
   await visit("/about"); await expect(page).toHaveURL(baseURL + "/");
   await visit("/blog/working-context"); await expect(page).toHaveURL(baseURL + "/blog/context-relay");
   for (const retired of ["decision-assumptions", "inference-latency", "verify-the-result", "llm-routing"]) {

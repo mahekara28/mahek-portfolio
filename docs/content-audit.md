@@ -20,6 +20,13 @@ This was a source review, not an execution or security certification of each app
 - The existing Google Drive resume link is preserved. Automated browsing could
   not verify the document's sharing permissions or contents.
 
+November 2026 update: the public Google Drive resume was readable. A one-page
+version now links from Contact and is served from this site. Its employment,
+education and reporting metrics follow that resume; the Greenhouse, Wellfound
+and Glassdoor scheduling detail was confirmed by the user in this conversation.
+The inference article is a sourced evaluation method, not a measured vendor
+benchmark.
+
 ## Reviewed repositories
 
 | Project                                                                                                                                | Reviewed revision | Evidence and important limits                                                                                                                                                                                                                                                                                      |

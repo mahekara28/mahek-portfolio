@@ -11,6 +11,7 @@ export default function ContactPage() {
       <p className="md-intro">Questions about the code, something you’re working on, or just a hello — my inbox is open.</p>
       <a className="md-email" href={links.email}>mahekarabangi28@gmail.com</a>
       <nav className="md-contact-links" aria-label="Contact profiles">
+        <a href={links.resume} download="Mahek_Ara_Bangi_Resume.pdf">Resume (PDF)</a>
         <a href={links.github} target="_blank" rel="noreferrer">GitHub</a>
         <a href={links.x} target="_blank" rel="noreferrer">X / Twitter</a>
         <a href={links.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
