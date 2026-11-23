@@ -1,17 +1,21 @@
 import type { DiagramId } from "../components/article-diagram";
 import { agentReliabilityNote } from "./agent-reliability-note";
 
+export type ArticleImage = { src: string; title: string; alt: string; width: number; height: number };
+
 export type NoteBlock =
-  | { type: "paragraph" | "heading"; text: string }
+  | { type: "paragraph" | "heading" | "quote"; text: string }
   | { type: "list" | "numbered"; items: string[] }
   | { type: "table"; columns: string[]; rows: string[][] }
-  | { type: "media"; media: "agent-reliability-chart" };
+  | ({ type: "image" | "probability-chart" } & ArticleImage)
+  | ({ type: "animated-image"; animation: string } & ArticleImage);
 
 export type Note = {
   slug: string;
   title: string;
   topic: string;
   description: string;
+  italicDescription?: boolean;
   date?: string;
   sections: {
     id: string;
@@ -27,6 +31,8 @@ export type Note = {
     references?: { title: string; href: string }[];
   }[];
   sources: { title: string; href: string }[];
+  sourcesHeading?: string;
+  sourceNote?: string;
 };
 
 const sources = {

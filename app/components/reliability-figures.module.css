@@ -1,0 +1,17 @@
+.chart { margin:30px 0; padding:clamp(16px,4vw,36px); background:#f5f1e6; color:#1c322e; border-radius:8px; }
+.chart figcaption { font:500 clamp(22px,4vw,36px)/1.2 Georgia,serif; }
+.control { display:grid; gap:4px; margin-block:20px; font-size:14px; }
+.control span, .controls { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+.control strong, .results dd { font-variant-numeric:tabular-nums; }
+.control input { width:100%; height:28px; accent-color:#126454; cursor:pointer; }
+.chart svg { display:block; width:100%; height:auto; overflow:visible; }
+.chart text { fill:#405b54; font:14px system-ui,sans-serif; }
+.results { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-block:14px; }
+.results div { border-top:3px solid; padding-top:5px; }
+.results dt { font-size:clamp(11px,2vw,15px); }
+.results dd { margin:0; font:clamp(20px,3vw,32px)/1.3 Georgia,serif; }
+.chart small { display:block; color:#405b54; font-size:12px; }
+.controls { justify-content:flex-start; flex-wrap:wrap; }
+.controls button { min-height:40px; padding:5px 14px; border:1px solid var(--rule); border-radius:5px; color:var(--paper-ink); background:var(--surface); cursor:pointer; }
+.controls button:hover { background:var(--surface-hover); }
+@media print { .controls, .control input { display:none; } }

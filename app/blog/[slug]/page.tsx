@@ -9,18 +9,30 @@ import { RecordedRelayDemo } from "../../components/recorded-relay-demo";
 import { AgentLatencyAnimation } from "../../components/agent-latency-animation";
 import { notes, readingTime, type NoteBlock } from "../../lib/writing";
 
+import { ReliabilityChart, ReliabilityLoop } from "../../components/reliability-figures";
+
+function inlineText(text: string) {
+  return text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g).map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**")) return <strong key={index}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("*") && part.endsWith("*")) return <em key={index}>{part.slice(1, -1)}</em>;
+    return part;
+  });
+}
+
 function ArticleBlockView({ block }: { block: NoteBlock }) {
   switch (block.type) {
-    case "paragraph": return <p>{block.text}</p>;
+    case "paragraph": return <p>{inlineText(block.text)}</p>;
+    case "quote": return <blockquote>{inlineText(block.text)}</blockquote>;
     case "heading": return <h3>{block.text}</h3>;
-    case "list": return <ul>{block.items.map(item => <li key={item}>{item}</li>)}</ul>;
-    case "numbered": return <ol>{block.items.map(item => <li key={item}>{item}</li>)}</ol>;
+    case "list": return <ul>{block.items.map(item => <li key={item}>{inlineText(item)}</li>)}</ul>;
+    case "numbered": return <ol>{block.items.map(item => <li key={item}>{inlineText(item)}</li>)}</ol>;
     case "table": return <div className="md-article-table-wrap"><table className="md-article-table"><thead><tr>{block.columns.map(column => <th scope="col" key={column}>{column}</th>)}</tr></thead><tbody>{block.rows.map(row => <tr key={row[0]}>{row.map((cell, index) => index === 0 ? <th scope="row" key={index}>{cell}</th> : <td key={index}>{cell}</td>)}</tr>)}</tbody></table></div>;
-    case "media": return <figure className="md-readme-architecture">
-      <a href="/images/agent-reliability-debt/reliability-chart.webp" target="_blank" rel="noreferrer" aria-label="Open full-size reliability chart">
-        <Image src="/images/agent-reliability-debt/reliability-chart.webp" width={1200} height={700} sizes="(max-width: 700px) 90vw, 850px" alt="Illustrative probability that all dependent steps succeed. At 99% per step, 100 steps have about a 36.6% chance of all succeeding, assuming independence and no recovery." />
+    case "probability-chart": return <ReliabilityChart image={block} />;
+    case "animated-image": return <ReliabilityLoop image={block} animation={block.animation} />;
+    case "image": return <figure className="md-readme-architecture">
+      <a href={block.src} target="_blank" rel="noreferrer" aria-label={`Open full-size figure: ${block.title}`}>
+        <Image src={block.src} width={block.width} height={block.height} sizes="(max-width: 700px) 90vw, 850px" alt={block.alt} />
       </a>
-      <figcaption>Illustrative calculation, not a production failure rate. Assumes independent steps and no recovery.</figcaption>
     </figure>;
   }
 }
@@ -53,7 +65,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
         <header className="md-article-header">
           <p className="md-eyebrow">{note.topic}</p>
           <h1>{note.title}</h1>
-          <p className="md-article-deck">{note.description}</p>
+          <p className="md-article-deck">{note.italicDescription ? <em>{note.description}</em> : note.description}</p>
           <div className="md-article-meta">
             <span>By Mahek Ara</span>
             {note.date && <time dateTime={note.date}>{new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" }).format(new Date(note.date))}</time>}
@@ -102,8 +114,9 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
             </section>
           ))}
           <section className="md-sources" id="sources" tabIndex={-1} aria-labelledby="sources-title">
-            <h2 id="sources-title">Sources & further reading</h2>
+            <h2 id="sources-title">{note.sourcesHeading ?? "Sources & further reading"}</h2>
             <ul>{note.sources.map(source => <li key={source.href}><a href={source.href} target="_blank" rel="noreferrer">{source.title}</a></li>)}</ul>
+            {note.sourceNote && <p><em>{note.sourceNote}</em></p>}
           </section>
         </div>
       </article>
