@@ -1,4 +1,11 @@
 import type { DiagramId } from "../components/article-diagram";
+import { agentReliabilityNote } from "./agent-reliability-note";
+
+export type NoteBlock =
+  | { type: "paragraph" | "heading"; text: string }
+  | { type: "list" | "numbered"; items: string[] }
+  | { type: "table"; columns: string[]; rows: string[][] }
+  | { type: "media"; media: "agent-reliability-chart" };
 
 export type Note = {
   slug: string;
@@ -12,6 +19,7 @@ export type Note = {
     label: string;
     paragraphs: string[];
     paragraphsAfterMedia?: string[];
+    blocks?: NoteBlock[];
     example?: { label: string; text: string };
     diagram?: DiagramId;
     media?: "architecture" | "demo" | "agent-latency" | "agent-cloud-workload";
@@ -175,6 +183,7 @@ const agentLatencyNote: Note = {
 export const relaySource = "https://github.com/mahekara28/context-relay/blob/4e52ada45c471f17a94b16b2d81ed6636495f0f7";
 
 export const notes: Note[] = [
+  agentReliabilityNote,
   agentCloudWorkloadNote,
   agentLatencyNote,
   {
@@ -384,6 +393,17 @@ export const notes: Note[] = [
 ];
 
 export function readingTime(note: Note) {
-  const words = note.sections.flatMap(section => [section.title ?? "", ...section.paragraphs, ...(section.paragraphsAfterMedia ?? []), section.example?.text ?? ""]).join(" ").trim().split(/\s+/).length;
+  const words = note.sections.flatMap(section => [
+    section.title ?? "",
+    ...section.paragraphs,
+    ...(section.paragraphsAfterMedia ?? []),
+    section.example?.text ?? "",
+    ...(section.blocks ?? []).flatMap(block => {
+      if ("text" in block) return [block.text];
+      if ("items" in block) return block.items;
+      if ("rows" in block) return [...block.columns, ...block.rows.flat()];
+      return [];
+    }),
+  ]).join(" ").trim().split(/\s+/).length;
   return `${Math.max(1, Math.ceil(words / 200))} min read`;
 }

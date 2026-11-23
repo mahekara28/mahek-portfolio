@@ -7,7 +7,23 @@ import { ArticleDiagram } from "../../components/article-diagram";
 import { ArticleContents } from "../../components/article-contents";
 import { RecordedRelayDemo } from "../../components/recorded-relay-demo";
 import { AgentLatencyAnimation } from "../../components/agent-latency-animation";
-import { notes, readingTime } from "../../lib/writing";
+import { notes, readingTime, type NoteBlock } from "../../lib/writing";
+
+function ArticleBlockView({ block }: { block: NoteBlock }) {
+  switch (block.type) {
+    case "paragraph": return <p>{block.text}</p>;
+    case "heading": return <h3>{block.text}</h3>;
+    case "list": return <ul>{block.items.map(item => <li key={item}>{item}</li>)}</ul>;
+    case "numbered": return <ol>{block.items.map(item => <li key={item}>{item}</li>)}</ol>;
+    case "table": return <div className="md-article-table-wrap"><table className="md-article-table"><thead><tr>{block.columns.map(column => <th scope="col" key={column}>{column}</th>)}</tr></thead><tbody>{block.rows.map(row => <tr key={row[0]}>{row.map((cell, index) => index === 0 ? <th scope="row" key={index}>{cell}</th> : <td key={index}>{cell}</td>)}</tr>)}</tbody></table></div>;
+    case "media": return <figure className="md-readme-architecture">
+      <a href="/images/agent-reliability-debt/reliability-chart.webp" target="_blank" rel="noreferrer" aria-label="Open full-size reliability chart">
+        <Image src="/images/agent-reliability-debt/reliability-chart.webp" width={1200} height={700} sizes="(max-width: 700px) 90vw, 850px" alt="Illustrative probability that all dependent steps succeed. At 99% per step, 100 steps have about a 36.6% chance of all succeeding, assuming independence and no recovery." />
+      </a>
+      <figcaption>Illustrative calculation, not a production failure rate. Assumes independent steps and no recovery.</figcaption>
+    </figure>;
+  }
+}
 
 export const dynamicParams = false;
 export function generateStaticParams() { return notes.map(({ slug }) => ({ slug })); }
@@ -50,6 +66,7 @@ export default async function NotePage({ params }: { params: Promise<{ slug: str
             <section key={section.id} id={section.id} tabIndex={-1}>
               {section.title && <h2>{section.title}</h2>}
               {section.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}
+              {section.blocks?.map((block, index) => <ArticleBlockView block={block} key={index} />)}
               {section.media === "architecture" && <figure className="md-readme-architecture">
                 <picture>
                   <source media="(max-width: 700px)" srcSet="/images/context-relay/architecture-mobile.svg" width={640} height={1110} />
